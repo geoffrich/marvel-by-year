@@ -2,6 +2,8 @@
 	import type { Comic } from '$lib/types/marvel';
 	import { default as dayjs } from 'dayjs';
 
+	// TODO: bring up more details on separate page
+
 	export let comic: Comic;
 
 	$: onSaleDate = dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date)

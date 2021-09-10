@@ -140,7 +140,7 @@
 <h1>Comics for {year}</h1>
 <details open>
 	<summary>Filter</summary>
-	<p>Displaying {filteredComics.length} of {comics.length} comics</p>
+	<p>Displaying {filteredComics.length} of {comics.length} comics (Total: {data.data.total})</p>
 	<label>Search <input type="text" bind:value={searchText} /></label>
 	<label for="sorting">Sort by</label>
 	<select id="sorting" bind:value={sortBy}>

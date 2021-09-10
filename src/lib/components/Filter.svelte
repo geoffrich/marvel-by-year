@@ -29,8 +29,10 @@
 {#if items.length > 1}
 	<fieldset>
 		<legend>{legend} {$included.size} / {items.length}</legend>
-		<button on:click={checkAll}>Check all</button>
-		<button on:click={uncheckAll}>Uncheck all</button>
+		<div class="buttons">
+			<button on:click={checkAll}>Check all</button>
+			<button on:click={uncheckAll}>Uncheck all</button>
+		</div>
 		{#each items as i (i)}
 			<!-- TODO: count of comics with this filter -->
 			<label
@@ -50,5 +52,13 @@
 		max-height: 300px;
 		overflow: auto;
 		align-self: start;
+		position: relative;
+	}
+
+	.buttons {
+		position: sticky;
+		top: 0;
+		background: white;
+		padding: 0.25rem;
 	}
 </style>
