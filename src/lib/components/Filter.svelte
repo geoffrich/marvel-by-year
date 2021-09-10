@@ -26,18 +26,20 @@
 	}
 </script>
 
-<fieldset>
-	<legend>{legend} {$included.size} / {items.length}</legend>
-	<button on:click={checkAll}>Check all</button>
-	<button on:click={uncheckAll}>Uncheck all</button>
-	{#each items as i (i)}
-		<!-- TODO: count of comics with this filter -->
-		<label
-			><input on:change={handleChange} type="checkbox" checked={$included.has(i)} value={i} />
-			{i}</label
-		>
-	{/each}
-</fieldset>
+{#if items.length > 1}
+	<fieldset>
+		<legend>{legend} {$included.size} / {items.length}</legend>
+		<button on:click={checkAll}>Check all</button>
+		<button on:click={uncheckAll}>Uncheck all</button>
+		{#each items as i (i)}
+			<!-- TODO: count of comics with this filter -->
+			<label
+				><input on:change={handleChange} type="checkbox" checked={$included.has(i)} value={i} />
+				{i}</label
+			>
+		{/each}
+	</fieldset>
+{/if}
 
 <style>
 	label {

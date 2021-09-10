@@ -24,7 +24,7 @@
 	}
 
 	li {
-		background-color: lightblue;
+		background-color: var(--secondary);
 	}
 
 	a {

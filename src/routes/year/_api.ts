@@ -22,7 +22,6 @@ export async function getComics(year: string, page: number = 0): Promise<ComicDa
 
 	const url = new URL('https://gateway.marvel.com:443/v1/public/comics');
 	url.search = new URLSearchParams(params).toString();
-	console.log(url.toString());
 
 	const result = await fetch(url.toString());
 	const parsedResult = await result.json();

@@ -2,15 +2,16 @@
 	/**
 	 * @type {import('@sveltejs/kit').Load}
 	 */
-	export async function load({ page, fetch, session, context }) {
+	export async function load({ page, fetch }) {
 		const url = `/year/${page.params.year}.json`;
-		const res = await fetch(url);
+		const res = await fetch(url, { credentials: 'omit' });
 
 		if (res.ok) {
 			return {
 				props: {
 					data: await res.json()
-				}
+				},
+				maxage: 86400
 			};
 		}
 
@@ -44,7 +45,18 @@
 	$: selectedSeries = writable(new Set(series));
 
 	// TODO: is there a way to update these based on the other selections?
-	$: creators = [...new Set(comics.flatMap((c) => c.creators.items.map((cr) => cr.name)))].sort();
+	$: creators = [
+		...new Set(
+			comics.flatMap((c) => {
+				const creators = c.creators.items;
+				if (creators.length > 0) {
+					return creators.map((cr) => cr.name);
+				} else {
+					return ['(unknown)'];
+				}
+			})
+		)
+	].sort();
 	$: selectedCreators = writable(new Set(creators));
 
 	$: events = [
@@ -101,10 +113,26 @@
 			(c) =>
 				(searchText ? c.title.toUpperCase().includes(searchText.toUpperCase()) : true) &&
 				selectedSeries.has(c.series.name) &&
-				// TODO: handle no creators
-				c.creators.items.find((cr) => selectedCreators.has(cr.name)) !== undefined &&
-				(c.events.items.find((cr) => selectedEvents.has(cr.name)) !== undefined ||
-					(selectedEvents.has('(no event)') && c.events.items.length === 0))
+				isCreatorSelected(c, selectedCreators) &&
+				isEventSelected(c, selectedEvents)
+		);
+	}
+
+	function isEventSelected(comic: Comic, selectedEvents: Set<string>) {
+		const eventList = comic.events.items;
+
+		return (
+			eventList.find((e) => selectedEvents.has(e.name)) !== undefined ||
+			(selectedEvents.has('(no event)') && eventList.length === 0)
+		);
+	}
+
+	function isCreatorSelected(comic: Comic, selectedCreators: Set<string>) {
+		const creatorList = comic.creators.items;
+
+		return (
+			creatorList.find((e) => selectedCreators.has(e.name)) !== undefined ||
+			(selectedCreators.has('(unknown)') && creatorList.length === 0)
 		);
 	}
 </script>
