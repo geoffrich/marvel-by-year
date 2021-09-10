@@ -147,7 +147,7 @@
 		gap: 1rem;
 	}
 
-	@media screen and (min-width: 332px) {
+	@media screen and (min-width: 450px) {
 		ul {
 			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 		}

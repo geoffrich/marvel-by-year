@@ -45,7 +45,8 @@
 	}
 
 	fieldset {
-		height: 300px;
+		max-height: 300px;
 		overflow: auto;
+		align-self: start;
 	}
 </style>

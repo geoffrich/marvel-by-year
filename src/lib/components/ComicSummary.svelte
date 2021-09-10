@@ -45,6 +45,7 @@
 	</a>
 	<p><a href={detailUrl}>{comic.title}</a></p>
 	<p>{onSaleDate}</p>
+	<!-- TODO: click to expand? -->
 	<p>By {creatorText}</p>
 </div>
 
@@ -57,7 +58,7 @@
 	}
 
 	/* There might be a more elegant way, but this number was chosen to line up with the grid sizing */
-	@media screen and (min-width: 332px) {
+	@media screen and (min-width: 450px) {
 		.container {
 			display: flex;
 			flex-direction: column;
