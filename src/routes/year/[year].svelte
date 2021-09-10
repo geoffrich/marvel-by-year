@@ -23,60 +23,89 @@
 
 <script lang="ts">
 	import { page } from '$app/stores';
-	import type { ComicDataWrapper } from '$lib/types/marvel';
+	import { writable } from 'svelte/store';
+	import type { ComicDataWrapper, Comic } from '$lib/types/marvel';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
+	import Filter from '$lib/components/Filter.svelte';
+	import { default as dayjs } from 'dayjs';
 
 	export let data: ComicDataWrapper;
 
 	let year = $page.params.year;
 
+	const sortingOptions = ['name', 'date'];
+
+	let sortBy = 'date';
+
 	$: comics = data.data.results;
+
 	$: series = [...new Set(comics.map((c) => c.series.name))].sort();
+	$: selectedSeries = writable(new Set(series));
 
-	$: selectedSeries = new Set(series);
+	$: creators = [...new Set(comics.flatMap((c) => c.creators.items.map((cr) => cr.name)))].sort();
+	$: selectedCreators = writable(new Set(creators));
 
-	function handleChange({ target }) {
-		if (target.checked) {
-			selectedSeries.add(target.value);
-		} else {
-			selectedSeries.delete(target.value);
+	$: events = [
+		...new Set(
+			comics.flatMap((c) => {
+				const events = c.events.items;
+				if (events.length > 0) {
+					return events.map((e) => e.name);
+				} else {
+					return ['(no event)'];
+				}
+			})
+		)
+	].sort();
+	$: selectedEvents = writable(new Set(events));
+
+	$: filteredComics = comics.filter(
+		// TODO: this is gross
+		(c) =>
+			$selectedSeries.has(c.series.name) &&
+			c.creators.items.find((cr) => $selectedCreators.has(cr.name)) !== undefined &&
+			(c.events.items.find((cr) => $selectedEvents.has(cr.name)) !== undefined ||
+				($selectedEvents.has('(no event)') && c.events.items.length === 0))
+	);
+
+	$: sortedComics = filteredComics.sort((a, b) =>
+		sortBy === 'date' ? getComicDate(a).diff(getComicDate(b)) : compareStrings(a.title, b.title)
+	);
+
+	function getComicDate(comic: Comic) {
+		return dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date);
+	}
+
+	function compareStrings(a, b) {
+		if (a < b) {
+			return -1;
 		}
 
-		selectedSeries = selectedSeries;
-	}
+		if (a > b) {
+			return 1;
+		}
 
-	function uncheckAll() {
-		selectedSeries.clear();
-		selectedSeries = selectedSeries;
-	}
-
-	function checkAll() {
-		selectedSeries = new Set(series);
+		return 0;
 	}
 </script>
 
 <h1>Comics for {year}</h1>
-<details>
+<details open>
 	<summary>Filter</summary>
-	<fieldset>
-		<legend>Series</legend>
-		<button on:click={checkAll}>Check all</button>
-		<button on:click={uncheckAll}>Uncheck all</button>
-		{#each series as s (s)}
-			<label
-				><input
-					on:change={handleChange}
-					type="checkbox"
-					checked={selectedSeries.has(s)}
-					value={s}
-				/>
-				{s}</label
-			>
+	<label for="sorting">Sort by</label>
+	<select id="sorting" bind:value={sortBy}>
+		{#each sortingOptions as opt (opt)}
+			<option>{opt}</option>
 		{/each}
-	</fieldset>
+	</select>
+	<div class="filters">
+		<Filter items={series} legend="Series" included={selectedSeries} />
+		<Filter items={creators} legend="Creators" included={selectedCreators} />
+		<Filter items={events} legend="Events" included={selectedEvents} />
+	</div>
 </details>
 <ul>
-	{#each comics.filter((c) => selectedSeries.has(c.series.name)) as comic (comic.id)}
+	{#each sortedComics as comic (comic.id)}
 		<li>
 			<ComicSummary {comic} />
 		</li>
@@ -96,12 +125,8 @@
 		gap: 1rem;
 	}
 
-	label {
-		display: block;
-	}
-
-	fieldset {
-		height: 300px;
-		overflow: auto;
+	.filters {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	}
 </style>

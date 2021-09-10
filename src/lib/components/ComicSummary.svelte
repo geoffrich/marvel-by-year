@@ -32,18 +32,29 @@
 	}
 </script>
 
-<a href="https://read.marvel.com/#/book/{comic.digitalId}">
-	<img
-		loading="lazy"
-		src="{comic.thumbnail.path}.{comic.thumbnail.extension}"
-		alt="{comic.title} cover"
-	/>
-</a>
-<p><a href={detailUrl}>{comic.title}</a></p>
-<p>{onSaleDate}</p>
-<p>By {creatorText}</p>
+<div class="container">
+	<a href="https://read.marvel.com/#/book/{comic.digitalId}">
+		<img
+			loading="lazy"
+			src="{comic.thumbnail.path}.{comic.thumbnail.extension}"
+			alt="{comic.title} cover"
+		/>
+	</a>
+	<p><a href={detailUrl}>{comic.title}</a></p>
+	<p>{onSaleDate}</p>
+	<p>By {creatorText}</p>
+</div>
 
 <style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.container > * {
+		margin: 0;
+	}
 	img {
 		width: 100%;
 	}
