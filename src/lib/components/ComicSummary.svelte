@@ -13,6 +13,9 @@
 	$: creatorText = getCreatorText(comic.creators.items.map((c) => c.name));
 
 	function getCreatorText(creators: string[]) {
+		if (creators.length === 0) {
+			return 'Unknown';
+		}
 		if (creators.length === 1) {
 			return creators[0];
 		}
@@ -28,7 +31,7 @@
 
 	function commaSeparate(arr: string[]) {
 		const last = arr.pop();
-		return arr.join(', ') + ', and ' + last;
+		return arr.join(', ') + ' and ' + last;
 	}
 </script>
 

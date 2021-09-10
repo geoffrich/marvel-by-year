@@ -1,4 +1,8 @@
 import preprocess from 'svelte-preprocess';
+import dotenv from 'dotenv';
+
+// TODO: will this work in non-dev?
+dotenv.config();
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

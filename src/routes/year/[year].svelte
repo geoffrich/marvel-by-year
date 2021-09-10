@@ -36,6 +36,7 @@
 	const sortingOptions = ['name', 'date'];
 
 	let sortBy = 'date';
+	let searchText = '';
 
 	$: comics = data.data.results;
 
@@ -60,13 +61,12 @@
 	].sort();
 	$: selectedEvents = writable(new Set(events));
 
-	$: filteredComics = comics.filter(
-		// TODO: this is gross
-		(c) =>
-			$selectedSeries.has(c.series.name) &&
-			c.creators.items.find((cr) => $selectedCreators.has(cr.name)) !== undefined &&
-			(c.events.items.find((cr) => $selectedEvents.has(cr.name)) !== undefined ||
-				($selectedEvents.has('(no event)') && c.events.items.length === 0))
+	$: filteredComics = filterComics(
+		comics,
+		searchText,
+		$selectedSeries,
+		$selectedCreators,
+		$selectedEvents
 	);
 
 	$: sortedComics = filteredComics.sort((a, b) =>
@@ -88,11 +88,32 @@
 
 		return 0;
 	}
+
+	function filterComics(
+		comics: Comic[],
+		searchText: string,
+		selectedSeries: Set<string>,
+		selectedCreators: Set<string>,
+		selectedEvents: Set<string>
+	) {
+		return comics.filter(
+			// TODO: this is gross
+			(c) =>
+				(searchText ? c.title.toUpperCase().includes(searchText.toUpperCase()) : true) &&
+				selectedSeries.has(c.series.name) &&
+				// TODO: handle no creators
+				c.creators.items.find((cr) => selectedCreators.has(cr.name)) !== undefined &&
+				(c.events.items.find((cr) => selectedEvents.has(cr.name)) !== undefined ||
+					(selectedEvents.has('(no event)') && c.events.items.length === 0))
+		);
+	}
 </script>
 
 <h1>Comics for {year}</h1>
 <details open>
 	<summary>Filter</summary>
+	<p>Displaying {filteredComics.length} of {comics.length} comics</p>
+	<label>Search <input type="text" bind:value={searchText} /></label>
 	<label for="sorting">Sort by</label>
 	<select id="sorting" bind:value={sortBy}>
 		{#each sortingOptions as opt (opt)}
