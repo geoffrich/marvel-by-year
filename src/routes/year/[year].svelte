@@ -42,6 +42,7 @@
 	$: series = [...new Set(comics.map((c) => c.series.name))].sort();
 	$: selectedSeries = writable(new Set(series));
 
+	// TODO: is there a way to update these based on the other selections?
 	$: creators = [...new Set(comics.flatMap((c) => c.creators.items.map((cr) => cr.name)))].sort();
 	$: selectedCreators = writable(new Set(creators));
 
@@ -121,8 +122,14 @@
 		list-style: none;
 		padding: 0;
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		grid-template-columns: 1fr;
 		gap: 1rem;
+	}
+
+	@media screen and (min-width: 332px) {
+		ul {
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		}
 	}
 
 	.filters {

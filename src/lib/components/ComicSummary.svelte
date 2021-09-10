@@ -28,7 +28,7 @@
 
 	function commaSeparate(arr: string[]) {
 		const last = arr.pop();
-		return arr.join(', ') + ' and ' + last;
+		return arr.join(', ') + ', and ' + last;
 	}
 </script>
 
@@ -47,9 +47,18 @@
 
 <style>
 	.container {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: 100px 1fr;
+		grid-template-rows: repeat(3, auto);
 		gap: 0.5rem;
+	}
+
+	/* There might be a more elegant way, but this number was chosen to line up with the grid sizing */
+	@media screen and (min-width: 332px) {
+		.container {
+			display: flex;
+			flex-direction: column;
+		}
 	}
 
 	.container > * {
@@ -57,5 +66,9 @@
 	}
 	img {
 		width: 100%;
+	}
+
+	a {
+		grid-row: 1 / -1;
 	}
 </style>
