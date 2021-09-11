@@ -69,7 +69,6 @@
 		return Math.floor(total / limit);
 	}
 
-	// TODO: is there a way to update these based on the other selections?
 	let [series, selectedSeries] = createSelectedStores(getComicSeries);
 	$: series.applyNewComics(comics);
 
