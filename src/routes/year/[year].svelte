@@ -3,13 +3,16 @@
 	 * @type {import('@sveltejs/kit').Load}
 	 */
 	export async function load({ page, fetch }) {
-		const url = `/year/${page.params.year}.json`;
+		const start = page.query.get('start') ?? 0;
+		const url = `/year/${page.params.year}.json?page=${start}`;
 		const res = await fetch(url, { credentials: 'omit' });
 
 		if (res.ok) {
 			return {
 				props: {
-					data: await res.json()
+					response: await res.json(),
+					year: page.params.year,
+					start: parseInt(start)
 				},
 				maxage: 86400
 			};
@@ -23,23 +26,34 @@
 </script>
 
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { writable } from 'svelte/store';
-	import type { ComicDataWrapper, Comic } from '$lib/types/marvel';
+	import type { ComicDataContainer, ComicDataWrapper, Comic } from '$lib/types/marvel';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import { default as dayjs } from 'dayjs';
 
-	export let data: ComicDataWrapper;
+	export let response: ComicDataWrapper;
+	export let year: string;
+	export let start: number;
 
-	let year = $page.params.year;
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		console.log('mounting');
+	});
 
 	const sortingOptions = ['name', 'date'];
 
 	let sortBy = 'date';
 	let searchText = '';
 
-	$: comics = data.data.results;
+	$: comics = response.data.results;
+	$: maxPage = getMaxPage(response.data);
+
+	function getMaxPage(data: ComicDataContainer) {
+		const { total, limit } = data;
+		return Math.floor(total / limit);
+	}
 
 	$: series = [...new Set(comics.map((c) => c.series.name))].sort();
 	$: selectedSeries = writable(new Set(series));
@@ -137,12 +151,28 @@
 	}
 </script>
 
-<h1>Comics for {year}</h1>
-<details open>
+<h1>
+	Comics for {year}
+</h1>
+{#if start > 0 || start < maxPage}
+	<div class="links">
+		{#if start > 0}
+			<a href="/year/{year}?start={start - 1}" sveltekit:prefetch>Previous page</a>
+		{/if}
+		{#if start < maxPage}
+			<a href="/year/{year}?start={start + 1}" sveltekit:prefetch>Next page</a>
+		{/if}
+	</div>
+{/if}
+<!-- TODO: better way to word this -->
+<p>Displaying {filteredComics.length} of {comics.length} comics (Total: {response.data.total})</p>
+
+<details>
 	<summary>Filter</summary>
-	<p>Displaying {filteredComics.length} of {comics.length} comics (Total: {data.data.total})</p>
-	<label>Search <input type="text" bind:value={searchText} /></label>
-	<label for="sorting">Sort by</label>
+	<div class="search">
+		<label>Search <input type="text" bind:value={searchText} /></label>
+		<label for="sorting">Sort by</label>
+	</div>
 	<select id="sorting" bind:value={sortBy}>
 		{#each sortingOptions as opt (opt)}
 			<option>{opt}</option>
@@ -164,7 +194,7 @@
 	{/each}
 </ul>
 
-<small>{data.attributionText}</small>
+<small>{response.attributionText}</small>
 
 <style>
 	ul {
@@ -184,5 +214,14 @@
 	.filters {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	}
+
+	.links {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.search {
+		margin-bottom: 0.5rem;
 	}
 </style>

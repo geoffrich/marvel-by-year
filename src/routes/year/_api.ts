@@ -4,7 +4,7 @@ import type { ComicDataWrapper } from '$lib/types/marvel';
 const PUBLIC_KEY = process.env['MARVEL_PUBLIC_KEY'];
 const PRIVATE_KEY = process.env['MARVEL_PRIVATE_KEY'];
 
-export async function getComics(year: string, page: number = 0): Promise<ComicDataWrapper> {
+export async function getComics(year: string, page: number): Promise<ComicDataWrapper> {
 	const ts = Date.now().toString();
 
 	const params = {

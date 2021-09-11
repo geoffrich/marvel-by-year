@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
+	// TODO: is there a way to preserve filter state across multiple pages?
 	import type { Writable } from 'svelte/store';
 	export let items: string[];
 	export let legend: string;
