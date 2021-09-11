@@ -16,17 +16,18 @@ export function createSelectedStores(
 	const selectedItems = writable(_selectedItems);
 
 	items.subscribe(($items) => {
-		if (_selectedItems.size > 0) {
-			// add new items to selected items and carry over what's already there
-			// TODO: determine if there's a way to not add new items but still persist "all selected" state
-			_selectedItems = new Set(
-				[...$items].filter((i) => _selectedItems.has(i) || !oldItems.has(i))
-			);
+		if (_selectedItems.size === oldItems.size || _selectedItems.size === 0) {
+			// if all items were selected, all items should stay selected
+			// (even with new items added)
+			selectedItems.set(new Set([...$items]));
 		} else {
-			// if nothing is selected, select everything on the new page
-			_selectedItems = new Set([...$items]);
+			// otherwise, selected items should be those that are still present in the new items
+			selectedItems.set(new Set([...$items].filter((i) => _selectedItems.has(i))));
 		}
-		selectedItems.set(_selectedItems);
+	});
+
+	selectedItems.subscribe(($selected) => {
+		_selectedItems = $selected;
 	});
 
 	return [
