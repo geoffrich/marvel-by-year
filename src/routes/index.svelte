@@ -3,11 +3,7 @@
 </script>
 
 <script lang="ts">
-	import { default as dayjs } from 'dayjs';
-	const MAX_YEAR = dayjs().year();
-	const MIN_YEAR = 1939;
-
-	const years = Array.from(Array(MAX_YEAR - MIN_YEAR + 1).keys()).map((x) => x + MIN_YEAR);
+	import { years } from '$lib/years';
 </script>
 
 <svelte:head>
