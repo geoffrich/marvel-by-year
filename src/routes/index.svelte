@@ -24,7 +24,8 @@
 		grid-template-columns: repeat(auto-fit, 50px);
 		list-style: none;
 		padding: 0;
-		gap: 2px;
+		gap: 0.5rem;
+		justify-content: center;
 	}
 
 	li {

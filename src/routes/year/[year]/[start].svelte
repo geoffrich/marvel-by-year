@@ -37,6 +37,8 @@
 	export let year: string;
 	export let start: number;
 
+	// TODO: programatically prefetch
+
 	const sortingOptions = ['name', 'date'];
 
 	let sortBy = 'date';
@@ -44,6 +46,10 @@
 
 	$: comics = response.data.results;
 	$: maxPage = getMaxPage(response.data);
+
+	$: comicStart = start * 100 + 1;
+	$: comicEnd =
+		response.data.count < 100 ? comicStart + response.data.count - 1 : (start + 1) * 100;
 
 	function getMaxPage(data: ComicDataContainer) {
 		const { total, limit } = data;
@@ -167,8 +173,10 @@
 {/if}
 
 <p>
-	Displaying comics {start * 100 + 1}&ndash;{(start + 1) * 100} of {response.data.total} (Filtered: {filteredComics.length}
-	/ {comics.length})
+	Displaying comics {comicStart}&ndash;{comicEnd} of {response.data.total}
+</p>
+<p>
+	(Filtered: {filteredComics.length} / {comics.length})
 </p>
 
 <details>

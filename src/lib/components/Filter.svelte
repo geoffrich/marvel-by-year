@@ -70,7 +70,7 @@
 		top: 0;
 		background: white;
 		padding: 0.25rem;
-		transform: translateY(-6px);
+		transform: translateY(-7px);
 	}
 
 	button {
