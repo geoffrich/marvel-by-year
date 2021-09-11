@@ -30,5 +30,3 @@ export async function getComics(year: string, page: number): Promise<ComicDataWr
 
 	// TODO: error handling
 }
-
-// TODO: filter out digital comics not on MU (check for date?), e.g. Alias by Bendis

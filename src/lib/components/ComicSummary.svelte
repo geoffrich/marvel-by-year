@@ -15,6 +15,8 @@
 
 	$: creatorText = getCreatorText(comic.creators.items.map((c) => c.name));
 
+	$: imgSrc = `${comic.thumbnail.path.replace('http:', 'https:')}.${comic.thumbnail.extension}`;
+
 	function getCreatorText(creators: string[]) {
 		if (creators.length === 0) {
 			return 'Unknown';
@@ -40,11 +42,7 @@
 
 <div class="container">
 	<a href="https://read.marvel.com/#/book/{comic.digitalId}">
-		<img
-			loading={lazyLoad ? 'lazy' : undefined}
-			src="{comic.thumbnail.path}.{comic.thumbnail.extension}"
-			alt="{comic.title} cover"
-		/>
+		<img loading={lazyLoad ? 'lazy' : undefined} src={imgSrc} alt="{comic.title} cover" />
 	</a>
 	<p><a href={detailUrl}>{comic.title}</a></p>
 	<p>{onSaleDate}</p>

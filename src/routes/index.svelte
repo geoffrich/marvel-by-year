@@ -1,3 +1,7 @@
+<script context="module">
+	export const prerender = true;
+</script>
+
 <script lang="ts">
 	import { default as dayjs } from 'dayjs';
 	const MAX_YEAR = dayjs().year();
