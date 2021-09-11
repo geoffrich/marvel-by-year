@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
-import testResponse from './testData.json';
+import testResponse from '../testData.json';
 
 import { getComics } from './_api';
 
