@@ -14,7 +14,7 @@
 <h2>Jump to a year</h2>
 <ul>
 	{#each years as year (year)}
-		<li><a href="/year/{year}">{year}</a></li>
+		<li><a href="/year/{year}/0">{year}</a></li>
 	{/each}
 </ul>
 
