@@ -5,9 +5,10 @@ import testResponse from '../testData.json';
 
 import { getComics } from './_api';
 
-const get: RequestHandler = async function get({ params, query }) {
+//@ts-ignore
+const get: RequestHandler = async function get({ params }) {
 	const year = parseInt(params.year);
-	let page = parseInt(query.get('page') ?? '0');
+	let page = parseInt(params.start);
 	if (year < MIN_YEAR || year > MAX_YEAR || page < 0) {
 		return {
 			status: 400

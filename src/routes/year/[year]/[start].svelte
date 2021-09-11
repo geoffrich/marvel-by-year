@@ -4,7 +4,7 @@
 	 */
 	export async function load({ page, fetch }) {
 		const start = page.params.start;
-		const url = `/year/${page.params.year}.json?page=${start}`;
+		const url = `/year/${page.params.year}/${start}.json`;
 		const res = await fetch(url, { credentials: 'omit' });
 		const response: ComicDataWrapper = await res.json();
 
@@ -32,6 +32,8 @@
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import { default as dayjs } from 'dayjs';
+	import { prefetch } from '$app/navigation';
+	import { browser } from '$app/env';
 
 	export let response: ComicDataWrapper;
 	export let year: string;
@@ -46,6 +48,10 @@
 
 	$: comics = response.data.results;
 	$: maxPage = getMaxPage(response.data);
+
+	$: if (browser && maxPage > start) {
+		prefetch(`/year/${year}/${start + 1}`);
+	}
 
 	$: comicStart = start * 100 + 1;
 	$: comicEnd =
@@ -211,7 +217,7 @@
 	{/each}
 </ul>
 
-<small>{response.attributionText}</small>
+<p>{response.attributionText}</p>
 
 <style>
 	ul {
@@ -224,7 +230,7 @@
 
 	.filters {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 		gap: 0.5rem;
 	}
 
