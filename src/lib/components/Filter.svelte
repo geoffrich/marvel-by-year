@@ -46,6 +46,7 @@
 <style>
 	label {
 		display: block;
+		margin-bottom: 0.25rem;
 	}
 
 	fieldset {
@@ -60,5 +61,11 @@
 		top: 0;
 		background: white;
 		padding: 0.25rem;
+		transform: translateY(-6px);
+	}
+
+	button {
+		font-size: 1rem;
+		padding: 0.25rem 0.5rem;
 	}
 </style>

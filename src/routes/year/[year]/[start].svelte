@@ -226,4 +226,9 @@
 	.search {
 		margin-bottom: 0.5rem;
 	}
+
+	input,
+	select {
+		font-size: inherit;
+	}
 </style>
