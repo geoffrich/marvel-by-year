@@ -21,6 +21,10 @@
 	is implemented to try and mitigate that, but it still may be an issue. If you can't get a page to
 	load, try again tomorrow.
 </p>
+<p>
+	Because of these API limits, please <em>do not</em> share links to this site on social media for the
+	time being.
+</p>
 <h2>Jump to a year</h2>
 <ul>
 	{#each years as year (year)}

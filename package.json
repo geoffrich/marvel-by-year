@@ -1,5 +1,5 @@
 {
-	"name": "~TODO~",
+	"name": "marvel-by-year",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "svelte-kit dev --host",

@@ -39,8 +39,6 @@
 	export let year: string;
 	export let start: number;
 
-	// TODO: programatically prefetch
-
 	const sortingOptions = ['name', 'date'];
 
 	let sortBy = 'date';
@@ -48,6 +46,7 @@
 
 	$: comics = response.data.results;
 	$: maxPage = getMaxPage(response.data);
+	$: title = `Comics for ${year}` + (maxPage > 1 ? ` (${start + 1}/${maxPage + 1})` : '');
 
 	$: if (browser && maxPage > start) {
 		prefetch(`/year/${year}/${start + 1}`);
@@ -158,15 +157,10 @@
 </script>
 
 <svelte:head>
-	<title>Comics for {year} - {start}</title>
+	<title>{title}</title>
 </svelte:head>
 
-<h1>
-	Comics for {year}
-	{#if maxPage > 1}
-		({start + 1}/{maxPage + 1})
-	{/if}
-</h1>
+<h1>{title}</h1>
 {#if start > 0 || start < maxPage}
 	<div class="links">
 		{#if start > 0}
