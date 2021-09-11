@@ -151,6 +151,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Comics for {year} - {start}</title>
+</svelte:head>
+
 <h1>
 	Comics for {year}
 </h1>
@@ -172,12 +176,13 @@
 	<div class="search">
 		<label>Search <input type="text" bind:value={searchText} /></label>
 		<label for="sorting">Sort by</label>
+		<select id="sorting" bind:value={sortBy}>
+			{#each sortingOptions as opt (opt)}
+				<option>{opt}</option>
+			{/each}
+		</select>
 	</div>
-	<select id="sorting" bind:value={sortBy}>
-		{#each sortingOptions as opt (opt)}
-			<option>{opt}</option>
-		{/each}
-	</select>
+
 	<div class="filters">
 		<Filter items={series} legend="Series" included={selectedSeries} />
 		<Filter items={creators} legend="Creators" included={selectedCreators} />

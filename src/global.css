@@ -1,6 +1,10 @@
 :root {
-	--primary: #489bcf;
+	--primary: #57a4d1;
 	--secondary: lightblue;
+}
+
+body {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 /* TODO: fonts */

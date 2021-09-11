@@ -6,6 +6,10 @@
 	const years = Array.from(Array(MAX_YEAR - MIN_YEAR + 1).keys()).map((x) => x + MIN_YEAR);
 </script>
 
+<svelte:head>
+	<title>Browse Marvel Unlimited by Year</title>
+</svelte:head>
+
 <h1>Browse Marvel Unlimited by Year</h1>
 <h2>Jump to a year</h2>
 <ul>
