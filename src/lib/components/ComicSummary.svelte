@@ -1,13 +1,14 @@
 <script lang="ts">
 	import type { Comic } from '$lib/types/marvel';
 	import { default as dayjs } from 'dayjs';
+	import { getComicDate } from '$lib/comics';
 
 	// TODO: bring up more details on separate page
 
 	export let comic: Comic;
 	export let lazyLoad = true;
 
-	$: onSaleDate = dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date)
+	$: onSaleDate = dayjs(getComicDate(comic))
 		.add(1, 'day') // TODO: days are off by one due to timezone issues, this is a hack
 		.format('D MMM YYYY');
 

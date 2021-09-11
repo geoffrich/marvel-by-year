@@ -31,7 +31,15 @@
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
-	import { default as dayjs } from 'dayjs';
+	import {
+		getComicSeries,
+		getComicCreators,
+		getComicEvents,
+		compareComicDates,
+		compareComicTitles,
+		isEventSelected,
+		isCreatorSelected
+	} from '$lib/comics';
 	import { prefetch } from '$app/navigation';
 	import { browser } from '$app/env';
 
@@ -61,28 +69,14 @@
 		return Math.floor(total / limit);
 	}
 
-	let [series, selectedSeries] = createSelectedStores((c) => c.series.name);
+	// TODO: is there a way to update these based on the other selections?
+	let [series, selectedSeries] = createSelectedStores(getComicSeries);
 	$: series.applyNewComics(comics);
 
-	// TODO: is there a way to update these based on the other selections?
-	let [creators, selectedCreators] = createSelectedStores((c) => {
-		const creators = c.creators.items;
-		if (creators.length > 0) {
-			return creators.map((cr) => cr.name);
-		} else {
-			return ['(unknown)'];
-		}
-	});
+	let [creators, selectedCreators] = createSelectedStores(getComicCreators);
 	$: creators.applyNewComics(comics);
 
-	let [events, selectedEvents] = createSelectedStores((c) => {
-		const events = c.events.items;
-		if (events.length > 0) {
-			return events.map((e) => e.name);
-		} else {
-			return ['(no event)'];
-		}
-	});
+	let [events, selectedEvents] = createSelectedStores(getComicEvents);
 	$: events.applyNewComics(comics);
 
 	$: filteredComics = filterComics(
@@ -93,25 +87,7 @@
 		$selectedEvents
 	);
 
-	$: sortedComics = filteredComics.sort((a, b) =>
-		sortBy === 'date' ? getComicDate(a).diff(getComicDate(b)) : compareStrings(a.title, b.title)
-	);
-
-	function getComicDate(comic: Comic) {
-		return dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date);
-	}
-
-	function compareStrings(a, b) {
-		if (a < b) {
-			return -1;
-		}
-
-		if (a > b) {
-			return 1;
-		}
-
-		return 0;
-	}
+	$: sortedComics = filteredComics.sort(sortBy === 'date' ? compareComicDates : compareComicTitles);
 
 	function filterComics(
 		comics: Comic[],
@@ -126,24 +102,6 @@
 				selectedSeries.has(c.series.name) &&
 				isCreatorSelected(c, selectedCreators) &&
 				isEventSelected(c, selectedEvents)
-		);
-	}
-
-	function isEventSelected(comic: Comic, selectedEvents: Set<string>) {
-		const eventList = comic.events.items;
-
-		return (
-			eventList.find((e) => selectedEvents.has(e.name)) !== undefined ||
-			(selectedEvents.has('(no event)') && eventList.length === 0)
-		);
-	}
-
-	function isCreatorSelected(comic: Comic, selectedCreators: Set<string>) {
-		const creatorList = comic.creators.items;
-
-		return (
-			creatorList.find((e) => selectedCreators.has(e.name)) !== undefined ||
-			(selectedCreators.has('(unknown)') && creatorList.length === 0)
 		);
 	}
 </script>
