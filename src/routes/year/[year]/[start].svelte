@@ -27,10 +27,10 @@
 </script>
 
 <script lang="ts">
-	import { writable } from 'svelte/store';
 	import type { ComicDataContainer, ComicDataWrapper, Comic } from '$lib/types/marvel';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
+	import { createSelectedStores } from '$lib/stores/selected';
 	import { default as dayjs } from 'dayjs';
 	import { prefetch } from '$app/navigation';
 	import { browser } from '$app/env';
@@ -61,37 +61,29 @@
 		return Math.floor(total / limit);
 	}
 
-	$: series = [...new Set(comics.map((c) => c.series.name))].sort();
-	$: selectedSeries = writable(new Set([...series]));
+	let [series, selectedSeries] = createSelectedStores((c) => c.series.name);
+	$: series.applyNewComics(comics);
 
 	// TODO: is there a way to update these based on the other selections?
-	$: creators = [
-		...new Set(
-			comics.flatMap((c) => {
-				const creators = c.creators.items;
-				if (creators.length > 0) {
-					return creators.map((cr) => cr.name);
-				} else {
-					return ['(unknown)'];
-				}
-			})
-		)
-	].sort();
-	$: selectedCreators = writable(new Set(creators));
+	let [creators, selectedCreators] = createSelectedStores((c) => {
+		const creators = c.creators.items;
+		if (creators.length > 0) {
+			return creators.map((cr) => cr.name);
+		} else {
+			return ['(unknown)'];
+		}
+	});
+	$: creators.applyNewComics(comics);
 
-	$: events = [
-		...new Set(
-			comics.flatMap((c) => {
-				const events = c.events.items;
-				if (events.length > 0) {
-					return events.map((e) => e.name);
-				} else {
-					return ['(no event)'];
-				}
-			})
-		)
-	].sort();
-	$: selectedEvents = writable(new Set(events));
+	let [events, selectedEvents] = createSelectedStores((c) => {
+		const events = c.events.items;
+		if (events.length > 0) {
+			return events.map((e) => e.name);
+		} else {
+			return ['(no event)'];
+		}
+	});
+	$: events.applyNewComics(comics);
 
 	$: filteredComics = filterComics(
 		comics,
@@ -196,9 +188,9 @@
 	</div>
 
 	<div class="filters">
-		<Filter items={series} legend="Series" included={selectedSeries} />
-		<Filter items={creators} legend="Creators" included={selectedCreators} />
-		<Filter items={events} legend="Events" included={selectedEvents} />
+		<Filter items={$series} legend="Series" included={selectedSeries} />
+		<Filter items={$creators} legend="Creators" included={selectedCreators} />
+		<Filter items={$events} legend="Events" included={selectedEvents} />
 	</div>
 </details>
 <ul>

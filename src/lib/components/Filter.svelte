@@ -1,12 +1,14 @@
 <script lang="ts">
 	// TODO: is there a way to preserve filter state across multiple pages?
 	import type { Writable } from 'svelte/store';
-	export let items: string[];
+	export let items: Set<string>;
 	export let legend: string;
 
 	export let included: Writable<Set<string>>;
 
 	let showItems = true;
+
+	$: sortedItems = [...items].sort();
 
 	function uncheckAll() {
 		$included.clear();
@@ -28,9 +30,9 @@
 	}
 </script>
 
-{#if items.length > 1}
+{#if items.size > 1}
 	<fieldset>
-		<legend>{legend} {$included.size} / {items.length}</legend>
+		<legend>{legend} {$included.size} / {items.size}</legend>
 		<div class="buttons">
 			<button on:click={checkAll}>Check all</button>
 			<button on:click={uncheckAll}>Uncheck all</button>
@@ -41,7 +43,7 @@
 			>
 		</div>
 		{#if showItems}
-			{#each items as i (i)}
+			{#each sortedItems as i (i)}
 				<!-- TODO: count of comics with this filter -->
 				<label
 					><input on:change={handleChange} type="checkbox" checked={$included.has(i)} value={i} />
