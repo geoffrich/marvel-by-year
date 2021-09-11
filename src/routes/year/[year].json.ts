@@ -15,11 +15,20 @@ const get: RequestHandler = async function get({ params, query }) {
 		console.log({ count, offset, total });
 	}
 
+	const { code, message } = response;
+
+	if (code === 200) {
+		return {
+			body: response,
+			headers: {
+				'cache-control': 'public, max-age=86400'
+			}
+		};
+	}
+
+	console.log({ code, message });
 	return {
-		body: response,
-		headers: {
-			'cache-control': 'public, max-age=86400'
-		}
+		status: 500
 	};
 };
 

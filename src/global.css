@@ -1,6 +1,7 @@
 :root {
 	--primary: #57a4d1;
 	--secondary: lightblue;
+	--error: #ed1d24;
 }
 
 body {

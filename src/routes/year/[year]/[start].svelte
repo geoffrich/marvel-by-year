@@ -6,11 +6,12 @@
 		const start = page.params.start;
 		const url = `/year/${page.params.year}.json?page=${start}`;
 		const res = await fetch(url, { credentials: 'omit' });
+		const response: ComicDataWrapper = await res.json();
 
 		if (res.ok) {
 			return {
 				props: {
-					response: await res.json(),
+					response,
 					year: page.params.year,
 					start: parseInt(start)
 				},
@@ -50,7 +51,7 @@
 	}
 
 	$: series = [...new Set(comics.map((c) => c.series.name))].sort();
-	$: selectedSeries = writable(new Set(series));
+	$: selectedSeries = writable(new Set([...series]));
 
 	// TODO: is there a way to update these based on the other selections?
 	$: creators = [
@@ -117,7 +118,6 @@
 		selectedEvents: Set<string>
 	) {
 		return comics.filter(
-			// TODO: this is gross
 			(c) =>
 				(searchText ? c.title.toUpperCase().includes(searchText.toUpperCase()) : true) &&
 				selectedSeries.has(c.series.name) &&
@@ -150,7 +150,10 @@
 </svelte:head>
 
 <h1>
-	Comics for {year} ({start + 1}/{maxPage + 1})
+	Comics for {year}
+	{#if maxPage > 1}
+		({start + 1}/{maxPage + 1})
+	{/if}
 </h1>
 {#if start > 0 || start < maxPage}
 	<div class="links">

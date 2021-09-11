@@ -20,13 +20,9 @@ export async function getComics(year: string, page: number): Promise<ComicDataWr
 		ts
 	};
 
-	const url = new URL('https://gateway.marvel.com:443/v1/public/comics');
+	const url = new URL('https://gateway.marvel.com/v1/public/comics');
 	url.search = new URLSearchParams(params).toString();
 
 	const result = await fetch(url.toString());
-	const parsedResult = await result.json();
-
-	return parsedResult;
-
-	// TODO: error handling
+	return await result.json();
 }

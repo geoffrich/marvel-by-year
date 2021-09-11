@@ -1,6 +1,6 @@
 export interface ComicDataWrapper {
-	code: number;
-	status: string;
+	code: number | string;
+	message: string;
 	copyright: string;
 	attributionText: string;
 	attributionHTML: string;
