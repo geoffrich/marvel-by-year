@@ -165,19 +165,26 @@
 		{/if}
 	</div>
 {/if}
-<!-- TODO: better way to word this -->
-<p>Displaying {filteredComics.length} of {comics.length} comics (Total: {response.data.total})</p>
+
+<p>
+	Displaying comics {start * 100 + 1}&ndash;{(start + 1) * 100} of {response.data.total} (Filtered: {filteredComics.length}
+	/ {comics.length})
+</p>
 
 <details>
 	<summary>Filter</summary>
 	<div class="search">
-		<label>Search <input type="text" bind:value={searchText} /></label>
-		<label for="sorting">Sort by</label>
-		<select id="sorting" bind:value={sortBy}>
-			{#each sortingOptions as opt (opt)}
-				<option>{opt}</option>
-			{/each}
-		</select>
+		<div>
+			<label>Search <input type="text" bind:value={searchText} /></label>
+		</div>
+		<div>
+			<label for="sorting">Sort by</label>
+			<select id="sorting" bind:value={sortBy}>
+				{#each sortingOptions as opt (opt)}
+					<option>{opt}</option>
+				{/each}
+			</select>
+		</div>
 	</div>
 
 	<div class="filters">
@@ -207,15 +214,10 @@
 		gap: 1rem;
 	}
 
-	@media screen and (min-width: 450px) {
-		ul {
-			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-		}
-	}
-
 	.filters {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 0.5rem;
 	}
 
 	.links {
@@ -224,11 +226,24 @@
 	}
 
 	.search {
-		margin-bottom: 0.5rem;
+		margin: 0.5rem 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	input,
 	select {
 		font-size: inherit;
+	}
+
+	@media screen and (min-width: 450px) {
+		ul {
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		}
+
+		.search {
+			flex-direction: row;
+		}
 	}
 </style>
