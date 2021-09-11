@@ -1,4 +1,4 @@
-import md5 from 'crypto-js/md5';
+import md5 from 'crypto-js/md5.js';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 
 const PUBLIC_KEY = process.env['MARVEL_PUBLIC_KEY'];
