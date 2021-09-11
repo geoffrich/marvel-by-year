@@ -3,7 +3,7 @@
 	 * @type {import('@sveltejs/kit').Load}
 	 */
 	export async function load({ page, fetch }) {
-		const start = page.query.get('start') ?? 0;
+		const start = page.params.start;
 		const url = `/year/${page.params.year}.json?page=${start}`;
 		const res = await fetch(url, { credentials: 'omit' });
 
@@ -35,12 +35,6 @@
 	export let response: ComicDataWrapper;
 	export let year: string;
 	export let start: number;
-
-	import { onMount } from 'svelte';
-
-	onMount(() => {
-		console.log('mounting');
-	});
 
 	const sortingOptions = ['name', 'date'];
 
@@ -156,15 +150,15 @@
 </svelte:head>
 
 <h1>
-	Comics for {year}
+	Comics for {year} ({start + 1}/{maxPage + 1})
 </h1>
 {#if start > 0 || start < maxPage}
 	<div class="links">
 		{#if start > 0}
-			<a href="/year/{year}?start={start - 1}" sveltekit:prefetch>Previous page</a>
+			<a href="/year/{year}/{start - 1}" sveltekit:prefetch>Previous page</a>
 		{/if}
 		{#if start < maxPage}
-			<a href="/year/{year}?start={start + 1}" sveltekit:prefetch>Next page</a>
+			<a href="/year/{year}/{start + 1}" sveltekit:prefetch>Next page</a>
 		{/if}
 	</div>
 {/if}
@@ -190,9 +184,9 @@
 	</div>
 </details>
 <ul>
-	{#each sortedComics as comic (comic.id)}
+	{#each sortedComics as comic, idx (comic.id)}
 		<li>
-			<ComicSummary {comic} />
+			<ComicSummary {comic} lazyLoad={idx > 10} />
 		</li>
 	{:else}
 		<li>Nothing to show!</li>

@@ -5,6 +5,7 @@
 	// TODO: bring up more details on separate page
 
 	export let comic: Comic;
+	export let lazyLoad = true;
 
 	$: onSaleDate = dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date)
 		.add(1, 'day') // TODO: days are off by one due to timezone issues, this is a hack
@@ -40,7 +41,7 @@
 <div class="container">
 	<a href="https://read.marvel.com/#/book/{comic.digitalId}">
 		<img
-			loading="lazy"
+			loading={lazyLoad ? 'lazy' : undefined}
 			src="{comic.thumbnail.path}.{comic.thumbnail.extension}"
 			alt="{comic.title} cover"
 		/>
