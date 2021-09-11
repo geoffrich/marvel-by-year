@@ -6,6 +6,8 @@
 
 	export let included: Writable<Set<string>>;
 
+	let showItems = true;
+
 	function uncheckAll() {
 		$included.clear();
 		$included = $included;
@@ -32,14 +34,21 @@
 		<div class="buttons">
 			<button on:click={checkAll}>Check all</button>
 			<button on:click={uncheckAll}>Uncheck all</button>
-		</div>
-		{#each items as i (i)}
-			<!-- TODO: count of comics with this filter -->
-			<label
-				><input on:change={handleChange} type="checkbox" checked={$included.has(i)} value={i} />
-				{i}</label
+			<button
+				on:click={() => {
+					showItems = !showItems;
+				}}>{showItems ? 'Hide' : 'Show'}</button
 			>
-		{/each}
+		</div>
+		{#if showItems}
+			{#each items as i (i)}
+				<!-- TODO: count of comics with this filter -->
+				<label
+					><input on:change={handleChange} type="checkbox" checked={$included.has(i)} value={i} />
+					{i}</label
+				>
+			{/each}
+		{/if}
 	</fieldset>
 {/if}
 
