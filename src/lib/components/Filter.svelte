@@ -73,9 +73,4 @@
 		padding: 0.25rem;
 		transform: translateY(-7px);
 	}
-
-	button {
-		font-size: 1rem;
-		padding: 0.25rem 0.5rem;
-	}
 </style>

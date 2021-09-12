@@ -8,14 +8,14 @@ interface ComicStore<T> extends Writable<T> {
 
 export function createSelectedStores(
 	mapping: (c: Comic) => string | string[]
-): [ComicStore<Set<string>>, Writable<Set<string>>] {
+): [ComicStore<Set<string>>, Writable<Set<string>>, () => void] {
 	const items = writable(new Set<string>());
 	let oldItems = new Set<string>();
 
 	let _selectedItems = new Set<string>();
 	const selectedItems = writable(_selectedItems);
 
-	items.subscribe(($items) => {
+	const unsubscribeItems = items.subscribe(($items) => {
 		if (_selectedItems.size === oldItems.size || _selectedItems.size === 0) {
 			// if all items were selected, all items should stay selected
 			// (even with new items added)
@@ -26,9 +26,14 @@ export function createSelectedStores(
 		}
 	});
 
-	selectedItems.subscribe(($selected) => {
+	const unsubscribeSelected = selectedItems.subscribe(($selected) => {
 		_selectedItems = $selected;
 	});
+
+	const cleanup = () => {
+		unsubscribeItems();
+		unsubscribeSelected();
+	};
 
 	return [
 		{
@@ -40,6 +45,7 @@ export function createSelectedStores(
 				});
 			}
 		},
-		selectedItems
+		selectedItems,
+		cleanup
 	];
 }

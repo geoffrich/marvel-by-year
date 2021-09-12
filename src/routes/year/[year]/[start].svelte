@@ -30,6 +30,7 @@
 	import type { ComicDataContainer, ComicDataWrapper, Comic } from '$lib/types/marvel';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
+	import PageLinks from '$lib/components/PageLinks.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
 	import {
 		getComicSeries,
@@ -42,6 +43,7 @@
 	} from '$lib/comics';
 	import { prefetch } from '$app/navigation';
 	import { browser } from '$app/env';
+	import { onDestroy } from 'svelte';
 
 	export let response: ComicDataWrapper;
 	export let year: string;
@@ -69,14 +71,20 @@
 		return Math.floor(total / limit);
 	}
 
-	let [series, selectedSeries] = createSelectedStores(getComicSeries);
+	let [series, selectedSeries, unsub1] = createSelectedStores(getComicSeries);
 	$: series.applyNewComics(comics);
 
-	let [creators, selectedCreators] = createSelectedStores(getComicCreators);
+	let [creators, selectedCreators, unsub2] = createSelectedStores(getComicCreators);
 	$: creators.applyNewComics(comics);
 
-	let [events, selectedEvents] = createSelectedStores(getComicEvents);
+	let [events, selectedEvents, unsub3] = createSelectedStores(getComicEvents);
 	$: events.applyNewComics(comics);
+
+	onDestroy(() => {
+		unsub1();
+		unsub2();
+		unsub3();
+	});
 
 	$: filteredComics = filterComics(
 		comics,
@@ -103,6 +111,13 @@
 				isEventSelected(c, selectedEvents)
 		);
 	}
+
+	function resetFilters() {
+		$selectedCreators = new Set($creators);
+		$selectedSeries = new Set($series);
+		$selectedEvents = new Set($events);
+		searchText = '';
+	}
 </script>
 
 <svelte:head>
@@ -110,22 +125,14 @@
 </svelte:head>
 
 <h1>{title}</h1>
-{#if start > 0 || start < maxPage}
-	<div class="links">
-		{#if start > 0}
-			<a href="/year/{year}/{start - 1}" sveltekit:prefetch>Previous page</a>
-		{/if}
-		{#if start < maxPage}
-			<a href="/year/{year}/{start + 1}" sveltekit:prefetch>Next page</a>
-		{/if}
-	</div>
-{/if}
+<PageLinks current={start} max={maxPage} {year} />
 
 <p>
 	Displaying comics {comicStart}&ndash;{comicEnd} of {response.data.total}
 </p>
 <p>
 	(Filtered: {filteredComics.length} / {comics.length})
+	<button on:click={resetFilters}>Reset filters</button>
 </p>
 
 <details>
@@ -159,6 +166,7 @@
 		<li>Nothing to show!</li>
 	{/each}
 </ul>
+<PageLinks current={start} max={maxPage} {year} />
 
 <p>{response.attributionText}</p>
 
@@ -175,11 +183,6 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 		gap: 0.5rem;
-	}
-
-	.links {
-		display: flex;
-		gap: 1rem;
 	}
 
 	.search {

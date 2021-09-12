@@ -26,6 +26,24 @@ const get: RequestHandler = async function get({ params }) {
 	const { code, message } = response;
 
 	if (code === 200) {
+		response.data.results = response.data.results.map((r) => {
+			return {
+				...r,
+				// we're not currently using these, so let's slim down the API response
+				characters: {
+					...r.characters,
+					items: []
+				},
+				stories: {
+					...r.stories,
+					items: []
+				},
+				textObjects: [],
+				variants: [],
+				collectedIssues: [],
+				prices: []
+			};
+		});
 		return {
 			body: response,
 			headers: {

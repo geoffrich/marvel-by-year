@@ -8,6 +8,16 @@
 	export let comic: Comic;
 	export let lazyLoad = true;
 
+	// documented at https://developer.marvel.com/documentation/images
+	enum ImageSize {
+		Small = 'portrait_small', // 50x75
+		Medium = 'portrait_medium', // 100x150
+		Large = 'portrait_xlarge', // 150x225
+		XLarge = 'portrait_fantastic', // 168x252
+		XXLarge = 'portrait_incredible', // 216x324
+		XXXLarge = 'portrait_uncanny' // 300x450
+	}
+
 	$: onSaleDate = dayjs(getComicDate(comic))
 		.add(1, 'day') // TODO: days are off by one due to timezone issues, this is a hack
 		.format('D MMM YYYY');
@@ -16,7 +26,11 @@
 
 	$: creatorText = getCreatorText(comic.creators.items.map((c) => c.name));
 
-	$: imgSrc = `${comic.thumbnail.path.replace('http:', 'https:')}.${comic.thumbnail.extension}`;
+	function getImageSrc(comic: Comic, size: ImageSize) {
+		return `${comic.thumbnail.path.replace('http:', 'https:')}/${size}.${
+			comic.thumbnail.extension
+		}`;
+	}
 
 	function getCreatorText(creators: string[]) {
 		if (creators.length === 0) {
@@ -43,7 +57,15 @@
 
 <div class="container">
 	<a href="https://read.marvel.com/#/book/{comic.digitalId}">
-		<img loading={lazyLoad ? 'lazy' : undefined} src={imgSrc} alt="{comic.title} cover" />
+		<picture>
+			<source srcset={getImageSrc(comic, ImageSize.XXLarge)} media="(min-width: 450px)" />
+			<img
+				loading={lazyLoad ? 'lazy' : undefined}
+				src={getImageSrc(comic, ImageSize.Large)}
+				alt="{comic.title} cover"
+			/>
+		</picture>
+		<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 	</a>
 	<p><a href={detailUrl}>{comic.title}</a></p>
 	<p>{onSaleDate}</p>
