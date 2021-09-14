@@ -3,10 +3,16 @@
 	import { default as dayjs } from 'dayjs';
 	import { getComicDate } from '$lib/comics';
 
+	import { Plus, Minus } from '$lib/icons';
+
 	// TODO: bring up more details on separate page
 
 	export let comic: Comic;
 	export let lazyLoad = true;
+
+	let showAllCreators = false;
+
+	const MAX_CREATORS = 3;
 
 	// documented at https://developer.marvel.com/documentation/images
 	enum ImageSize {
@@ -24,7 +30,11 @@
 
 	$: detailUrl = comic.urls.find((u) => u.type === 'detail').url;
 
-	$: creatorText = getCreatorText(comic.creators.items.map((c) => c.name));
+	$: creatorCount = comic.creators.items.length;
+	$: creatorText = getCreatorText(
+		comic.creators.items.map((c) => c.name),
+		showAllCreators ? creatorCount : MAX_CREATORS
+	);
 
 	function getImageSrc(comic: Comic, size: ImageSize) {
 		return `${comic.thumbnail.path.replace('http:', 'https:')}/${size}.${
@@ -32,18 +42,18 @@
 		}`;
 	}
 
-	function getCreatorText(creators: string[]) {
+	function getCreatorText(creators: string[], max) {
 		if (creators.length === 0) {
 			return 'Unknown';
 		}
 		if (creators.length === 1) {
 			return creators[0];
 		}
-		if (creators.length <= 3) {
+		if (creators.length <= max) {
 			return commaSeparate(creators);
 		} else {
-			const additionalCount = creators.length - 3;
-			const subset = creators.slice(0, 3);
+			const additionalCount = creators.length - max;
+			const subset = creators.slice(0, max);
 			subset.push(`${additionalCount} others`);
 			return commaSeparate(subset);
 		}
@@ -52,6 +62,10 @@
 	function commaSeparate(arr: string[]) {
 		const last = arr.pop();
 		return arr.join(', ') + ' and ' + last;
+	}
+
+	function toggleCreators() {
+		showAllCreators = !showAllCreators;
 	}
 </script>
 
@@ -69,8 +83,20 @@
 	</a>
 	<p><a href={detailUrl}>{comic.title}</a></p>
 	<p>{onSaleDate}</p>
-	<!-- TODO: click to expand? -->
-	<p>By {creatorText}</p>
+	<p>
+		<span>By {creatorText}</span>
+		{#if creatorCount > MAX_CREATORS}
+			{#if showAllCreators}
+				<button on:click={toggleCreators}
+					><Minus /><span class="visually-hidden">Show less</span></button
+				>
+			{:else}
+				<button on:click={toggleCreators}
+					><Plus /><span class="visually-hidden">Show more</span></button
+				>
+			{/if}
+		{/if}
+	</p>
 </div>
 
 <style>
@@ -98,5 +124,24 @@
 
 	a {
 		grid-row: 1 / -1;
+	}
+
+	button {
+		all: unset;
+		box-sizing: border-box;
+		height: 1.25rem;
+		width: 1.25rem;
+		vertical-align: middle;
+		color: var(--primary);
+	}
+
+	button:hover,
+	button:active {
+		filter: brightness(1.1);
+	}
+
+	button:focus:not(:focus-visible) {
+		border: 2px solid black;
+		border-radius: 50%;
 	}
 </style>
