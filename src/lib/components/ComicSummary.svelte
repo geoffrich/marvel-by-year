@@ -42,7 +42,7 @@
 		}`;
 	}
 
-	function getCreatorText(creators: string[], max) {
+	function getCreatorText(creators: string[], max: number) {
 		if (creators.length === 0) {
 			return 'Unknown';
 		}
