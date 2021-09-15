@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Comic } from '$lib/types/marvel';
-	import { default as dayjs } from 'dayjs';
-	import { getComicDate } from '$lib/comics';
+	import { getOnSaleDate } from '$lib/comics';
 
 	import { Plus, Minus } from '$lib/icons';
 
@@ -24,7 +23,7 @@
 		XXXLarge = 'portrait_uncanny' // 300x450
 	}
 
-	$: onSaleDate = dayjs(getComicDate(comic))
+	$: onSaleDate = getOnSaleDate(comic)
 		.add(1, 'day') // TODO: days are off by one due to timezone issues, this is a hack
 		.format('D MMM YYYY');
 

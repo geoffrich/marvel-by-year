@@ -31,11 +31,11 @@
 	import PageLinks from '$lib/components/PageLinks.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
 	import {
-		getComicSeries,
-		getComicCreators,
-		getComicEvents,
-		compareComicDates,
-		compareComicTitles,
+		getSeries,
+		getCreators,
+		getEvents,
+		compareDates,
+		compareTitles,
 		isEventSelected,
 		isCreatorSelected
 	} from '$lib/comics';
@@ -70,13 +70,13 @@
 
 	// TODO: refactor this if we're loading all comics at once
 	// possibly persist filters across years? but don't keep adding to list
-	let [series, selectedSeries, unsub1] = createSelectedStores(getComicSeries);
+	let [series, selectedSeries, unsub1] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
 
-	let [creators, selectedCreators, unsub2] = createSelectedStores(getComicCreators);
+	let [creators, selectedCreators, unsub2] = createSelectedStores(getCreators);
 	$: creators.applyNewComics(comics);
 
-	let [events, selectedEvents, unsub3] = createSelectedStores(getComicEvents);
+	let [events, selectedEvents, unsub3] = createSelectedStores(getEvents);
 	$: events.applyNewComics(comics);
 
 	onDestroy(() => {
@@ -93,7 +93,7 @@
 		$selectedEvents
 	);
 
-	$: sortedComics = filteredComics.sort(sortBy === 'date' ? compareComicDates : compareComicTitles);
+	$: sortedComics = filteredComics.sort(sortBy === 'date' ? compareDates : compareTitles);
 
 	function filterComics(
 		comics: Comic[],

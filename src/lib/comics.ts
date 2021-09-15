@@ -4,11 +4,11 @@ import { default as dayjs } from 'dayjs';
 const NO_EVENT = '(no event)';
 const NO_CREATOR = '(unknown)';
 
-export function getComicSeries(c: Comic): string {
+export function getSeries(c: Comic): string {
 	return c.series.name;
 }
 
-export function getComicCreators(c: Comic): string[] {
+export function getCreators(c: Comic): string[] {
 	const creators = c.creators.items;
 	if (creators.length > 0) {
 		return creators.map((cr) => cr.name);
@@ -17,7 +17,7 @@ export function getComicCreators(c: Comic): string[] {
 	}
 }
 
-export function getComicEvents(c: Comic): string[] {
+export function getEvents(c: Comic): string[] {
 	const events = c.events.items;
 	if (events.length > 0) {
 		return events.map((e) => e.name);
@@ -26,11 +26,11 @@ export function getComicEvents(c: Comic): string[] {
 	}
 }
 
-export function compareComicDates(a: Comic, b: Comic) {
-	return getComicDate(a).diff(getComicDate(b));
+export function compareDates(a: Comic, b: Comic) {
+	return getOnSaleDate(a).diff(getOnSaleDate(b));
 }
 
-export function compareComicTitles(a: Comic, b: Comic) {
+export function compareTitles(a: Comic, b: Comic) {
 	return compareStrings(a.title, b.title);
 }
 
@@ -52,7 +52,7 @@ export function isCreatorSelected(comic: Comic, selectedCreators: Set<string>) {
 	);
 }
 
-export function getComicDate(comic: Comic) {
+export function getOnSaleDate(comic: Comic) {
 	return dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date);
 }
 
