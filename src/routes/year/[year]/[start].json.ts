@@ -1,13 +1,14 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
-import testResponse from '../testData.json';
 
-import { getComics } from './_api';
+import { getComics, getTotalComics } from './_api';
 
 //@ts-ignore
 const get: RequestHandler = async function get({ params }) {
 	const year = parseInt(params.year);
+
+	// TODO: un-paginate
 	let page = parseInt(params.start);
 	if (year < MIN_YEAR || year > MAX_YEAR || page < 0) {
 		return {
@@ -16,34 +17,28 @@ const get: RequestHandler = async function get({ params }) {
 	}
 
 	console.log(`Getting comics for ${year} (page ${page})`);
+	const totalComics = await getTotalComics(params.year);
 
-	const response: ComicDataWrapper = await getComics(params.year, page);
-	if (response.data) {
-		const { count, offset, total } = response.data;
-		console.log({ count, offset, total });
-	}
+	const requests = Array.from(Array(Math.ceil(totalComics / 100)).keys()).map((i) =>
+		getComics(params.year, i)
+	);
 
-	const { code, message } = response;
+	const results = await Promise.all(requests);
+	// TODO: adapt into custom response
+	const response: ComicDataWrapper = {
+		...results[0],
+		data: {
+			...results[0].data,
+			results: []
+		}
+	};
 
-	if (code === 200) {
-		response.data.results = response.data.results.map((r) => {
-			return {
-				...r,
-				// we're not currently using these, so let's slim down the API response
-				characters: {
-					...r.characters,
-					items: []
-				},
-				stories: {
-					...r.stories,
-					items: []
-				},
-				textObjects: [],
-				variants: [],
-				collectedIssues: [],
-				prices: []
-			};
-		});
+	const badStatus = results.find((r) => r.code !== 200);
+	if (badStatus === undefined) {
+		for (const result of results) {
+			response.data.results = [...response.data.results, ...result.data.results];
+		}
+
 		return {
 			body: response,
 			headers: {
@@ -52,7 +47,7 @@ const get: RequestHandler = async function get({ params }) {
 		};
 	}
 
-	console.log({ code, message });
+	console.log({ code: badStatus.code, message: badStatus.message });
 	return {
 		status: 500
 	};

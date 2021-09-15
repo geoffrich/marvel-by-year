@@ -54,13 +54,17 @@
 	let sortBy = 'date';
 	let searchText = '';
 
-	$: comics = response.data.results;
+	// remove duplicate comics from the list
+	$: comics = response.data.results.filter(
+		(c, idx) => response.data.results.findIndex((c2) => c.id === c2.id) === idx
+	);
 	$: maxPage = getMaxPage(response.data);
 	$: title = `Comics for ${year}` + (maxPage > 1 ? ` (${start + 1}/${maxPage + 1})` : '');
 
-	$: if (browser && maxPage > start) {
-		prefetch(`/year/${year}/${start + 1}`);
-	}
+	// TODO: prefetch next year and update links to be forward/back years
+	// $: if (browser && maxPage > start) {
+	// 	prefetch(`/year/${year}/${start + 1}`);
+	// }
 
 	$: comicStart = start * 100 + 1;
 	$: comicEnd =
@@ -71,6 +75,8 @@
 		return Math.floor(total / limit);
 	}
 
+	// TODO: refactor this if we're loading all comics at once
+	// possibly persist filters across years? but don't keep adding to list
 	let [series, selectedSeries, unsub1] = createSelectedStores(getComicSeries);
 	$: series.applyNewComics(comics);
 
