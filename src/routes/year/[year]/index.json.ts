@@ -8,15 +8,13 @@ import { getComics, getTotalComics } from './_api';
 const get: RequestHandler = async function get({ params }) {
 	const year = parseInt(params.year);
 
-	// TODO: un-paginate
-	let page = parseInt(params.start);
-	if (year < MIN_YEAR || year > MAX_YEAR || page < 0) {
+	if (year < MIN_YEAR || year > MAX_YEAR) {
 		return {
 			status: 400
 		};
 	}
 
-	console.log(`Getting comics for ${year} (page ${page})`);
+	console.log(`Getting comics for ${year}`);
 	const totalComics = await getTotalComics(params.year);
 
 	const requests = Array.from(Array(Math.ceil(totalComics / 100)).keys()).map((i) =>

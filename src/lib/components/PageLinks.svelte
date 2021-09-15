@@ -1,16 +1,19 @@
 <script lang="ts">
-	export let current;
-	export let max;
-	export let year;
+	import { MAX_YEAR, MIN_YEAR } from '$lib/years';
+
+	export let year: number;
+
+	$: hasPrevious = year > MIN_YEAR;
+	$: hasNext = year < MAX_YEAR;
 </script>
 
-{#if current > 0 || current < max}
+{#if hasPrevious || hasNext}
 	<div class="links">
-		{#if current > 0}
-			<a href="/year/{year}/{current - 1}" sveltekit:prefetch>Previous page</a>
+		{#if hasPrevious}
+			<a href="/year/{year - 1}" sveltekit:prefetch>Previous year</a>
 		{/if}
-		{#if current < max}
-			<a href="/year/{year}/{current + 1}" sveltekit:prefetch>Next page</a>
+		{#if hasNext}
+			<a href="/year/{year + 1}" sveltekit:prefetch>Next year</a>
 		{/if}
 	</div>
 {/if}

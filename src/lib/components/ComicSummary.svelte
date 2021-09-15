@@ -140,8 +140,12 @@
 		filter: brightness(1.1);
 	}
 
-	button:focus:not(:focus-visible) {
+	button:focus {
 		border: 2px solid black;
 		border-radius: 50%;
+	}
+
+	button:focus:not(:focus-visible) {
+		border: none;
 	}
 </style>
