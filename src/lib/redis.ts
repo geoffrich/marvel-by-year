@@ -21,8 +21,7 @@ async function get<T>(key: string, parse: (val: string) => T = JSON.parse): Prom
 	return null;
 }
 
-// TODO: increase TTL
-async function set<T>(key: string, value: T, expiry: number = 120) {
+async function set<T>(key: string, value: T, expiry: number = 24 * 60 * 60) {
 	return await redis.set(key, JSON.stringify(value), 'EX', expiry);
 }
 
