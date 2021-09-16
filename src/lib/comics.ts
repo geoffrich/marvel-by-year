@@ -4,9 +4,6 @@ import { default as dayjs } from 'dayjs';
 const NO_EVENT = '(no event)';
 const NO_CREATOR = '(unknown)';
 
-export const MIN_ID = 1303;
-export const MAX_ID = 56924; // TODO: dynamically generate somehow?
-
 export function getSeries(c: Comic): string {
 	return c.series.name;
 }

@@ -4,19 +4,6 @@
 
 <script lang="ts">
 	import { years } from '$lib/years';
-	import { MIN_ID, MAX_ID } from '$lib/comics';
-	import { Refresh } from '$lib/icons';
-	import IconButton from '$lib/components/IconButton.svelte';
-
-	// TODO: how is this with prerendering
-	let randomId;
-	setRandomId();
-
-	// TODO: make this smarter, a lot of the comics don't exist
-	// use redis somehow?
-	function setRandomId() {
-		randomId = Math.floor(Math.random() * (MAX_ID - MIN_ID)) + MIN_ID;
-	}
 </script>
 
 <svelte:head>
@@ -44,13 +31,12 @@
 	time being.
 </p>
 
-<a href="https://read.marvel.com/#/book/{randomId}">Random comic!</a>
-<IconButton altText="Refresh" on:click={setRandomId}><Refresh /></IconButton>
+<a href="/comic/random">Random comic</a>
 
 <h2>Jump to a year</h2>
 <ul>
 	{#each years as year (year)}
-		<li><a href="/year/{year}">{year}</a></li>
+		<li><a href="/year/{year}" sveltekit:prefetch>{year}</a></li>
 	{/each}
 </ul>
 

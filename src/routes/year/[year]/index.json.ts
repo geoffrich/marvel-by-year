@@ -3,7 +3,7 @@ import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 import { dev } from '$app/env';
 
-import { getComics, getTotalComics } from './_api';
+import { getComics, getTotalComics } from '$lib/api';
 
 //@ts-ignore
 const get: RequestHandler = async function get({ params }) {

@@ -28,4 +28,9 @@
 		margin-right: auto;
 		padding: 1rem;
 	}
+
+	:global(div#svelte) {
+		display: grid;
+		grid-template-rows: auto 1fr auto;
+	}
 </style>

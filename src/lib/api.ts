@@ -24,7 +24,7 @@ export async function getComics(year: string, page: number): Promise<ComicDataWr
 
 	const parsedResult: ComicDataWrapper = await result.json();
 	if (parsedResult.code === 200) {
-		redis.set(key, parsedResult);
+		redis.addComics(key, parsedResult);
 	}
 
 	return parsedResult;
@@ -46,6 +46,10 @@ export async function getTotalComics(year: string): Promise<number> {
 		return total;
 	}
 	return -1;
+}
+
+export async function getRandomIds() {
+	return await redis.getRandomComicIds();
 }
 
 async function callMarvelApi(urlString: string, params: Record<string, string>): Promise<Response> {
