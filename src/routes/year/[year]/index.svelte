@@ -43,13 +43,14 @@
 	import { prefetch } from '$app/navigation';
 	import { browser } from '$app/env';
 	import { onDestroy } from 'svelte';
+	import { matchSorter } from 'match-sorter';
 
 	export let response: ComicDataWrapper;
 	export let year: number;
 
-	const sortingOptions = ['name', 'date'];
+	const sortingOptions = ['best match', 'name', 'date'];
 
-	let sortBy = 'date';
+	let sortBy = sortingOptions[0];
 	let searchText = '';
 
 	// remove duplicate comics from the list
@@ -86,7 +87,9 @@
 		$selectedEvents
 	);
 
-	$: sortedComics = filteredComics.sort(sortBy === 'date' ? compareDates : compareTitles);
+	// TODO: sort by best match
+	// TODO: debounce
+	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
 
 	function filterComics(
 		comics: Comic[],
@@ -95,13 +98,32 @@
 		selectedCreators: Set<string>,
 		selectedEvents: Set<string>
 	) {
-		return comics.filter(
+		// TODO: fuzzy search with creators/events
+		// https://github.com/kentcdodds/match-sorter#match-many-words-across-multiple-fields-table-filtering
+		return matchSorter(comics, searchText, {
+			keys: ['title'],
+			threshold: matchSorter.rankings.ACRONYM
+		}).filter(
 			(c) =>
-				(searchText ? c.title.toUpperCase().includes(searchText.toUpperCase()) : true) &&
 				selectedSeries.has(c.series.name) &&
 				isCreatorSelected(c, selectedCreators) &&
 				isEventSelected(c, selectedEvents)
 		);
+	}
+
+	function sortComics(comics: Comic[], sortBy: string, searchText: string) {
+		// TODO: enum
+		if (sortBy === 'date') {
+			return comics.sort(compareDates);
+		} else if (sortBy === 'name') {
+			return comics.sort(compareTitles);
+		} else if (!searchText) {
+			// if no search text, use dates instead of best-match
+			return comics.sort(compareDates);
+		}
+		// default sort by match-sorter
+		// TODO: order doesn't return after going to date and back to best-match
+		return comics;
 	}
 
 	function resetFilters() {
