@@ -54,7 +54,7 @@ async function callMarvelApi(urlString: string, params: Record<string, string>):
 	const paramsWithKey = {
 		...params,
 		apikey: PUBLIC_KEY,
-		hash: md5(ts + PRIVATE_KEY + PUBLIC_KEY),
+		hash: md5(ts + PRIVATE_KEY + PUBLIC_KEY).toString(),
 		ts
 	};
 
