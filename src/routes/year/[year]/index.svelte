@@ -30,7 +30,6 @@
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
-	import { MAX_YEAR } from '$lib/years';
 	import {
 		getSeries,
 		getCreators,
@@ -40,8 +39,6 @@
 		isEventSelected,
 		isCreatorSelected
 	} from '$lib/comics';
-	import { prefetch } from '$app/navigation';
-	import { browser } from '$app/env';
 	import { onDestroy } from 'svelte';
 	import { matchSorter } from 'match-sorter';
 
@@ -59,10 +56,6 @@
 	);
 
 	$: title = `Comics for ${year}`;
-
-	$: if (browser && year < MAX_YEAR) {
-		prefetch(`/year/${year + 1}`);
-	}
 
 	let [series, selectedSeries, unsub1] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
@@ -98,10 +91,11 @@
 		selectedCreators: Set<string>,
 		selectedEvents: Set<string>
 	) {
-		// TODO: fuzzy search with creators/events
+		// TODO: fuzzy search with creators/events (should match any)
 		// https://github.com/kentcdodds/match-sorter#match-many-words-across-multiple-fields-table-filtering
+		// TODO: after best match, we should sort by date
 		return matchSorter(comics, searchText, {
-			keys: ['title'],
+			keys: ['title', 'creators.items.*.name', 'events.items.*.name'],
 			threshold: matchSorter.rankings.ACRONYM
 		}).filter(
 			(c) =>
