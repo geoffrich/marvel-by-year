@@ -16,6 +16,12 @@ const get: RequestHandler = async function get({ params }) {
 
 	console.log(`Getting comics for ${year}`);
 	const totalComics = await getTotalComics(params.year);
+	if (totalComics === -1) {
+		console.log(`unable to fetch total comics for ${year}`);
+		return {
+			status: 500
+		};
+	}
 
 	const requests = Array.from(Array(Math.ceil(totalComics / 100)).keys()).map((i) =>
 		getComics(params.year, i)

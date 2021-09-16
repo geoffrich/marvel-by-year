@@ -1,5 +1,6 @@
 import md5 from 'crypto-js/md5.js';
 import type { ComicDataWrapper } from '$lib/types/marvel';
+import redis from '$lib/redis';
 
 const PUBLIC_KEY = process.env['MARVEL_PUBLIC_KEY'];
 const PRIVATE_KEY = process.env['MARVEL_PRIVATE_KEY'];
@@ -8,18 +9,43 @@ const COMICS_ENDPOINT = 'https://gateway.marvel.com/v1/public/comics';
 const MAX_LIMIT = 100;
 
 export async function getComics(year: string, page: number): Promise<ComicDataWrapper> {
+	const key = `year:${year}:${page}`;
+	const val = await redis.get<ComicDataWrapper>(key);
+
+	if (val) {
+		console.log(`found ${year} page ${page} in redis cache`);
+		return val;
+	}
+
 	const result = await callMarvelApi(
 		COMICS_ENDPOINT,
 		getComicsSearchParams(year, page * MAX_LIMIT, MAX_LIMIT)
 	);
-	return await result.json();
+
+	const parsedResult: ComicDataWrapper = await result.json();
+	if (parsedResult.code === 200) {
+		redis.set(key, parsedResult);
+	}
+
+	return parsedResult;
 }
 
 export async function getTotalComics(year: string): Promise<number> {
+	const key = `year:${year}:total`;
+	const val = await redis.get<number>(key, parseInt);
+	if (val) {
+		return val;
+	}
+
 	const result = await callMarvelApi(COMICS_ENDPOINT, getComicsSearchParams(year, 0, 1));
 	const parsedResult: ComicDataWrapper = await result.json();
-	// TODO: errors
-	return parsedResult.data.total;
+
+	if (parsedResult.code === 200) {
+		const { total } = parsedResult.data;
+		await redis.set(key, total);
+		return total;
+	}
+	return -1;
 }
 
 async function callMarvelApi(urlString: string, params: Record<string, string>): Promise<Response> {
