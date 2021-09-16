@@ -3,6 +3,7 @@
 	import { getOnSaleDate } from '$lib/comics';
 
 	import { Plus, Minus } from '$lib/icons';
+	import IconButton from '$lib/components/IconButton.svelte';
 
 	// TODO: bring up more details on separate page
 
@@ -86,13 +87,13 @@
 		<span>By {creatorText}</span>
 		{#if creatorCount > MAX_CREATORS}
 			{#if showAllCreators}
-				<button on:click={toggleCreators}
-					><Minus /><span class="visually-hidden">Show less</span></button
-				>
+				<IconButton altText="Show less" on:click={toggleCreators}>
+					<Minus />
+				</IconButton>
 			{:else}
-				<button on:click={toggleCreators}
-					><Plus /><span class="visually-hidden">Show more</span></button
-				>
+				<IconButton altText="Show more" on:click={toggleCreators}>
+					<Plus />
+				</IconButton>
 			{/if}
 		{/if}
 	</p>
@@ -123,28 +124,5 @@
 
 	a {
 		grid-row: 1 / -1;
-	}
-
-	button {
-		all: unset;
-		box-sizing: border-box;
-		height: 1.25rem;
-		width: 1.25rem;
-		vertical-align: middle;
-		color: var(--primary);
-	}
-
-	button:hover,
-	button:active {
-		filter: brightness(1.1);
-	}
-
-	button:focus {
-		border: 2px solid black;
-		border-radius: 50%;
-	}
-
-	button:focus:not(:focus-visible) {
-		border: none;
 	}
 </style>

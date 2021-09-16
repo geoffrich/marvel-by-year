@@ -4,6 +4,19 @@
 
 <script lang="ts">
 	import { years } from '$lib/years';
+	import { MIN_ID, MAX_ID } from '$lib/comics';
+	import { Refresh } from '$lib/icons';
+	import IconButton from '$lib/components/IconButton.svelte';
+
+	// TODO: how is this with prerendering
+	let randomId;
+	setRandomId();
+
+	// TODO: make this smarter, a lot of the comics don't exist
+	// use redis somehow?
+	function setRandomId() {
+		randomId = Math.floor(Math.random() * (MAX_ID - MIN_ID)) + MIN_ID;
+	}
 </script>
 
 <svelte:head>
@@ -30,6 +43,10 @@
 	Because of these API limits, please <em>do not</em> share links to this site on social media for the
 	time being.
 </p>
+
+<a href="https://read.marvel.com/#/book/{randomId}">Random comic!</a>
+<IconButton altText="Refresh" on:click={setRandomId}><Refresh /></IconButton>
+
 <h2>Jump to a year</h2>
 <ul>
 	{#each years as year (year)}
@@ -51,7 +68,7 @@
 		background-color: var(--secondary);
 	}
 
-	a {
+	ul a {
 		display: block;
 		padding: 0.5rem;
 	}
