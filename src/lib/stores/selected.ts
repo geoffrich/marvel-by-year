@@ -16,13 +16,14 @@ export function createSelectedStores(
 	const selectedItems = writable(_selectedItems);
 
 	const unsubscribeItems = items.subscribe(($items) => {
-		if (_selectedItems.size === oldItems.size || _selectedItems.size === 0) {
+		const newItems = new Set([...$items]);
+		if (_selectedItems.size === oldItems.size) {
 			// if all items were selected, all items should stay selected
-			// (even with new items added)
-			selectedItems.set(new Set([...$items]));
+			selectedItems.set(newItems);
 		} else {
 			// otherwise, selected items should be those that are still present in the new items
-			selectedItems.set(new Set([...$items].filter((i) => _selectedItems.has(i))));
+			const intersection = new Set([...$items].filter((i) => _selectedItems.has(i)));
+			selectedItems.set(intersection);
 		}
 	});
 
@@ -41,7 +42,7 @@ export function createSelectedStores(
 			applyNewComics: (comics: Comic[]) => {
 				items.update((currentItems) => {
 					oldItems = currentItems;
-					return new Set([...currentItems, ...comics.flatMap(mapping)]);
+					return new Set([...comics.flatMap(mapping)]);
 				});
 			}
 		},

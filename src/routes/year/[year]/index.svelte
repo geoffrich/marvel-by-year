@@ -25,11 +25,12 @@
 </script>
 
 <script lang="ts">
-	import type { ComicDataContainer, ComicDataWrapper, Comic } from '$lib/types/marvel';
+	import type { ComicDataWrapper, Comic } from '$lib/types/marvel';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
+	import { MAX_YEAR } from '$lib/years';
 	import {
 		getSeries,
 		getCreators,
@@ -58,18 +59,10 @@
 
 	$: title = `Comics for ${year}`;
 
-	// TODO: prefetch next year?
-	// $: if (browser && maxPage > start) {
-	// 	prefetch(`/year/${year}/${start + 1}`);
-	// }
-
-	function getMaxPage(data: ComicDataContainer) {
-		const { total, limit } = data;
-		return Math.floor(total / limit);
+	$: if (browser && year < MAX_YEAR) {
+		prefetch(`/year/${year + 1}`);
 	}
 
-	// TODO: refactor this if we're loading all comics at once
-	// possibly persist filters across years? but don't keep adding to list
 	let [series, selectedSeries, unsub1] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
 
@@ -127,7 +120,7 @@
 <PageLinks {year} />
 
 <p>
-	Displaying comics {comics.length} comics
+	Displaying {comics.length} comics
 </p>
 <p>
 	(Filtered: {filteredComics.length} / {comics.length})

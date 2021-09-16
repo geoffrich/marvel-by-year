@@ -1,6 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
+import { dev } from '$app/env';
 
 import { getComics, getTotalComics } from './_api';
 
@@ -15,12 +16,17 @@ const get: RequestHandler = async function get({ params }) {
 	}
 
 	console.log(`Getting comics for ${year}`);
-	const totalComics = await getTotalComics(params.year);
+	let totalComics = await getTotalComics(params.year);
 	if (totalComics === -1) {
 		console.log(`unable to fetch total comics for ${year}`);
 		return {
 			status: 500
 		};
+	}
+
+	// don't use up API calls/cache hits when developing
+	if (dev) {
+		totalComics = 200;
 	}
 
 	const requests = Array.from(Array(Math.ceil(totalComics / 100)).keys()).map((i) =>
