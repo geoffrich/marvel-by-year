@@ -4,6 +4,7 @@ import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 import { dev } from '$app/env';
 
 import { getComics, getTotalComics } from '$lib/api';
+import { getCachedComics } from '$lib/redis';
 
 //@ts-ignore
 const get: RequestHandler = async function get({ params }) {
@@ -16,7 +17,7 @@ const get: RequestHandler = async function get({ params }) {
 	}
 
 	console.log(`Getting comics for ${year}`);
-	let totalComics = await getTotalComics(params.year);
+	let totalComics = await getTotalComics(year);
 	console.log(`Total comics: ${totalComics}`);
 	if (totalComics === -1) {
 		console.log(`unable to fetch total comics for ${year}`);
@@ -30,11 +31,17 @@ const get: RequestHandler = async function get({ params }) {
 		totalComics = Math.min(200, totalComics);
 	}
 
-	const requests = Array.from(Array(Math.ceil(totalComics / 100)).keys()).map((i) =>
-		getComics(params.year, i)
-	);
+	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
+	const cache: Record<number, ComicDataWrapper> = {};
+	for (const i of pages) {
+		// we can't make the redis calls in parallel due to Redis host limitations
+		// https://docs.upstash.com/troubleshooting/max_request_size_exceeded
+		cache[i] = await getCachedComics(year, i);
+	}
 
+	const requests = pages.map((i) => getComics(year, i, cache));
 	const results = await Promise.all(requests);
+
 	let response: ComicDataWrapper;
 	if (results.length === 0) {
 		response = createEmptyResponse();

@@ -8,15 +8,16 @@ const PRIVATE_KEY = process.env['MARVEL_PRIVATE_KEY'];
 const COMICS_ENDPOINT = 'https://gateway.marvel.com/v1/public/comics';
 const MAX_LIMIT = 100;
 
-export async function getComics(year: string, page: number): Promise<ComicDataWrapper> {
-	const key = `year:${year}:${page}`;
+export async function getComics(
+	year: number,
+	page: number,
+	cache: Record<number, ComicDataWrapper>
+): Promise<ComicDataWrapper> {
 	console.log(`retrieving ${year} page ${page}`);
-	// TODO: handle error
-	const val = await redis.get<ComicDataWrapper>(key);
 
-	if (val) {
+	if (cache[page]) {
 		console.log(`found ${year} page ${page} in redis cache`);
-		return val;
+		return cache[page];
 	}
 
 	const result = await callMarvelApi(
@@ -26,15 +27,15 @@ export async function getComics(year: string, page: number): Promise<ComicDataWr
 
 	const parsedResult: ComicDataWrapper = await result.json();
 	if (parsedResult.code === 200) {
-		redis.addComics(key, parsedResult);
+		redis.addComics(year, page, parsedResult);
 	}
 
 	return parsedResult;
 }
 
-export async function getTotalComics(year: string): Promise<number> {
+export async function getTotalComics(year: number): Promise<number> {
 	const key = `year:${year}:total`;
-	const val = await redis.get<number>(key, parseInt);
+	const val = await redis.get<number>(key, false, parseInt);
 	if (val) {
 		return val;
 	}
@@ -70,7 +71,7 @@ async function callMarvelApi(urlString: string, params: Record<string, string>):
 	return await fetch(url.toString());
 }
 
-function getComicsSearchParams(year: string, offset: number, limit: number) {
+function getComicsSearchParams(year: number, offset: number, limit: number) {
 	return {
 		formatType: 'comic',
 		noVariants: 'true',
