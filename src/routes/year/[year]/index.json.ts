@@ -34,7 +34,6 @@ const get: RequestHandler = async function get({ params }) {
 	);
 
 	const results = await Promise.all(requests);
-	// TODO: adapt into custom response
 	const response: ComicDataWrapper = {
 		...results[0],
 		data: {

@@ -5,8 +5,6 @@
 	import { Plus, Minus } from '$lib/icons';
 	import IconButton from '$lib/components/IconButton.svelte';
 
-	// TODO: bring up more details on separate page
-
 	export let comic: Comic;
 	export let lazyLoad = true;
 

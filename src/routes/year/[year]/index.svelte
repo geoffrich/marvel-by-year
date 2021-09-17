@@ -80,8 +80,6 @@
 		$selectedEvents
 	);
 
-	// TODO: sort by best match
-	// TODO: debounce
 	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
 
 	function filterComics(
@@ -91,12 +89,9 @@
 		selectedCreators: Set<string>,
 		selectedEvents: Set<string>
 	) {
-		// TODO: fuzzy search with creators/events (should match any)
-		// https://github.com/kentcdodds/match-sorter#match-many-words-across-multiple-fields-table-filtering
 		// TODO: after best match, we should sort by date
 		return matchSorter(comics, searchText, {
-			keys: ['title', 'creators.items.*.name', 'events.items.*.name'],
-			threshold: matchSorter.rankings.ACRONYM
+			keys: ['title']
 		}).filter(
 			(c) =>
 				selectedSeries.has(c.series.name) &&
@@ -116,7 +111,6 @@
 			return comics.sort(compareDates);
 		}
 		// default sort by match-sorter
-		// TODO: order doesn't return after going to date and back to best-match
 		return comics;
 	}
 
@@ -143,22 +137,22 @@
 	<button on:click={resetFilters}>Reset filters</button>
 </p>
 
+<div class="search">
+	<div>
+		<label>Search <input type="text" bind:value={searchText} /></label>
+	</div>
+	<div>
+		<label for="sorting">Sort by</label>
+		<select id="sorting" bind:value={sortBy}>
+			{#each sortingOptions as opt (opt)}
+				<option>{opt}</option>
+			{/each}
+		</select>
+	</div>
+</div>
+
 <details>
 	<summary>Filter</summary>
-	<div class="search">
-		<div>
-			<label>Search <input type="text" bind:value={searchText} /></label>
-		</div>
-		<div>
-			<label for="sorting">Sort by</label>
-			<select id="sorting" bind:value={sortBy}>
-				{#each sortingOptions as opt (opt)}
-					<option>{opt}</option>
-				{/each}
-			</select>
-		</div>
-	</div>
-
 	<div class="filters">
 		<Filter items={$series} legend="Series" included={selectedSeries} />
 		<Filter items={$creators} legend="Creators" included={selectedCreators} />
