@@ -17,6 +17,7 @@ const get: RequestHandler = async function get({ params }) {
 
 	console.log(`Getting comics for ${year}`);
 	let totalComics = await getTotalComics(params.year);
+	console.log(`Total comics: ${totalComics}`);
 	if (totalComics === -1) {
 		console.log(`unable to fetch total comics for ${year}`);
 		return {
@@ -24,7 +25,7 @@ const get: RequestHandler = async function get({ params }) {
 		};
 	}
 
-	// don't use up API calls/cache hits when developing
+	// reduce API calls/cache hits when developing
 	if (dev) {
 		totalComics = Math.min(200, totalComics);
 	}
@@ -34,13 +35,18 @@ const get: RequestHandler = async function get({ params }) {
 	);
 
 	const results = await Promise.all(requests);
-	const response: ComicDataWrapper = {
-		...results[0],
-		data: {
-			...results[0].data,
-			results: []
-		}
-	};
+	let response: ComicDataWrapper;
+	if (results.length === 0) {
+		response = createEmptyResponse();
+	} else {
+		response = {
+			...results[0],
+			data: {
+				...results[0].data,
+				results: []
+			}
+		};
+	}
 
 	const badStatus = results.find((r) => r.code !== 200);
 	if (badStatus === undefined) {
@@ -63,3 +69,21 @@ const get: RequestHandler = async function get({ params }) {
 };
 
 export { get };
+
+function createEmptyResponse(): ComicDataWrapper {
+	return {
+		code: 200,
+		message: null,
+		copyright: null,
+		attributionHTML: '',
+		attributionText: '',
+		etag: null,
+		data: {
+			offset: 0,
+			limit: 0,
+			total: 0,
+			count: 0,
+			results: []
+		}
+	};
+}
