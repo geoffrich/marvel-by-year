@@ -10,6 +10,7 @@ const MAX_LIMIT = 100;
 
 export async function getComics(year: string, page: number): Promise<ComicDataWrapper> {
 	const key = `year:${year}:${page}`;
+	console.log(`retrieving ${year} page ${page}`);
 	// TODO: handle error
 	const val = await redis.get<ComicDataWrapper>(key);
 

@@ -17,25 +17,40 @@ const redis = new Redis({
 });
 
 async function get<T>(key: string, parse: (val: string) => T = JSON.parse): Promise<T> {
-	const val = await redis.get(key);
-	if (val) {
-		return parse(val);
+	try {
+		const val = await redis.get(key);
+		if (val) {
+			return parse(val);
+		}
+	} catch (e) {
+		console.log(e);
 	}
 
 	return null;
 }
 
 async function set<T>(key: string, value: T, expiry: number = DEFAULT_EXPIRY) {
-	return await redis.set(key, JSON.stringify(value), 'EX', expiry);
+	try {
+		return await redis.set(key, JSON.stringify(value), 'EX', expiry);
+	} catch (e) {
+		console.log(e);
+	}
 }
 
 async function addComics(key: string, value: ComicDataWrapper) {
-	const comicIds = value.data.results.map((c) => c.digitalId);
-	return await redis
-		.multi()
-		.set(key, JSON.stringify(value), 'EX', DEFAULT_EXPIRY)
-		.sadd(COMIC_ID_KEY, comicIds)
-		.exec();
+	try {
+		const comicIds = value.data.results.map((c) => c.digitalId);
+		if (comicIds.length === 0) {
+			return;
+		}
+		return await redis
+			.multi()
+			.set(key, JSON.stringify(value), 'EX', DEFAULT_EXPIRY)
+			.sadd(COMIC_ID_KEY, comicIds)
+			.exec();
+	} catch (e) {
+		console.log(e);
+	}
 }
 
 async function getRandomComicIds() {
