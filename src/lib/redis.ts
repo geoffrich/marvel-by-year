@@ -25,11 +25,8 @@ async function get<T>(
 	parse: (val: string) => T = JSON.parse
 ): Promise<T> {
 	try {
-		const val = await redis.get(key);
-		if (val) {
-			const uncompressed = compressed ? decompress(val) : val;
-			return parse(uncompressed);
-		}
+		const result = await redis.get(key);
+		return unpackResult(result, parse, compressed);
 	} catch (e) {
 		console.log('Unable to retrieve', key);
 		console.log(e);
@@ -53,10 +50,29 @@ async function set<T>(
 	}
 }
 
-export async function getCachedComics(year: number, page: number): Promise<ComicDataWrapper> {
-	const key = getComicKey(year, page);
-	const val = await get<ComicDataWrapper>(key, COMPRESS_COMICS);
-	return val;
+export async function getCachedComicsMulti(
+	year: number,
+	pages: number[]
+): Promise<ComicDataWrapper[]> {
+	const keys = pages.map((p) => getComicKey(year, p));
+	try {
+		const results = await redis.mget(...keys);
+		return results.map((r) => unpackResult(r, JSON.parse, COMPRESS_COMICS));
+	} catch (e) {
+		console.log('Unable to retrieve', ...keys);
+		console.log(e);
+	}
+
+	return [];
+}
+
+function unpackResult<T>(result: string, parse: (val: string) => T, compressed = false) {
+	if (result) {
+		const uncompressed = COMPRESS_COMICS ? decompress(result) : result;
+		return parse(uncompressed);
+	}
+
+	return null;
 }
 
 async function addComics(year: number, page: number, value: ComicDataWrapper) {

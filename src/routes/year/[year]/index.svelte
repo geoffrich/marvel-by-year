@@ -135,7 +135,16 @@
 
 <div class="search">
 	<div>
-		<label>Search <input type="text" bind:value={searchText} /></label>
+		<label
+			>Search <input
+				type="text"
+				autocomplete="off"
+				autocorrect="off"
+				autocapitalize="off"
+				spellcheck="false"
+				bind:value={searchText}
+			/></label
+		>
 	</div>
 	<div>
 		<label for="sorting">Sort by</label>
