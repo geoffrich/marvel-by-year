@@ -68,27 +68,18 @@
 		unsub3();
 	});
 
-	$: filteredComics = filterComics(
-		comics,
-		searchText,
-		$selectedSeries,
-		$selectedCreators,
-		$selectedEvents
-	);
+	$: filteredComics = filterComics(comics, $selectedSeries, $selectedCreators, $selectedEvents);
 
 	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
 
 	function filterComics(
 		comics: Comic[],
-		searchText: string,
 		selectedSeries: Set<string>,
 		selectedCreators: Set<string>,
 		selectedEvents: Set<string>
 	) {
 		// TODO: after best match, we should sort by date
-		return matchSorter(comics, searchText, {
-			keys: ['title']
-		}).filter(
+		return comics.filter(
 			(c) =>
 				selectedSeries.has(c.series.name) &&
 				isCreatorSelected(c, selectedCreators) &&
@@ -98,16 +89,19 @@
 
 	function sortComics(comics: Comic[], sortBy: string, searchText: string) {
 		// TODO: enum
+		const matchedComics = matchSorter(comics, searchText, {
+			keys: ['title']
+		});
 		if (sortBy === 'date') {
-			return comics.sort(compareDates);
+			return matchedComics.sort(compareDates);
 		} else if (sortBy === 'name') {
-			return comics.sort(compareTitles);
+			return matchedComics.sort(compareTitles);
 		} else if (!searchText) {
 			// if no search text, use dates instead of best-match
-			return comics.sort(compareDates);
+			return matchedComics.sort(compareDates);
 		}
 		// default sort by match-sorter
-		return comics;
+		return matchedComics;
 	}
 
 	function resetFilters() {
