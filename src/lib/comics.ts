@@ -1,5 +1,5 @@
 import type { Comic } from '$lib/types';
-import { default as dayjs } from 'dayjs';
+import dayjs from './dayjs';
 
 const NO_EVENT = '(no event)';
 const NO_CREATOR = '(unknown)';
@@ -47,7 +47,7 @@ export function isCreatorSelected({ creators }: Comic, selectedCreators: Set<str
 }
 
 export function getOnSaleDate(comic: Comic) {
-	return dayjs(comic.dates.onSale);
+	return dayjs.utc(comic.dates.onSale);
 }
 
 function compareStrings(a, b) {

@@ -1,4 +1,4 @@
-import { default as dayjs } from 'dayjs';
+import dayjs from './dayjs';
 export const MAX_YEAR = dayjs().year();
 export const MIN_YEAR = 1939;
 

@@ -205,6 +205,10 @@
 		font-size: inherit;
 	}
 
+	summary {
+		padding: 0.5rem;
+	}
+
 	@media screen and (min-width: 450px) {
 		ul {
 			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));

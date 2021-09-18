@@ -22,7 +22,7 @@
 		XXXLarge = 'portrait_uncanny' // 300x450
 	}
 
-	$: onSaleDate = getOnSaleDate(comic).add(1, 'day').format('D MMM YYYY');
+	$: onSaleDate = getOnSaleDate(comic).format('D MMM YYYY');
 
 	$: creatorCount = comic.creators.length;
 	$: creatorText = getCreatorText(
