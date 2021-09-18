@@ -1,4 +1,4 @@
-import type { Comic } from '$lib/types/marvel';
+import type { Comic } from '$lib/types';
 import { default as dayjs } from 'dayjs';
 
 const NO_EVENT = '(no event)';
@@ -8,8 +8,7 @@ export function getSeries(c: Comic): string {
 	return c.series.name;
 }
 
-export function getCreators(c: Comic): string[] {
-	const creators = c.creators.items;
+export function getCreators({ creators }: Comic): string[] {
 	if (creators.length > 0) {
 		return creators.map((cr) => cr.name);
 	} else {
@@ -17,8 +16,7 @@ export function getCreators(c: Comic): string[] {
 	}
 }
 
-export function getEvents(c: Comic): string[] {
-	const events = c.events.items;
+export function getEvents({ events }: Comic): string[] {
 	if (events.length > 0) {
 		return events.map((e) => e.name);
 	} else {
@@ -34,26 +32,22 @@ export function compareTitles(a: Comic, b: Comic) {
 	return compareStrings(a.title, b.title);
 }
 
-export function isEventSelected(comic: Comic, selectedEvents: Set<string>) {
-	const eventList = comic.events.items;
-
+export function isEventSelected({ events }: Comic, selectedEvents: Set<string>) {
 	return (
-		eventList.find((e) => selectedEvents.has(e.name)) !== undefined ||
-		(selectedEvents.has(NO_EVENT) && eventList.length === 0)
+		events.find((e) => selectedEvents.has(e.name)) !== undefined ||
+		(selectedEvents.has(NO_EVENT) && events.length === 0)
 	);
 }
 
-export function isCreatorSelected(comic: Comic, selectedCreators: Set<string>) {
-	const creatorList = comic.creators.items;
-
+export function isCreatorSelected({ creators }: Comic, selectedCreators: Set<string>) {
 	return (
-		creatorList.find((e) => selectedCreators.has(e.name)) !== undefined ||
-		(selectedCreators.has(NO_CREATOR) && creatorList.length === 0)
+		creators.find((e) => selectedCreators.has(e.name)) !== undefined ||
+		(selectedCreators.has(NO_CREATOR) && creators.length === 0)
 	);
 }
 
 export function getOnSaleDate(comic: Comic) {
-	return dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date);
+	return dayjs(comic.dates.onSale);
 }
 
 function compareStrings(a, b) {

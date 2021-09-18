@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Comic } from '$lib/types/marvel';
+	import type { Comic } from '$lib/types';
 	import { getOnSaleDate } from '$lib/comics';
 
 	import { Plus, Minus } from '$lib/icons';
@@ -22,22 +22,16 @@
 		XXXLarge = 'portrait_uncanny' // 300x450
 	}
 
-	$: onSaleDate = getOnSaleDate(comic)
-		.add(1, 'day') // TODO: days are off by one due to timezone issues, this is a hack
-		.format('D MMM YYYY');
+	$: onSaleDate = getOnSaleDate(comic).add(1, 'day').format('D MMM YYYY');
 
-	$: detailUrl = comic.urls.find((u) => u.type === 'detail').url;
-
-	$: creatorCount = comic.creators.items.length;
+	$: creatorCount = comic.creators.length;
 	$: creatorText = getCreatorText(
-		comic.creators.items.map((c) => c.name),
+		comic.creators.map((c) => c.name),
 		showAllCreators ? creatorCount : MAX_CREATORS
 	);
 
 	function getImageSrc(comic: Comic, size: ImageSize) {
-		return `${comic.thumbnail.path.replace('http:', 'https:')}/${size}.${
-			comic.thumbnail.extension
-		}`;
+		return `${comic.cover.path.replace('http:', 'https:')}/${size}.${comic.cover.ext}`;
 	}
 
 	function getCreatorText(creators: string[], max: number) {
@@ -79,7 +73,7 @@
 		</picture>
 		<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 	</a>
-	<p><a href={detailUrl}>{comic.title}</a></p>
+	<p><a href={comic.detailUrl}>{comic.title}</a></p>
 	<p>{onSaleDate}</p>
 	<p>
 		<span>By {creatorText}</span>

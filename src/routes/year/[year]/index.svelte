@@ -5,7 +5,7 @@
 	export async function load({ page, fetch }) {
 		const url = `/year/${page.params.year}.json`;
 		const res = await fetch(url, { credentials: 'omit' });
-		const response: ComicDataWrapper = await res.json();
+		const response: ComicResponse = await res.json();
 
 		if (res.ok) {
 			return {
@@ -25,7 +25,7 @@
 </script>
 
 <script lang="ts">
-	import type { ComicDataWrapper, Comic } from '$lib/types/marvel';
+	import type { ComicResponse, Comic } from '$lib/types';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
@@ -42,7 +42,7 @@
 	import { onDestroy } from 'svelte';
 	import { matchSorter } from 'match-sorter';
 
-	export let response: ComicDataWrapper;
+	export let response: ComicResponse;
 	export let year: number;
 
 	const sortingOptions = ['best match', 'name', 'date'];
@@ -50,11 +50,7 @@
 	let sortBy = sortingOptions[0];
 	let searchText = '';
 
-	// remove duplicate comics from the list
-	$: comics = response.data.results.filter(
-		(c, idx) => response.data.results.findIndex((c2) => c.id === c2.id) === idx
-	);
-
+	$: comics = response.comics;
 	$: title = `Comics for ${year}`;
 
 	let [series, selectedSeries, unsub1] = createSelectedStores(getSeries);
@@ -171,7 +167,7 @@
 </ul>
 <PageLinks {year} />
 
-<p>{response.attributionText}</p>
+<p>{response.attr}</p>
 
 <style>
 	ul {

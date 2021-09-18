@@ -5,9 +5,12 @@ import { dev } from '$app/env';
 
 import { getComics, getTotalComics } from '$lib/api';
 import { getCachedComics } from '$lib/redis';
+import { adaptResponses } from '$lib/adapt/comics';
+import { performance } from 'perf_hooks';
 
 //@ts-ignore
 const get: RequestHandler = async function get({ params }) {
+	const start = performance.now();
 	const year = parseInt(params.year);
 
 	if (year < MIN_YEAR || year > MAX_YEAR) {
@@ -42,24 +45,12 @@ const get: RequestHandler = async function get({ params }) {
 	const requests = pages.map((i) => getComics(year, i, cache));
 	const results = await Promise.all(requests);
 
-	let response: ComicDataWrapper;
-	if (results.length === 0) {
-		response = createEmptyResponse();
-	} else {
-		response = {
-			...results[0],
-			data: {
-				...results[0].data,
-				results: []
-			}
-		};
-	}
+	const end = performance.now();
+	console.log('elapsed', (end - start) / 1000);
 
 	const badStatus = results.find((r) => r.code !== 200);
 	if (badStatus === undefined) {
-		for (const result of results) {
-			response.data.results = [...response.data.results, ...result.data.results];
-		}
+		const response = adaptResponses(results);
 
 		return {
 			body: response,
@@ -76,21 +67,3 @@ const get: RequestHandler = async function get({ params }) {
 };
 
 export { get };
-
-function createEmptyResponse(): ComicDataWrapper {
-	return {
-		code: 200,
-		message: null,
-		copyright: null,
-		attributionHTML: '',
-		attributionText: '',
-		etag: null,
-		data: {
-			offset: 0,
-			limit: 0,
-			total: 0,
-			count: 0,
-			results: []
-		}
-	};
-}

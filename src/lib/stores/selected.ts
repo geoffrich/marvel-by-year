@@ -1,4 +1,4 @@
-import type { Comic } from '$lib/types/marvel';
+import type { Comic } from '$lib/types';
 import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
 
