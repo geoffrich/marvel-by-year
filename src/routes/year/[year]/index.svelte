@@ -49,6 +49,14 @@
 
 	let sortBy = sortingOptions[0];
 	let searchText = '';
+	let timer;
+
+	function updateSearchText(e: Event) {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			searchText = (e.target as HTMLInputElement).value;
+		}, 250);
+	}
 
 	$: comics = response.comics;
 	$: title = `Comics for ${year}`;
@@ -68,6 +76,8 @@
 		unsub3();
 	});
 
+	// TODO: can this be more efficient?
+	// with simulated CPU slowdown, there's lag when clearing the text field
 	$: filteredComics = filterComics(comics, $selectedSeries, $selectedCreators, $selectedEvents);
 
 	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
@@ -78,20 +88,26 @@
 		selectedCreators: Set<string>,
 		selectedEvents: Set<string>
 	) {
-		// TODO: after best match, we should sort by date
+		let noCreatorsSelected = selectedCreators.size === $creators.size;
+		let noEventsSelected = selectedEvents.size === $events.size;
+		let noSeriesSelected = selectedSeries.size === $series.size;
+		if (noCreatorsSelected && noEventsSelected && noSeriesSelected) {
+			return comics;
+		}
 		return comics.filter(
 			(c) =>
-				selectedSeries.has(c.series.name) &&
-				isCreatorSelected(c, selectedCreators) &&
-				isEventSelected(c, selectedEvents)
+				(noSeriesSelected || selectedSeries.has(c.series.name)) &&
+				(noCreatorsSelected || isCreatorSelected(c, selectedCreators)) &&
+				(noEventsSelected || isEventSelected(c, selectedEvents))
 		);
 	}
 
 	function sortComics(comics: Comic[], sortBy: string, searchText: string) {
-		// TODO: enum
+		// TODO: is there a way to have match sorter use dates/titles as secondary keys?
 		const matchedComics = matchSorter(comics, searchText, {
 			keys: ['title']
 		});
+		// TODO: enum
 		if (sortBy === 'date') {
 			return matchedComics.sort(compareDates);
 		} else if (sortBy === 'name') {
@@ -136,7 +152,8 @@
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
-				bind:value={searchText}
+				value={searchText}
+				on:input={updateSearchText}
 			/></label
 		>
 	</div>
