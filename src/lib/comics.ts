@@ -39,6 +39,7 @@ export function isEventSelected({ events }: Comic, selectedEvents: Set<string>) 
 	);
 }
 
+// TODO: make more efficient
 export function isCreatorSelected({ creators }: Comic, selectedCreators: Set<string>) {
 	return (
 		creators.find((e) => selectedCreators.has(e.name)) !== undefined ||

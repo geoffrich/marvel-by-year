@@ -41,6 +41,7 @@
 	} from '$lib/comics';
 	import { onDestroy } from 'svelte';
 	import { matchSorter } from 'match-sorter';
+	import type { MatchSorterOptions } from 'match-sorter';
 
 	export let response: ComicResponse;
 	export let year: number;
@@ -103,20 +104,26 @@
 	}
 
 	function sortComics(comics: Comic[], sortBy: string, searchText: string) {
-		// TODO: is there a way to have match sorter use dates/titles as secondary keys?
-		const matchedComics = matchSorter(comics, searchText, {
-			keys: ['title']
-		});
-		// TODO: enum
-		if (sortBy === 'date') {
-			return matchedComics.sort(compareDates);
-		} else if (sortBy === 'name') {
-			return matchedComics.sort(compareTitles);
-		} else if (!searchText) {
-			// if no search text, use dates instead of best-match
-			return matchedComics.sort(compareDates);
+		let sortFunction: MatchSorterOptions<Comic>['sorter'];
+
+		switch (sortBy) {
+			case 'date':
+				sortFunction = (matchItems) => matchItems.sort((a, b) => compareDates(a.item, b.item));
+				break;
+			case 'name':
+				sortFunction = (matchItems) => matchItems.sort((a, b) => compareTitles(a.item, b.item));
+				break;
 		}
-		// default sort by match-sorter
+
+		const matchedComics = matchSorter(comics, searchText, {
+			keys: ['title'],
+			// baseSort tie-breaks items that have the same ranking
+			// when there's no search text (i.e. all items have same ranking), sort by date
+			baseSort: searchText ? undefined : (a, b) => compareDates(a.item, b.item),
+			// sorter sorts the items after matching them
+			// using a custom function here means the items are sorted by something other than rank
+			sorter: sortFunction
+		});
 		return matchedComics;
 	}
 
