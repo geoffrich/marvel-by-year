@@ -50,7 +50,8 @@
 
 	let sortBy = sortingOptions[0];
 	let searchText = '';
-	let timer;
+	let timer: ReturnType<typeof setTimeout>;
+	let sortDescending = true;
 
 	function updateSearchText(e: Event) {
 		clearTimeout(timer);
@@ -82,6 +83,8 @@
 	$: filteredComics = filterComics(comics, $selectedSeries, $selectedCreators, $selectedEvents);
 
 	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
+
+	$: orderedComics = sortDescending ? sortedComics : [...sortedComics].reverse();
 
 	function filterComics(
 		comics: Comic[],
@@ -172,6 +175,9 @@
 			{/each}
 		</select>
 	</div>
+	<div>
+		<label><input type="checkbox" bind:checked={sortDescending} />Descending</label>
+	</div>
 </div>
 
 <details>
@@ -184,7 +190,7 @@
 </details>
 
 <ul>
-	{#each sortedComics as comic, idx (comic.id)}
+	{#each orderedComics as comic, idx (comic.id)}
 		<li>
 			<ComicSummary {comic} lazyLoad={idx > 10} />
 		</li>
@@ -216,11 +222,18 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+		flex-wrap: wrap;
 	}
 
 	input,
 	select {
 		font-size: inherit;
+	}
+
+	input[type='checkbox'] {
+		height: 1rem;
+		width: 1rem;
+		margin-right: 0.25rem;
 	}
 
 	summary {
