@@ -2,9 +2,7 @@ import Redis from 'ioredis';
 import LZString from '$lib/lz-string';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 
-const REDIS_ENDPOINT = process.env['REDIS_ENDPOINT'];
-const REDIS_PASSWORD = process.env['REDIS_PASSWORD'];
-const REDIS_PORT = process.env['REDIS_PORT'];
+const REDIS_CONNECTION = process.env['REDIS_CONNECTION'];
 
 const DEFAULT_EXPIRY = 24 * 60 * 60;
 const COMIC_ID_KEY = 'comics:ids';
@@ -23,11 +21,7 @@ export default class RedisClient {
 	redis: Redis.Redis;
 
 	constructor() {
-		this.redis = new Redis({
-			host: REDIS_ENDPOINT,
-			port: parseInt(REDIS_PORT),
-			password: REDIS_PASSWORD,
-			tls: {},
+		this.redis = new Redis(REDIS_CONNECTION, {
 			retryStrategy: (times) => {
 				if (times > 0) {
 					console.log('unable to connect to redis');
