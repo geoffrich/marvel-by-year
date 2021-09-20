@@ -88,6 +88,13 @@ function getRoleEnum(role: string): Role {
 			return Role.Painter;
 		case 'project manager':
 			return Role.ProjectManager;
+		case 'other':
+		case 'publisher':
+		case 'director of digital content':
+		case 'digital coordinator':
+		case 'digital production manager':
+		case 'editor in chief':
+			return Role.Unknown;
 		default:
 			console.log('unknown role', role);
 			return Role.Unknown;

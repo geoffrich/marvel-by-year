@@ -21,18 +21,20 @@ export default class RedisClient {
 	redis: Redis.Redis;
 
 	constructor() {
-		this.redis = new Redis(REDIS_CONNECTION, {
-			retryStrategy: (times) => {
-				if (times > 0) {
-					console.log('unable to connect to redis');
-					return null;
-				} else {
-					console.log('retrying redis connection');
-					return 50;
-				}
-			},
-			connectTimeout: 500
-		});
+		this.redis = REDIS_CONNECTION
+			? new Redis(REDIS_CONNECTION, {
+					retryStrategy: (times) => {
+						if (times > 0) {
+							console.log('unable to connect to redis');
+							return null;
+						} else {
+							console.log('retrying redis connection');
+							return 50;
+						}
+					},
+					connectTimeout: 500
+			  })
+			: new Redis(); // fallback to locally-hosted Redis
 	}
 
 	get status(): string {

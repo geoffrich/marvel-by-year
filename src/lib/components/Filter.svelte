@@ -59,7 +59,7 @@
 	}
 
 	fieldset {
-		height: 300px; /* I'd like this to be max-height, but content breaks out of the box in Chrome */
+		max-height: 300px;
 		overflow: auto;
 		align-self: start;
 		position: relative;

@@ -149,7 +149,7 @@
 	Displaying {comics.length} comics
 </p>
 <p>
-	(Filtered: {filteredComics.length} / {comics.length})
+	(Filtered: {sortedComics.length} / {comics.length})
 	<button on:click={resetFilters}>Reset filters</button>
 </p>
 
