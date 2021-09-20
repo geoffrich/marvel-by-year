@@ -29,8 +29,13 @@ export default class RedisClient {
 			password: REDIS_PASSWORD,
 			tls: {},
 			retryStrategy: (times) => {
-				console.log('retrying redis connection');
-				return times > 0 ? null : 50;
+				if (times > 0) {
+					console.log('unable to connect to redis');
+					return null;
+				} else {
+					console.log('retrying redis connection');
+					return 50;
+				}
 			},
 			connectTimeout: 500
 		});
