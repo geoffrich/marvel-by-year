@@ -3,8 +3,8 @@ import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 import { dev } from '$app/env';
 
-import { getComics, getTotalComics } from '$lib/api';
-import { getCachedComicsMulti } from '$lib/redis';
+import MarvelApi from '$lib/api';
+import Redis from '$lib/redis';
 import { adaptResponses } from '$lib/adapt/comics';
 import { performance } from 'perf_hooks';
 
@@ -19,8 +19,11 @@ const get: RequestHandler = async function get({ params }) {
 		};
 	}
 
+	const redis = new Redis();
+	const api = new MarvelApi(redis);
+
 	console.log(`Getting comics for ${year}`);
-	let totalComics = await getTotalComics(year);
+	let totalComics = await api.getTotalComics(year);
 	console.log(`Total comics: ${totalComics}`);
 	if (totalComics === -1) {
 		console.log(`unable to fetch total comics for ${year}`);
@@ -38,9 +41,10 @@ const get: RequestHandler = async function get({ params }) {
 	const cache = await buildCache(year, pages);
 	console.log('cache checked in', (performance.now() - start) / 1000);
 
-	const requests = pages.map((i) => getComics(year, i, cache));
+	const requests = pages.map((i) => api.getComics(year, i, cache));
 	const results = await Promise.all(requests);
 
+	redis.quit();
 	console.log('elapsed', (performance.now() - start) / 1000);
 
 	const badStatus = results.find((r) => r.code !== 200);
@@ -59,22 +63,22 @@ const get: RequestHandler = async function get({ params }) {
 	return {
 		status: 500
 	};
-};
 
-async function buildCache(
-	year: number,
-	pages: number[]
-): Promise<Record<number, ComicDataWrapper>> {
-	const cache: Record<number, ComicDataWrapper> = {};
-	const SIMUL_PAGES = 5;
-	// only get 5 at a time due to request size limits (the responses are big)
-	for (let i = 0; i < pages.length; i += SIMUL_PAGES) {
-		const cached = await getCachedComicsMulti(year, pages.slice(i, i + SIMUL_PAGES));
-		for (let j = 0; j < cached.length; j++) {
-			cache[j + i] = cached[j];
+	async function buildCache(
+		year: number,
+		pages: number[]
+	): Promise<Record<number, ComicDataWrapper>> {
+		const cache: Record<number, ComicDataWrapper> = {};
+		const SIMUL_PAGES = 5;
+		// only get 5 at a time due to request size limits (the responses are big)
+		for (let i = 0; i < pages.length; i += SIMUL_PAGES) {
+			const cached = await redis.getCachedComicsMulti(year, pages.slice(i, i + SIMUL_PAGES));
+			for (let j = 0; j < cached.length; j++) {
+				cache[j + i] = cached[j];
+			}
 		}
+		return cache;
 	}
-	return cache;
-}
+};
 
 export { get };
