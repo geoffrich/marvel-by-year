@@ -1,8 +1,11 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { getRandomIds } from '$lib/api';
+import Api from '$lib/api';
+import Redis from '$lib/redis';
 
 const get: RequestHandler = async function get({ params }) {
-	const ids = await getRandomIds();
+	const redis = new Redis();
+	const api = new Api(redis);
+	const ids = await api.getRandomIds();
 	return {
 		body: {
 			ids
