@@ -1,7 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
-import { dev } from '$app/env';
 
 import MarvelApi from '$lib/api';
 import Redis from '$lib/redis';
@@ -9,9 +8,10 @@ import { adaptResponses } from '$lib/adapt/comics';
 import { performance } from 'perf_hooks';
 
 //@ts-ignore
-const get: RequestHandler = async function get({ params }) {
+const get: RequestHandler = async function get({ params, query }) {
 	const start = performance.now();
 	const year = parseInt(params.year);
+	const ignoreCache = !!query.get('ignoreCache');
 
 	if (year < MIN_YEAR || year > MAX_YEAR) {
 		return {
@@ -20,7 +20,7 @@ const get: RequestHandler = async function get({ params }) {
 	}
 
 	const redis = new Redis();
-	const api = new MarvelApi(redis);
+	const api = new MarvelApi(redis, ignoreCache);
 
 	console.log(`Getting comics for ${year}`);
 	let totalComics = await api.getTotalComics(year);
@@ -32,13 +32,8 @@ const get: RequestHandler = async function get({ params }) {
 		};
 	}
 
-	// reduce API calls/cache hits when developing
-	if (dev) {
-		totalComics = Math.min(200, totalComics);
-	}
-
 	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
-	const cache = await buildCache(year, pages);
+	const cache = ignoreCache ? {} : await buildCache(year, pages);
 	console.log('cache checked in', (performance.now() - start) / 1000);
 
 	const requests = pages.map((i) => api.getComics(year, i, cache));

@@ -10,8 +10,10 @@ const MAX_LIMIT = 100;
 
 export default class MarvelApi {
 	redis: RedisClient;
-	constructor(redis: RedisClient) {
+	ignoreCache: boolean;
+	constructor(redis: RedisClient, ignoreCache: boolean) {
 		this.redis = redis;
+		this.ignoreCache = ignoreCache;
 	}
 
 	async getComics(
@@ -42,7 +44,7 @@ export default class MarvelApi {
 	async getTotalComics(year: number): Promise<number> {
 		const key = `year:${year}:total`;
 		const val = await this.redis.get<number>(key, false, parseInt);
-		if (val) {
+		if (val && !this.ignoreCache) {
 			return val;
 		}
 
@@ -80,11 +82,15 @@ export default class MarvelApi {
 
 function getComicsSearchParams(year: number, offset: number, limit: number) {
 	return {
-		formatType: 'comic',
+		format: 'comic',
 		noVariants: 'true',
 		dateRange: `${year}-01-01,${year}-12-31`,
 		hasDigitalIssue: 'true',
 		limit: limit.toString(),
-		offset: offset.toString()
+		offset: offset.toString(),
+		// when ordering by other fields (e.g. date), the API response is missing some comics. So don't change this without testing!
+		// to check if comics are missing, order a year alphabetically and check for missing issue numbers
+		// if duplicates are found, this likely means another comic is missing.
+		orderBy: 'modified'
 	};
 }

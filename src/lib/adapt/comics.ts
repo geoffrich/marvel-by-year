@@ -12,7 +12,16 @@ export function adaptResponses(responses: ComicDataWrapper[]): ComicResponse {
 	const comics = responses.flatMap((r) => r.data.results);
 	const adapted = comics.map(mapComic);
 	// remove duplicate ids
-	const deduped = adapted.filter((c, idx) => adapted.findIndex((c2) => c.id === c2.id) === idx);
+	const deduped = adapted.filter((c, idx) => {
+		const matchingIdIndex = adapted.findIndex((c2) => c.id === c2.id);
+		if (matchingIdIndex === idx) {
+			return true;
+		}
+
+		// if we find duplicates, this likely means we are missing other comics
+		console.log('duplicate', adapted[matchingIdIndex].title);
+		return false;
+	});
 
 	return {
 		attr: responses[0].attributionText,
@@ -88,6 +97,7 @@ function getRoleEnum(role: string): Role {
 			return Role.Painter;
 		case 'project manager':
 			return Role.ProjectManager;
+		// TODO: map these?
 		case 'other':
 		case 'publisher':
 		case 'director of digital content':

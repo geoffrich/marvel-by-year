@@ -3,7 +3,7 @@
 	 * @type {import('@sveltejs/kit').Load}
 	 */
 	export async function load({ page, fetch }) {
-		const url = `/year/${page.params.year}.json`;
+		const url = `/year/${page.params.year}.json?${page.query.toString()}`;
 		const res = await fetch(url, { credentials: 'omit' });
 		const response: ComicResponse = await res.json();
 
@@ -122,7 +122,9 @@
 			keys: ['title'],
 			// baseSort tie-breaks items that have the same ranking
 			// when there's no search text (i.e. all items have same ranking), sort by date
-			baseSort: searchText ? undefined : (a, b) => compareDates(a.item, b.item),
+			baseSort: searchText
+				? (a, b) => compareTitles(a.item, b.item)
+				: (a, b) => compareDates(a.item, b.item),
 			// sorter sorts the items after matching them
 			// using a custom function here means the items are sorted by something other than rank
 			sorter: sortFunction

@@ -28,8 +28,10 @@ export function compareDates(a: Comic, b: Comic) {
 	return getOnSaleDate(a).diff(getOnSaleDate(b));
 }
 
-export function compareTitles(a: Comic, b: Comic) {
-	return compareStrings(a.title, b.title);
+export function compareTitles({ title: titleA }: Comic, { title: titleB }: Comic) {
+	// TODO: possible perf enhancement
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare#performance
+	return titleA.localeCompare(titleB, undefined, { numeric: true, sensitivity: 'base' });
 }
 
 export function isEventSelected({ events }: Comic, selectedEvents: Set<string>) {
