@@ -76,10 +76,12 @@
 		<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 	</a>
 	<p><a href={comic.detailUrl}>{comic.title}</a></p>
-	<p>
-		{onSaleDate}
-		{#if showUnlimitedDate}(Unlimited: {unlimitedDate}){/if}
-	</p>
+	<div>
+		<p>
+			{onSaleDate}
+		</p>
+		{#if showUnlimitedDate}<p>(MU: {unlimitedDate})</p>{/if}
+	</div>
 	<p>
 		<span>By {creatorText}</span>
 		{#if creatorCount > MAX_CREATORS}
@@ -121,5 +123,9 @@
 
 	a {
 		grid-row: 1 / -1;
+	}
+
+	p {
+		margin: 0;
 	}
 </style>
