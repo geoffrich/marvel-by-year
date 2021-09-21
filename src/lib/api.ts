@@ -11,7 +11,7 @@ const MAX_LIMIT = 100;
 export default class MarvelApi {
 	redis: RedisClient;
 	ignoreCache: boolean;
-	constructor(redis: RedisClient, ignoreCache: boolean) {
+	constructor(redis: RedisClient, ignoreCache: boolean = false) {
 		this.redis = redis;
 		this.ignoreCache = ignoreCache;
 	}
