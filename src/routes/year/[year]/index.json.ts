@@ -6,6 +6,7 @@ import MarvelApi from '$lib/api';
 import Redis from '$lib/redis';
 import { adaptResponses } from '$lib/adapt/comics';
 import { performance } from 'perf_hooks';
+import { dev } from '$app/env';
 
 //@ts-ignore
 const get: RequestHandler = async function get({ params, query }) {
@@ -30,6 +31,11 @@ const get: RequestHandler = async function get({ params, query }) {
 		return {
 			status: 500
 		};
+	}
+
+	// reduce API calls/cache hits when developing
+	if (dev) {
+		totalComics = Math.min(200, totalComics);
 	}
 
 	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
