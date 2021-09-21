@@ -1,26 +1,53 @@
 <script context="module" lang="ts">
+	// https://italonascimento.github.io/applying-a-timeout-to-your-promises/
+	const promiseTimeout = function (ms, promise) {
+		// Create a promise that rejects in <ms> milliseconds
+		let timeout = new Promise((_, reject) => {
+			let id = setTimeout(() => {
+				clearTimeout(id);
+				reject('Timed out in ' + ms + 'ms.');
+			}, ms);
+		});
+
+		// Returns a race between our timeout and the passed in promise
+		return Promise.race([promise, timeout]);
+	};
+
+	const DEFAULT_TIMEOUT = 9500;
+
 	/**
 	 * @type {import('@sveltejs/kit').Load}
 	 */
 	export async function load({ page, fetch }) {
 		const url = `/year/${page.params.year}.json?${page.query.toString()}`;
-		const res = await fetch(url, { credentials: 'omit' });
-		const response: ComicResponse = await res.json();
+		// Netlify functions have a execution time limit of 10 seconds
+		// The Marvel API can be slow and take 20+ seconds in some cases
+		// If we don't hear back in time, throw an error so the user can easily retry
+		try {
+			const res = await promiseTimeout(DEFAULT_TIMEOUT, fetch(url, { credentials: 'omit' }));
+			const response: ComicResponse = await res.json();
 
-		if (res.ok) {
+			if (res.ok) {
+				return {
+					props: {
+						response,
+						year: parseInt(page.params.year)
+					},
+					maxage: 86400
+				};
+			}
+
 			return {
-				props: {
-					response,
-					year: parseInt(page.params.year)
-				},
-				maxage: 86400
+				status: res.status,
+				error: new Error(`Could not load ${url}`)
+			};
+		} catch (e) {
+			console.log(page.params.year, e);
+			return {
+				status: 500,
+				error: e
 			};
 		}
-
-		return {
-			status: res.status,
-			error: new Error(`Could not load ${url}`)
-		};
 	}
 </script>
 
@@ -46,9 +73,15 @@
 	export let response: ComicResponse;
 	export let year: number;
 
-	const sortingOptions = ['best match', 'name', 'date'];
+	enum SortOption {
+		BestMatch = 'best match',
+		Title = 'title',
+		Date = 'date'
+	}
 
-	let sortBy = sortingOptions[0];
+	const sortingOptions = Object.values(SortOption);
+
+	let sortBy = SortOption.BestMatch;
 	let searchText = '';
 	let timer: ReturnType<typeof setTimeout>;
 	let sortDescending = true;
@@ -110,10 +143,10 @@
 		let sortFunction: MatchSorterOptions<Comic>['sorter'];
 
 		switch (sortBy) {
-			case 'date':
+			case SortOption.Date:
 				sortFunction = (matchItems) => matchItems.sort((a, b) => compareDates(a.item, b.item));
 				break;
-			case 'name':
+			case SortOption.Title:
 				sortFunction = (matchItems) => matchItems.sort((a, b) => compareTitles(a.item, b.item));
 				break;
 		}
@@ -202,7 +235,9 @@
 </ul>
 <PageLinks {year} />
 
-<p>{response.attr}</p>
+{#if response.attr}
+	<p>{response.attr}</p>
+{/if}
 
 <style>
 	ul {

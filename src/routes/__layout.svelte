@@ -18,7 +18,7 @@
 
 <footer>
 	Built by <a href="https://geoffrich.net/">Geoff</a> with
-	<a rel="noreferrer" href="https://kit.svelte.dev/">SvelteKit</a>.
+	<a href="https://kit.svelte.dev/">SvelteKit</a>.
 </footer>
 
 <style>
