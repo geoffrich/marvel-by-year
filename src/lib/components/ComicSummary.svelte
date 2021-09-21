@@ -80,7 +80,7 @@
 		<p>
 			{onSaleDate}
 		</p>
-		{#if showUnlimitedDate}<p>(MU: {unlimitedDate})</p>{/if}
+		{#if showUnlimitedDate}<p>MU: {unlimitedDate}</p>{/if}
 	</div>
 	<p>
 		<span>By {creatorText}</span>
