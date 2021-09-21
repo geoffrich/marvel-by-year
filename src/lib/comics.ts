@@ -28,6 +28,10 @@ export function compareDates(a: Comic, b: Comic) {
 	return getOnSaleDate(a).diff(getOnSaleDate(b));
 }
 
+export function compareUnlimitedDates(a: Comic, b: Comic) {
+	return getUnlimitedDate(a).diff(getUnlimitedDate(b));
+}
+
 export function compareTitles({ title: titleA }: Comic, { title: titleB }: Comic) {
 	// TODO: possible perf enhancement
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare#performance
@@ -53,14 +57,6 @@ export function getOnSaleDate(comic: Comic) {
 	return dayjs.utc(comic.dates.onSale);
 }
 
-function compareStrings(a, b) {
-	if (a < b) {
-		return -1;
-	}
-
-	if (a > b) {
-		return 1;
-	}
-
-	return 0;
+export function getUnlimitedDate(comic: Comic) {
+	return dayjs.utc(comic.dates.unlimited);
 }

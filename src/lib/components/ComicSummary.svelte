@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { Comic } from '$lib/types';
-	import { getOnSaleDate } from '$lib/comics';
+	import { getOnSaleDate, getUnlimitedDate } from '$lib/comics';
 
 	import { Plus, Minus } from '$lib/icons';
 	import IconButton from '$lib/components/IconButton.svelte';
 
 	export let comic: Comic;
 	export let lazyLoad = true;
+	export let showUnlimitedDate = false;
 
 	let showAllCreators = false;
 
@@ -23,6 +24,7 @@
 	}
 
 	$: onSaleDate = getOnSaleDate(comic).format('D MMM YYYY');
+	$: unlimitedDate = getUnlimitedDate(comic).format('D MMM YYYY');
 
 	$: creatorCount = comic.creators.length;
 	$: creatorText = getCreatorText(
@@ -74,7 +76,10 @@
 		<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 	</a>
 	<p><a href={comic.detailUrl}>{comic.title}</a></p>
-	<p>{onSaleDate}</p>
+	<p>
+		{onSaleDate}
+		{#if showUnlimitedDate}(Unlimited: {unlimitedDate}){/if}
+	</p>
 	<p>
 		<span>By {creatorText}</span>
 		{#if creatorCount > MAX_CREATORS}

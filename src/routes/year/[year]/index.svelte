@@ -64,7 +64,8 @@
 		compareDates,
 		compareTitles,
 		isEventSelected,
-		isCreatorSelected
+		isCreatorSelected,
+		compareUnlimitedDates
 	} from '$lib/comics';
 	import { onDestroy } from 'svelte';
 	import { matchSorter } from 'match-sorter';
@@ -76,7 +77,8 @@
 	enum SortOption {
 		BestMatch = 'best match',
 		Title = 'title',
-		Date = 'date'
+		PublishDate = 'publish date',
+		UnlimitedDate = 'unlimited date'
 	}
 
 	const sortingOptions = Object.values(SortOption);
@@ -143,11 +145,15 @@
 		let sortFunction: MatchSorterOptions<Comic>['sorter'];
 
 		switch (sortBy) {
-			case SortOption.Date:
+			case SortOption.PublishDate:
 				sortFunction = (matchItems) => matchItems.sort((a, b) => compareDates(a.item, b.item));
 				break;
 			case SortOption.Title:
 				sortFunction = (matchItems) => matchItems.sort((a, b) => compareTitles(a.item, b.item));
+				break;
+			case SortOption.UnlimitedDate:
+				sortFunction = (matchItems) =>
+					matchItems.sort((a, b) => compareUnlimitedDates(a.item, b.item));
 				break;
 		}
 
@@ -227,7 +233,11 @@
 <ul>
 	{#each orderedComics as comic, idx (comic.id)}
 		<li>
-			<ComicSummary {comic} lazyLoad={idx > 10} />
+			<ComicSummary
+				{comic}
+				lazyLoad={idx > 10}
+				showUnlimitedDate={sortBy === SortOption.UnlimitedDate}
+			/>
 		</li>
 	{:else}
 		<li>Nothing to show!</li>
