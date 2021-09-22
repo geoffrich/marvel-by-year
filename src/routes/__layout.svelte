@@ -10,6 +10,8 @@
 
 <nav>
 	<a href="/">Home</a>
+	<a href="/year">Years</a>
+	<a href="/comic/random">Random Comic</a>
 </nav>
 
 <main>
@@ -32,5 +34,10 @@
 	:global(div#svelte) {
 		display: grid;
 		grid-template-rows: auto 1fr auto;
+	}
+
+	nav {
+		display: flex;
+		gap: 1rem;
 	}
 </style>

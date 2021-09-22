@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Comic } from '$lib/types';
-	import { getOnSaleDate, getUnlimitedDate } from '$lib/comics';
+	import { ImageSize, getOnSaleDate, getUnlimitedDate, getImage } from '$lib/comics';
 
 	import { Plus, Minus } from '$lib/icons';
 	import IconButton from '$lib/components/IconButton.svelte';
@@ -13,16 +13,6 @@
 
 	const MAX_CREATORS = 3;
 
-	// documented at https://developer.marvel.com/documentation/images
-	enum ImageSize {
-		Small = 'portrait_small', // 50x75
-		Medium = 'portrait_medium', // 100x150
-		Large = 'portrait_xlarge', // 150x225
-		XLarge = 'portrait_fantastic', // 168x252
-		XXLarge = 'portrait_incredible', // 216x324
-		XXXLarge = 'portrait_uncanny' // 300x450
-	}
-
 	$: onSaleDate = getOnSaleDate(comic).format('D MMM YYYY');
 	$: unlimitedDate = getUnlimitedDate(comic).format('D MMM YYYY');
 
@@ -33,7 +23,7 @@
 	);
 
 	function getImageSrc(comic: Comic, size: ImageSize) {
-		return `${comic.cover.path.replace('http:', 'https:')}/${size}.${comic.cover.ext}`;
+		return getImage(comic.cover.path, size, comic.cover.ext);
 	}
 
 	function getCreatorText(creators: string[], max: number) {

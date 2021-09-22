@@ -2,10 +2,6 @@
 	export const prerender = true;
 </script>
 
-<script lang="ts">
-	import { years } from '$lib/years';
-</script>
-
 <svelte:head>
 	<title>Browse Marvel Unlimited by Year</title>
 </svelte:head>
@@ -30,32 +26,3 @@
 	Because of these API limits, please <em>do not</em> share links to this site on social media for the
 	time being.
 </p>
-
-<a href="/comic/random">Random comic</a>
-
-<h2>Jump to a year</h2>
-<ul>
-	{#each years as year (year)}
-		<li><a href="/year/{year}" sveltekit:prefetch>{year}</a></li>
-	{/each}
-</ul>
-
-<style>
-	ul {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, 50px);
-		list-style: none;
-		padding: 0;
-		gap: 0.5rem;
-		justify-content: center;
-	}
-
-	li {
-		background-color: var(--secondary);
-	}
-
-	ul a {
-		display: block;
-		padding: 0.5rem;
-	}
-</style>

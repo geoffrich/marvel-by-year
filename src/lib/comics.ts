@@ -60,3 +60,24 @@ export function getOnSaleDate(comic: Comic) {
 export function getUnlimitedDate(comic: Comic) {
 	return dayjs.utc(comic.dates.unlimited);
 }
+
+export function getImage(path: string, size: ImageSize, ext?: string) {
+	if (ext === undefined) {
+		// assume the extension is included in the path
+		let splitPath = path.split('.');
+		ext = splitPath.pop();
+		path = splitPath.join('.');
+	}
+
+	return `${path.replace('http:', 'https:')}/${size}.${ext}`;
+}
+
+// documented at https://developer.marvel.com/documentation/images
+export enum ImageSize {
+	Small = 'portrait_small', // 50x75
+	Medium = 'portrait_medium', // 100x150
+	Large = 'portrait_xlarge', // 150x225
+	XLarge = 'portrait_fantastic', // 168x252
+	XXLarge = 'portrait_incredible', // 216x324
+	XXXLarge = 'portrait_uncanny' // 300x450
+}

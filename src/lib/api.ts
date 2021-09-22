@@ -59,8 +59,8 @@ export default class MarvelApi {
 		return -1;
 	}
 
-	async getRandomIds() {
-		return await this.redis.getRandomComicIds();
+	async getRandomComics() {
+		return await this.redis.getRandomComics();
 	}
 
 	async callMarvelApi(urlString: string, params: Record<string, string>): Promise<Response> {

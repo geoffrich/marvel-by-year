@@ -35,7 +35,7 @@ const get: RequestHandler = async function get({ params, query }) {
 
 	// reduce API calls/cache hits when developing
 	if (dev) {
-		totalComics = Math.min(200, totalComics);
+		//totalComics = Math.min(200, totalComics);
 	}
 
 	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());

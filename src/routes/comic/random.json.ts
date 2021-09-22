@@ -5,10 +5,10 @@ import Redis from '$lib/redis';
 const get: RequestHandler = async function get({ params }) {
 	const redis = new Redis();
 	const api = new Api(redis);
-	const ids = await api.getRandomIds();
+	const comics = await api.getRandomComics();
 	return {
 		body: {
-			ids
+			comics
 		}
 	};
 };

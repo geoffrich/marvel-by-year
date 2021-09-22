@@ -1,7 +1,14 @@
 import { Role } from './enums';
 
 export interface RandomResponse {
-	ids: string[];
+	comics: RandomComic[];
+}
+
+export interface RandomComic {
+	id: string;
+	image: string;
+	ext: string;
+	title: string;
 }
 
 export interface ComicResponse {

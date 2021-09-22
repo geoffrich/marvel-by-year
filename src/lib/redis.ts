@@ -1,6 +1,7 @@
 import Redis from 'ioredis';
 import LZString from '$lib/lz-string';
 import type { ComicDataWrapper } from '$lib/types/marvel';
+import type { RandomComic } from '$lib/types';
 
 const REDIS_CONNECTION = process.env['REDIS_CONNECTION'];
 
@@ -94,26 +95,58 @@ export default class RedisClient {
 		if (this.closed) return;
 		try {
 			const key = getComicKey(year, page);
-			const comicIds = value.data.results.map((c) => c.digitalId);
-			if (comicIds.length === 0) {
+			const comics = value.data.results.map((c) => ({
+				id: c.digitalId,
+				image: c.thumbnail.path,
+				ext: c.thumbnail.extension,
+				title: c.title
+			}));
+			if (comics.length === 0) {
 				return;
 			}
 
 			const stringified = JSON.stringify(value);
 			const compressed = COMPRESS_COMICS ? compress(stringified) : stringified;
-			return await this.redis
+			let pipeline = this.redis
 				.multi()
 				.set(key, compressed, 'EX', DEFAULT_EXPIRY)
-				.sadd(COMIC_ID_KEY, comicIds)
-				.exec();
+				.sadd(
+					COMIC_ID_KEY,
+					comics.map((c) => c.id)
+				);
+
+			for (let { id, image, ext, title } of comics) {
+				// TODO: extract common id
+				// TODO: document redis structure
+				pipeline = pipeline.hset(`comic:${id}`, 'image', image, 'ext', ext, 'title', title);
+			}
+
+			return await pipeline.exec();
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
-	async getRandomComicIds() {
+	async getRandomComics(): Promise<RandomComic[]> {
 		if (this.closed) return;
-		return await this.redis.srandmember(COMIC_ID_KEY, 20);
+		const ids = await this.redis.srandmember(COMIC_ID_KEY, 18);
+		let pipeline = this.redis.multi();
+
+		for (let id of ids) {
+			pipeline = pipeline.hgetall(`comic:${id}`);
+		}
+
+		const imagePaths = await pipeline.exec();
+
+		return ids.map((id, idx) => {
+			const result = imagePaths[idx][1] as RandomComicRedis;
+			return {
+				id,
+				title: result.title,
+				image: result.image,
+				ext: result.ext
+			};
+		});
 	}
 
 	async quit() {
@@ -133,4 +166,10 @@ function unpackResult<T>(result: string, parse: (val: string) => T, compressed =
 
 function getComicKey(year: number, page: number) {
 	return `year:${year}:${page}` + (COMPRESS_COMICS ? ':c' : '');
+}
+
+interface RandomComicRedis {
+	image: string;
+	ext: string;
+	title: string;
 }
