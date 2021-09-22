@@ -22,26 +22,32 @@
 </script>
 
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
 	import type { RandomComic } from '$lib/types';
 	import { getImage, ImageSize } from '$lib/comics';
+	import { invalidate } from '$app/navigation';
 
 	export let comics: RandomComic[];
 
 	let index = 0;
 	const LIST_SIZE = 6;
-	$: randomList = comics.slice(index, index + LIST_SIZE);
+	let container: HTMLElement;
 
-	function setRandomId() {
-		index = (index + LIST_SIZE) % comics.length;
-		if (index === 0) {
-			// only invalidated once -- is this a SvelteKit bug?
-			invalidate('comic/random.json');
+	$: randomList = comics.slice(0, index + LIST_SIZE);
+	$: allComicsShowing = randomList.length >= comics.length;
+
+	function showMore() {
+		if (allComicsShowing) {
+			invalidate('/comic/random.json').then(() => {
+				index = 0;
+				container.querySelector('a').focus();
+			});
+		} else {
+			index += LIST_SIZE;
 		}
 	}
 
 	function getBackground(index: number) {
-		switch (index) {
+		switch (index % LIST_SIZE) {
 			case 0:
 				return '--red';
 			case 1:
@@ -69,12 +75,10 @@
 	open directly in the app or in the web-based reader.
 </p>
 
-<div class="container">
+<div class="container" bind:this={container}>
 	{#each randomList as comic, idx}
 		<div class="card" style="--background: var({getBackground(idx)})">
 			<a href="https://read.marvel.com/#/book/{comic.id}">
-				<!-- TODO: share component with ComicSummary -->
-				<!-- TODO: better focus styles -->
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
 				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 			</a>
@@ -83,7 +87,7 @@
 	{/each}
 </div>
 
-<button on:click={setRandomId}>Load more</button>
+<button on:click={showMore}>{allComicsShowing ? 'Refresh' : 'Load more'}</button>
 
 <style>
 	.container {
@@ -116,9 +120,14 @@
 		position: relative;
 	}
 
-	.card:focus-within {
-		outline: 0.25rem solid white;
-		outline-offset: -0.5rem;
+	a:focus {
+		outline: 0.25rem solid black;
+		outline-offset: 0.25rem;
+		border-radius: 8px;
+	}
+
+	a:focus:not(:focus-visible) {
+		outline: none;
 	}
 
 	.q {
