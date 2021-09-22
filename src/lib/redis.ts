@@ -95,6 +95,7 @@ export default class RedisClient {
 		if (this.closed) return;
 		try {
 			const key = getComicKey(year, page);
+			const imagesKey = getComicWithImagesKey(year);
 			const comics = value.data.results.map((c) => ({
 				id: c.digitalId,
 				image: c.thumbnail.path,
@@ -107,15 +108,28 @@ export default class RedisClient {
 
 			const stringified = JSON.stringify(value);
 			const compressed = COMPRESS_COMICS ? compress(stringified) : stringified;
+			const ids = comics.map((c) => c.id);
+
+			const imageSetMembers = await this.redis.smembers(imagesKey);
+			const comicIdsWithImages = new Set(imageSetMembers);
+
 			let pipeline = this.redis
 				.multi()
 				.set(key, compressed, 'EX', DEFAULT_EXPIRY)
+				.sadd(COMIC_ID_KEY, ids)
 				.sadd(
-					COMIC_ID_KEY,
-					comics.map((c) => c.id)
+					// Keep track of which comics we have stored images for
+					// TODO: this won't expire -- is this an issue?
+					imagesKey,
+					ids
 				);
 
-			for (let { id, image, ext, title } of comics) {
+			// only set image/ext/title for comics not in that set
+			const comicsWithoutStoredImages = comics.filter(
+				(c) => !comicIdsWithImages.has(c.id.toString())
+			);
+			console.log(`Adding images for ${comicsWithoutStoredImages.length} comics`);
+			for (let { id, image, ext, title } of comicsWithoutStoredImages) {
 				// TODO: extract common id
 				// TODO: document redis structure
 				pipeline = pipeline.hset(`comic:${id}`, 'image', image, 'ext', ext, 'title', title);
@@ -123,7 +137,7 @@ export default class RedisClient {
 
 			return await pipeline.exec();
 		} catch (e) {
-			console.log(e);
+			console.log('Error when adding comics to redis', e);
 		}
 	}
 
@@ -166,6 +180,10 @@ function unpackResult<T>(result: string, parse: (val: string) => T, compressed =
 
 function getComicKey(year: number, page: number) {
 	return `year:${year}:${page}` + (COMPRESS_COMICS ? ':c' : '');
+}
+
+function getComicWithImagesKey(year: number) {
+	return `comic:image:${year}`;
 }
 
 interface RandomComicRedis {

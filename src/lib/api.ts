@@ -35,7 +35,7 @@ export default class MarvelApi {
 
 		const parsedResult: ComicDataWrapper = await result.json();
 		if (parsedResult.code === 200) {
-			this.redis.addComics(year, page, parsedResult);
+			await this.redis.addComics(year, page, parsedResult);
 		}
 
 		return parsedResult;
