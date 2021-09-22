@@ -110,6 +110,7 @@ export default class RedisClient {
 			const compressed = COMPRESS_COMICS ? compress(stringified) : stringified;
 			const ids = comics.map((c) => c.id);
 
+			// TODO: is there a way to combine this command with the previous get?
 			const imageSetMembers = await this.redis.smembers(imagesKey);
 			const comicIdsWithImages = new Set(imageSetMembers);
 

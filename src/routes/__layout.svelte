@@ -9,9 +9,9 @@
 {/if}
 
 <nav>
-	<a href="/">Home</a>
-	<a href="/year">Years</a>
-	<a href="/comic/random">Random Comic</a>
+	<a href="/" sveltekit:prefetch>Home</a>
+	<a href="/year" sveltekit:prefetch>Years</a>
+	<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
 </nav>
 
 <main>
