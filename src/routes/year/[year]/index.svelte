@@ -13,7 +13,7 @@
 		return Promise.race([promise, timeout]);
 	};
 
-	const DEFAULT_TIMEOUT = 9500;
+	const DEFAULT_TIMEOUT = 9000;
 
 	/**
 	 * @type {import('@sveltejs/kit').Load}

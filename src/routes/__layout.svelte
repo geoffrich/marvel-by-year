@@ -19,7 +19,7 @@
 </main>
 
 <footer>
-	Built by <a href="https://geoffrich.net/">Geoff</a> with
+	Site built by <a href="https://geoffrich.net/">Geoff</a> with
 	<a href="https://kit.svelte.dev/">SvelteKit</a>.
 </footer>
 
@@ -39,5 +39,9 @@
 	nav {
 		display: flex;
 		gap: 1rem;
+	}
+
+	footer {
+		margin-top: 1rem;
 	}
 </style>

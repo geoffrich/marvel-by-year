@@ -35,6 +35,7 @@
 	function setRandomId() {
 		index = (index + LIST_SIZE) % comics.length;
 		if (index === 0) {
+			// only invalidated once -- is this a SvelteKit bug?
 			invalidate('comic/random.json');
 		}
 	}
@@ -72,7 +73,9 @@
 	{#each randomList as comic, idx}
 		<div class="card" style="--background: var({getBackground(idx)})">
 			<a href="https://read.marvel.com/#/book/{comic.id}">
-				Random comic {idx}
+				<!-- TODO: share component with ComicSummary -->
+				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
+				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 			</a>
 			<span class="q">?</span>
 		</div>
@@ -137,6 +140,9 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		opacity: 0;
+	}
+
+	img {
+		height: 100%;
 	}
 </style>
