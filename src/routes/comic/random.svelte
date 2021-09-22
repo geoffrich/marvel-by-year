@@ -24,23 +24,25 @@
 <script lang="ts">
 	import type { RandomComic } from '$lib/types';
 	import { getImage, ImageSize } from '$lib/comics';
-	import { invalidate } from '$app/navigation';
 
 	export let comics: RandomComic[];
 
 	let index = 0;
 	const LIST_SIZE = 6;
-	let container: HTMLElement;
+	let shouldFocusFirstElement = false;
 
 	$: randomList = comics.slice(0, index + LIST_SIZE);
 	$: allComicsShowing = randomList.length >= comics.length;
 
 	function showMore() {
 		if (allComicsShowing) {
-			invalidate('/comic/random.json').then(() => {
-				index = 0;
-				container.querySelector('a').focus();
-			});
+			shouldFocusFirstElement = true;
+			fetch('/comic/random.json')
+				.then((res) => res.json())
+				.then((res) => {
+					comics = res.comics;
+					index = 0;
+				});
 		} else {
 			index += LIST_SIZE;
 		}
@@ -62,6 +64,13 @@
 				return '--purple';
 		}
 	}
+
+	function focusFirst(node: HTMLElement, index: number) {
+		// only focus the first element after the list has been updated, not on initial load
+		if (index === 0 && shouldFocusFirstElement) {
+			node.focus();
+		}
+	}
 </script>
 
 <svelte:head>
@@ -75,10 +84,10 @@
 	open directly in the app or in the web-based reader.
 </p>
 
-<div class="container" bind:this={container}>
-	{#each randomList as comic, idx}
+<div class="container">
+	{#each randomList as comic, idx (comic.id)}
 		<div class="card" style="--background: var({getBackground(idx)})">
-			<a href="https://read.marvel.com/#/book/{comic.id}">
+			<a href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
 				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 			</a>
