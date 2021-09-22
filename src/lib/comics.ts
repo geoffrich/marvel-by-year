@@ -62,6 +62,9 @@ export function getUnlimitedDate(comic: Comic) {
 }
 
 export function getImage(path: string, size: ImageSize, ext?: string) {
+	if (path === undefined) {
+		return '';
+	}
 	if (ext === undefined) {
 		// assume the extension is included in the path
 		let splitPath = path.split('.');

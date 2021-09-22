@@ -74,6 +74,7 @@
 		<div class="card" style="--background: var({getBackground(idx)})">
 			<a href="https://read.marvel.com/#/book/{comic.id}">
 				<!-- TODO: share component with ComicSummary -->
+				<!-- TODO: better focus styles -->
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
 				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 			</a>
@@ -144,5 +145,9 @@
 
 	img {
 		height: 100%;
+	}
+
+	img[src=''] {
+		display: none;
 	}
 </style>
