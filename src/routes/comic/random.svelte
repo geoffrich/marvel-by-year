@@ -48,23 +48,6 @@
 		}
 	}
 
-	function getBackground(index: number) {
-		switch (index % LIST_SIZE) {
-			case 0:
-				return '--red';
-			case 1:
-				return '--orange';
-			case 2:
-				return '--yellow';
-			case 3:
-				return '--green';
-			case 4:
-				return '--blue';
-			case 5:
-				return '--purple';
-		}
-	}
-
 	function focusFirst(node: HTMLElement, index: number) {
 		// only focus the first element after the list has been updated, not on initial load
 		if (index === 0 && shouldFocusFirstElement) {
@@ -86,7 +69,7 @@
 
 <div class="container">
 	{#each randomList as comic, idx (comic.id)}
-		<div class="card" style="--background: var({getBackground(idx)})">
+		<div class="card">
 			<a href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
 				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
@@ -120,13 +103,36 @@
 		width: 133px;
 		display: grid;
 		place-items: center;
-		background-color: var(--background);
 		--shadow-color: 0deg 0% 50%;
 		box-shadow: 1px 2px 2px hsl(var(--shadow-color) / 0.333),
 			2px 4px 4px hsl(var(--shadow-color) / 0.333), 3px 6px 6px hsl(var(--shadow-color) / 0.333);
 		border-radius: 8px;
 
 		position: relative;
+	}
+
+	.card:nth-child(6n + 1) {
+		background-color: var(--red);
+	}
+
+	.card:nth-child(6n + 2) {
+		background-color: var(--orange);
+	}
+
+	.card:nth-child(6n + 3) {
+		background-color: var(--yellow);
+	}
+
+	.card:nth-child(6n + 4) {
+		background-color: var(--green);
+	}
+
+	.card:nth-child(6n + 5) {
+		background-color: var(--blue);
+	}
+
+	.card:nth-child(6n) {
+		background-color: var(--purple);
 	}
 
 	a:focus {
