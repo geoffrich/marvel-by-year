@@ -24,6 +24,7 @@
 <script lang="ts">
 	import type { RandomComic } from '$lib/types';
 	import { getImage, ImageSize } from '$lib/comics';
+	import { blur } from 'svelte/transition';
 
 	export let comics: RandomComic[];
 
@@ -69,7 +70,7 @@
 
 <ul class="container">
 	{#each randomList as comic, idx (comic.id)}
-		<li class="card">
+		<li class="card" in:blur>
 			<a href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
 				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
