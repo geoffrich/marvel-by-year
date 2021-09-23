@@ -25,12 +25,14 @@
 	import type { RandomComic } from '$lib/types';
 	import { getImage, ImageSize } from '$lib/comics';
 	import { blur } from 'svelte/transition';
+	import title from '$lib/stores/title';
 
 	export let comics: RandomComic[];
 
 	let index = 0;
 	const LIST_SIZE = 6;
 	let shouldFocusFirstElement = false;
+	$title = 'Random comic';
 
 	$: randomList = comics.slice(0, index + LIST_SIZE);
 	$: allComicsShowing = randomList.length >= comics.length;
@@ -56,10 +58,6 @@
 		}
 	}
 </script>
-
-<svelte:head>
-	<title>Random comic</title>
-</svelte:head>
 
 <h1>Random comic</h1>
 

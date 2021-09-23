@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
+	import title from '$lib/stores/title';
 	import { navigating } from '$app/stores';
 	import '../global.css';
 </script>
@@ -7,6 +8,10 @@
 {#if $navigating}
 	<PreloadingIndicator />
 {/if}
+
+<svelte:head>
+	<title>{$title ? $title + ' | ' : ''}MU by Year</title>
+</svelte:head>
 
 <nav>
 	<a href="/" sveltekit:prefetch>Home</a>

@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { years } from '$lib/years';
+	import title from '$lib/stores/title';
+
+	$title = 'Years';
 </script>
 
 <h1>Years</h1>

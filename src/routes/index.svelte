@@ -2,9 +2,11 @@
 	export const prerender = true;
 </script>
 
-<svelte:head>
-	<title>Browse Marvel Unlimited by Year</title>
-</svelte:head>
+<script>
+	import title from '$lib/stores/title';
+
+	$title = 'Home';
+</script>
 
 <h1>Browse Marvel Unlimited by Year</h1>
 <p>

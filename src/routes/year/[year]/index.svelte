@@ -57,6 +57,7 @@
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
+	import titleStore from '$lib/stores/title';
 	import {
 		getSeries,
 		getCreators,
@@ -97,6 +98,7 @@
 
 	$: comics = response.comics;
 	$: title = `Comics for ${year}`;
+	$: $titleStore = title;
 
 	let [series, selectedSeries, unsub1] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
@@ -178,10 +180,6 @@
 		searchText = '';
 	}
 </script>
-
-<svelte:head>
-	<title>{title}</title>
-</svelte:head>
 
 <h1>{title}</h1>
 <PageLinks {year} />
