@@ -29,11 +29,12 @@
 		margin-left: auto;
 		margin-right: auto;
 		padding: 1rem;
+		padding-bottom: 0;
 	}
 
 	:global(div#svelte) {
-		display: grid;
-		grid-template-rows: auto 1fr auto;
+		display: flex;
+		flex-direction: column;
 	}
 
 	nav {
@@ -42,6 +43,7 @@
 	}
 
 	footer {
-		margin: 1rem 0;
+		margin-top: auto;
+		padding: 1rem 0;
 	}
 </style>
