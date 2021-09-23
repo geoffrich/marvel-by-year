@@ -67,26 +67,26 @@
 	open directly in the app or in the web-based reader.
 </p>
 
-<div class="container">
+<ul class="container">
 	{#each randomList as comic, idx (comic.id)}
-		<div class="card">
+		<li class="card">
 			<a href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
 				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 			</a>
-			<span class="q">?</span>
-		</div>
+			<span class="q" aria-hidden="true">?</span>
+		</li>
 	{/each}
-</div>
+</ul>
 
 <button on:click={showMore}>{allComicsShowing ? 'Refresh' : 'Load more'}</button>
 
 <style>
 	.container {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 1rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, 150px);
 		justify-content: center;
+		gap: 1rem;
 
 		--red: hsl(0deg 75% 60%);
 		--orange: hsl(30deg 95% 60%);
@@ -96,6 +96,11 @@
 		--purple: hsl(280deg 100% 80%);
 
 		margin-bottom: 1rem;
+	}
+
+	ul {
+		padding: 0;
+		list-style: none;
 	}
 
 	.card {
