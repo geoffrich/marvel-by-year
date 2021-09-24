@@ -118,11 +118,14 @@ export default class RedisClient {
 
 			let pipeline = this.redis
 				.multi()
+				// cache the Marvel API response itself
 				.set(key, compressed, 'EX', DEFAULT_EXPIRY)
+				// set with all Marvel comic IDs
 				.sadd(COMIC_ID_KEY, ids)
+				// add comic IDs to a sorted set, where the score is the year of publication
 				.zadd(COMIC_ID_KEY_WITH_YEAR, ...idsWithYear)
+				// Keep track of which comics we have stored images for
 				.sadd(
-					// Keep track of which comics we have stored images for
 					// TODO: this won't expire -- is this an issue?
 					imagesKey,
 					ids
@@ -165,6 +168,49 @@ export default class RedisClient {
 				ext: result.ext
 			};
 		});
+	}
+
+	async getRandomComicForYear(startYear: number, endYear: number): Promise<RandomComic> {
+		if (this.closed) return;
+
+		this.redis.defineCommand('randomYear', {
+			numberOfKeys: 1,
+			// TODO: get multiple comics
+			// TODO: refactor range call to use entire range
+			lua: `
+				local count = redis.call('ZCARD', KEYS[1])
+
+				if count ~= 0 then
+					math.randomseed(ARGV[3]) 
+					local start = redis.call('ZRANGEBYSCORE', KEYS[1], ARGV[1], ARGV[1], 'LIMIT', '0', '1')
+					local last = redis.call('ZREVRANGEBYSCORE', KEYS[1], ARGV[2], ARGV[2], 'LIMIT', '0', '1')
+					local startRank = redis.call('ZRANK', KEYS[1], start[1])
+					local endRank = redis.call('ZRANK', KEYS[1], last[1])
+					
+					local rank = math.random(startRank, endRank) 
+					local range = redis.call('ZRANGE', KEYS[1], rank, rank)
+					return range[1]
+				else
+					return ''
+				end
+			`
+		});
+
+		// TODO: TS
+		const id = await this.redis.randomYear(
+			COMIC_ID_KEY_WITH_YEAR,
+			startYear,
+			endYear,
+			Date.now().toString()
+		);
+
+		const comic = await this.redis.hgetall(`comic:${id}`);
+		return {
+			id,
+			title: comic.title,
+			image: comic.image,
+			ext: comic.ext
+		};
 	}
 
 	async quit() {

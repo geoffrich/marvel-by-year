@@ -50,7 +50,9 @@
 		padding: 0;
 		margin: 0;
 		display: flex;
-		gap: 1rem;
+		flex-wrap: wrap;
+		column-gap: 1rem;
+		row-gap: 0.5rem;
 	}
 
 	footer {

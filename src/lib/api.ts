@@ -69,6 +69,11 @@ export default class MarvelApi {
 		return await this.redis.getRandomComics();
 	}
 
+	async getRandomComicsForDecade(decade: number) {
+		// TODO: validation logic
+		return await this.redis.getRandomComicForYear(decade, decade + 9);
+	}
+
 	async callMarvelApi(urlString: string, params: Record<string, string>): Promise<Response> {
 		const ts = Date.now().toString();
 
