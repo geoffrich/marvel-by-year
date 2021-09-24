@@ -12,6 +12,6 @@
 <label for={id}><slot /></label>
 <select {name} {id} bind:value>
 	{#each options as opt, idx (opt)}
-		<option value={values[idx]}>{opt}</option>
+		<option selected={values[idx] === value} value={values[idx]}>{opt}</option>
 	{/each}
 </select>
