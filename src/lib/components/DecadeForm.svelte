@@ -18,7 +18,9 @@
 <!-- TODO: submit client-side if JS available -->
 <form action="/comic/random">
 	<div>
-		<Select {options} {values} id="decade" name="decade" value={selected}>Decade</Select>
+		<Select {options} {values} id="decade" name="decade" value={selected ? selected : ''}
+			>Decade</Select
+		>
 	</div>
 	<button>Submit</button>
 </form>

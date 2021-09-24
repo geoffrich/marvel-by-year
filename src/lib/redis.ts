@@ -184,7 +184,7 @@ export default class RedisClient {
 				local count = redis.call('ZCARD', KEYS[1])
 
 				if count ~= 0 then
-					math.randomseed(ARGV[3]) 
+					math.randomseed(tonumber(ARGV[3])) 
 					local start = redis.call('ZRANGEBYSCORE', KEYS[1], ARGV[1], ARGV[2], 'LIMIT', '0', '1')
 					local last = redis.call('ZREVRANGEBYSCORE', KEYS[1], ARGV[2], ARGV[1], 'LIMIT', '0', '1')
 					local startRank = redis.call('ZRANK', KEYS[1], start[1])
