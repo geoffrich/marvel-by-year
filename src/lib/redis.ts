@@ -7,6 +7,7 @@ const REDIS_CONNECTION = process.env['REDIS_CONNECTION'];
 
 const DEFAULT_EXPIRY = 24 * 60 * 60;
 const COMIC_ID_KEY = 'comics:ids';
+const COMIC_ID_KEY_WITH_YEAR = 'comics:year-ids';
 const COMPRESS_COMICS = true;
 const { compressToUTF16: compress, decompressFromUTF16: decompress } = LZString;
 
@@ -109,6 +110,7 @@ export default class RedisClient {
 			const stringified = JSON.stringify(value);
 			const compressed = COMPRESS_COMICS ? compress(stringified) : stringified;
 			const ids = comics.map((c) => c.id);
+			const idsWithYear = comics.flatMap((c) => [year, c.id]);
 
 			// TODO: is there a way to combine this command with the previous get?
 			const imageSetMembers = await this.redis.smembers(imagesKey);
@@ -118,6 +120,7 @@ export default class RedisClient {
 				.multi()
 				.set(key, compressed, 'EX', DEFAULT_EXPIRY)
 				.sadd(COMIC_ID_KEY, ids)
+				.zadd(COMIC_ID_KEY_WITH_YEAR, ...idsWithYear)
 				.sadd(
 					// Keep track of which comics we have stored images for
 					// TODO: this won't expire -- is this an issue?
@@ -143,7 +146,7 @@ export default class RedisClient {
 	}
 
 	async getRandomComics(): Promise<RandomComic[]> {
-		if (this.closed) return;
+		if (this.closed) return [];
 		const ids = await this.redis.srandmember(COMIC_ID_KEY, 18);
 		let pipeline = this.redis.multi();
 

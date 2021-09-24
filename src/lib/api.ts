@@ -1,6 +1,7 @@
 import md5 from 'crypto-js/md5.js';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import type RedisClient from '$lib/redis';
+import { performance } from 'perf_hooks';
 
 const PUBLIC_KEY = process.env['MARVEL_PUBLIC_KEY'];
 const PRIVATE_KEY = process.env['MARVEL_PRIVATE_KEY'];
@@ -23,6 +24,7 @@ export default class MarvelApi {
 	): Promise<ComicDataWrapper> {
 		console.log(`retrieving ${year} page ${page}`);
 
+		let start = performance.now();
 		if (cache[page]) {
 			console.log(`found ${year} page ${page} in redis cache`);
 			return cache[page];
@@ -32,11 +34,15 @@ export default class MarvelApi {
 			COMICS_ENDPOINT,
 			getComicsSearchParams(year, page * MAX_LIMIT, MAX_LIMIT)
 		);
+		// TODO: refactor performance logs into shared function
+		console.log('called Marvel API in', (performance.now() - start) / 1000);
+		start = performance.now();
 
 		const parsedResult: ComicDataWrapper = await result.json();
 		if (parsedResult.code === 200) {
 			await this.redis.addComics(year, page, parsedResult);
 		}
+		console.log('updated redis in', (performance.now() - start) / 1000);
 
 		return parsedResult;
 	}

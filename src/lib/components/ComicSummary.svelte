@@ -37,6 +37,10 @@
 			return commaSeparate(creators);
 		} else {
 			const additionalCount = creators.length - max;
+			if (additionalCount === 1) {
+				// adding "and 1 others" will be the same length as the name
+				return commaSeparate(creators);
+			}
 			const subset = creators.slice(0, max);
 			subset.push(`${additionalCount} others`);
 			return commaSeparate(subset);
@@ -74,7 +78,7 @@
 	</div>
 	<p>
 		<span>By {creatorText}</span>
-		{#if creatorCount > MAX_CREATORS}
+		{#if creatorCount > MAX_CREATORS + 1}
 			{#if showAllCreators}
 				<IconButton altText="Show less" on:click={toggleCreators}>
 					<Minus />
