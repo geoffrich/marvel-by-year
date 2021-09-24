@@ -56,6 +56,7 @@
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
+	import Select from '$lib/components/form/Select.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
 	import titleStore from '$lib/stores/title';
 	import {
@@ -207,12 +208,7 @@
 		>
 	</div>
 	<div>
-		<label for="sorting">Sort by</label>
-		<select id="sorting" bind:value={sortBy}>
-			{#each sortingOptions as opt (opt)}
-				<option>{opt}</option>
-			{/each}
-		</select>
+		<Select options={sortingOptions} id="sorting" bind:value={sortBy}>Sort by</Select>
 	</div>
 	<div>
 		<label><input type="checkbox" bind:checked={sortDescending} />Descending</label>
@@ -268,11 +264,6 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		flex-wrap: wrap;
-	}
-
-	input,
-	select {
-		font-size: inherit;
 	}
 
 	input[type='checkbox'] {

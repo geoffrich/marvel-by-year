@@ -1,15 +1,22 @@
 <script context="module" lang="ts">
 	import type { RandomResponse } from '$lib/types';
 
-	export async function load({ fetch }) {
-		const url = '/comic/random.json';
+	/**
+	 * @type {import('@sveltejs/kit').Load}
+	 */
+	export async function load({ fetch, page }) {
+		const decade = parseInt(page.query.get('decade'));
+		const url = `/comic/random.json${decade ? `?decade=${decade}` : ''}`;
 		const res = await fetch(url, { credentials: 'omit' });
 		const response: RandomResponse = await res.json();
 
 		if (res.ok) {
 			return {
+				// TODO: more type safety here
 				props: {
-					comics: response.comics
+					comics: response.comics,
+					decade,
+					refreshUrl: url
 				}
 			};
 		}
@@ -23,24 +30,35 @@
 
 <script lang="ts">
 	import type { RandomComic } from '$lib/types';
+	import DecadeForm from '$lib/components/DecadeForm.svelte';
 	import { getImage, ImageSize } from '$lib/comics';
 	import { blur } from 'svelte/transition';
 	import title from '$lib/stores/title';
 
 	export let comics: RandomComic[];
+	export let decade: number;
+	export let refreshUrl: string;
 
 	let index = 0;
 	const LIST_SIZE = 6;
 	let shouldFocusFirstElement = false;
-	$title = 'Random comic';
+	$: $title = decade ? `Random comic from the ${getDecadeAsString(decade)}` : 'Random comic';
 
 	$: randomList = comics.slice(0, index + LIST_SIZE);
 	$: allComicsShowing = randomList.length >= comics.length;
 
+	function getDecadeAsString(decade: number) {
+		if (decade < 1960) {
+			return 'pre-1960s';
+		} else {
+			return `${decade}s`;
+		}
+	}
+
 	function showMore() {
 		if (allComicsShowing) {
 			shouldFocusFirstElement = true;
-			fetch('/comic/random.json')
+			fetch(refreshUrl)
 				.then((res) => res.json())
 				.then((res) => {
 					comics = res.comics;
@@ -59,17 +77,20 @@
 	}
 </script>
 
-<h1>Random comic</h1>
+<h1>{$title}</h1>
 
 <p>
 	Tap the covers below to view a random comic on Marvel Unlimited. Depending on your device, it will
-	open directly in the app or in the web-based reader.
+	open directly in the app or in the web-based reader. You can also narrow the response to only
+	include comics from a given decade.
 </p>
+
+<DecadeForm selected={decade} />
 
 <ul class="container">
 	{#each randomList as comic, idx (comic.id)}
 		<li class="card" in:blur>
-			<a href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
+			<a class="comicLink" href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
 				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
 			</a>
@@ -85,6 +106,7 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, 150px);
 		justify-content: center;
+		justify-items: center;
 		gap: 1rem;
 
 		--red: hsl(0deg 75% 60%);
@@ -139,13 +161,13 @@
 		background-color: var(--purple);
 	}
 
-	a:focus {
+	.comicLink:focus {
 		outline: 0.25rem solid black;
 		outline-offset: 0.25rem;
 		border-radius: 8px;
 	}
 
-	a:focus:not(:focus-visible) {
+	.comicLink:focus:not(:focus-visible) {
 		outline: none;
 	}
 
@@ -163,7 +185,7 @@
 		display: block;
 	}
 
-	a {
+	.comicLink {
 		position: absolute;
 		top: 0;
 		left: 0;

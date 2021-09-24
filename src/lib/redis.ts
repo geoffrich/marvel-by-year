@@ -170,20 +170,23 @@ export default class RedisClient {
 		});
 	}
 
-	async getRandomComicForYear(startYear: number, endYear: number): Promise<RandomComic> {
+	async getRandomComicForYear(
+		startYear: number,
+		endYear: number,
+		seed: number
+	): Promise<RandomComic> {
 		if (this.closed) return;
 
 		this.redis.defineCommand('randomYear', {
 			numberOfKeys: 1,
 			// TODO: get multiple comics
-			// TODO: refactor range call to use entire range
 			lua: `
 				local count = redis.call('ZCARD', KEYS[1])
 
 				if count ~= 0 then
 					math.randomseed(ARGV[3]) 
-					local start = redis.call('ZRANGEBYSCORE', KEYS[1], ARGV[1], ARGV[1], 'LIMIT', '0', '1')
-					local last = redis.call('ZREVRANGEBYSCORE', KEYS[1], ARGV[2], ARGV[2], 'LIMIT', '0', '1')
+					local start = redis.call('ZRANGEBYSCORE', KEYS[1], ARGV[1], ARGV[2], 'LIMIT', '0', '1')
+					local last = redis.call('ZREVRANGEBYSCORE', KEYS[1], ARGV[2], ARGV[1], 'LIMIT', '0', '1')
 					local startRank = redis.call('ZRANK', KEYS[1], start[1])
 					local endRank = redis.call('ZRANK', KEYS[1], last[1])
 					
@@ -197,12 +200,7 @@ export default class RedisClient {
 		});
 
 		// TODO: TS
-		const id = await this.redis.randomYear(
-			COMIC_ID_KEY_WITH_YEAR,
-			startYear,
-			endYear,
-			Date.now().toString()
-		);
+		const id = await this.redis.randomYear(COMIC_ID_KEY_WITH_YEAR, startYear, endYear, seed);
 
 		const comic = await this.redis.hgetall(`comic:${id}`);
 		return {
