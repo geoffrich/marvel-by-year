@@ -14,9 +14,12 @@
 </svelte:head>
 
 <nav>
-	<a href="/" sveltekit:prefetch>Home</a>
-	<a href="/year" sveltekit:prefetch>Years</a>
-	<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
+	<ul>
+		<a href="/" sveltekit:prefetch>Home</a>
+		<a href="/year" sveltekit:prefetch>Years</a>
+		<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
+		<a href="/year/random" sveltekit:prefetch>Random Year</a>
+	</ul>
 </nav>
 
 <main>
@@ -42,7 +45,10 @@
 		flex-direction: column;
 	}
 
-	nav {
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
 		display: flex;
 		gap: 1rem;
 	}
