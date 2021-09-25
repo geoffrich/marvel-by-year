@@ -1,6 +1,8 @@
 <script context="module" lang="ts">
+	import { browser } from '$app/env';
+
 	// https://italonascimento.github.io/applying-a-timeout-to-your-promises/
-	const promiseTimeout = function (ms, promise) {
+	const promiseTimeout = function (ms: number, promise) {
 		// Create a promise that rejects in <ms> milliseconds
 		let timeout = new Promise((_, reject) => {
 			let id = setTimeout(() => {
@@ -23,8 +25,11 @@
 		// Netlify functions have a execution time limit of 10 seconds
 		// The Marvel API can be slow and take 20+ seconds in some cases
 		// If we don't hear back in time, throw an error so the user can easily retry
+		// Only do this on server render so the user sees a useful error page
+		// In the browser, we don't want to fail too early.
 		try {
-			const res = await promiseTimeout(DEFAULT_TIMEOUT, fetch(url, { credentials: 'omit' }));
+			const apiCall = fetch(url, { credentials: 'omit' });
+			const res = browser ? await apiCall : await promiseTimeout(DEFAULT_TIMEOUT, apiCall);
 			const response: ComicResponse = await res.json();
 
 			if (res.ok) {
