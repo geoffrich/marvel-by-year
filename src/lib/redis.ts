@@ -130,11 +130,8 @@ export default class RedisClient {
 				// add comic IDs to a sorted set, where the score is the year of publication
 				.zadd(COMIC_ID_KEY_WITH_YEAR, ...idsWithYear)
 				// Keep track of which comics we have stored images for
-				.sadd(
-					// TODO: this won't expire -- is this an issue?
-					imagesKey,
-					ids
-				);
+				// This set won't expire, so we should keep an eye out for broken images
+				.sadd(imagesKey, ids);
 
 			// only set image/ext/title for comics not in that set
 			const comicsWithoutStoredImages = comics.filter(
@@ -142,7 +139,6 @@ export default class RedisClient {
 			);
 			console.log(`Adding images for ${comicsWithoutStoredImages.length} comics`);
 			for (let { id, image, ext, title } of comicsWithoutStoredImages) {
-				// TODO: document redis structure
 				pipeline = pipeline.hset(getComicKey(id), 'image', image, 'ext', ext, 'title', title);
 			}
 
@@ -183,7 +179,6 @@ export default class RedisClient {
 
 		this.redis.defineCommand('randomYear', {
 			numberOfKeys: 1,
-			// TODO: get multiple comics
 			lua: `
 				local count = redis.call('ZCARD', KEYS[1])
 

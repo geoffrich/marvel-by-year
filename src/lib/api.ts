@@ -36,7 +36,7 @@ export default class MarvelApi {
 			COMICS_ENDPOINT,
 			getComicsSearchParams(year, page * MAX_LIMIT, MAX_LIMIT)
 		);
-		// TODO: refactor performance logs into shared function
+
 		console.log('called Marvel API in', (performance.now() - start) / 1000);
 		start = performance.now();
 
