@@ -40,30 +40,20 @@
 	export let decade: number;
 	export let refreshUrl: string;
 
-	let index = 0;
-	const LIST_SIZE = 6;
 	let shouldFocusFirstElement = false;
 	$: $title = decade ? `Random comic from the ${getDecadeAsString(decade)}` : 'Random comic';
-
-	$: randomList = comics.slice(0, index + LIST_SIZE);
-	$: allComicsShowing = randomList.length >= comics.length;
 
 	function getDecadeAsString(decade: number) {
 		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;
 	}
 
-	function showMore() {
-		if (allComicsShowing) {
-			shouldFocusFirstElement = true;
-			fetch(refreshUrl)
-				.then((res) => res.json())
-				.then((res) => {
-					comics = res.comics;
-					index = 0;
-				});
-		} else {
-			index += LIST_SIZE;
-		}
+	function refresh() {
+		shouldFocusFirstElement = true;
+		fetch(refreshUrl)
+			.then((res) => res.json())
+			.then((res) => {
+				comics = res.comics;
+			});
 	}
 
 	function focusFirst(node: HTMLElement, index: number) {
@@ -85,7 +75,7 @@
 <DecadeForm selected={decade} />
 
 <ul class="container">
-	{#each randomList as comic, idx (comic.id)}
+	{#each comics as comic, idx (comic.id)}
 		<li class="card" in:blur>
 			<a class="comicLink" href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
 				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
@@ -96,7 +86,7 @@
 	{/each}
 </ul>
 
-<button on:click={showMore}>{allComicsShowing ? 'Refresh' : 'Load more'}</button>
+<button on:click={refresh}>Refresh</button>
 
 <style>
 	.container {
