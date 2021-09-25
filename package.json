@@ -16,6 +16,7 @@
 		"@types/crypto-js": "^4.0.2",
 		"@types/ioredis": "^4.27.2",
 		"dotenv": "^10.0.0",
+		"focus-visible": "^5.2.0",
 		"prettier": "~2.2.1",
 		"prettier-plugin-svelte": "^2.2.0",
 		"svelte": "^3.34.0",

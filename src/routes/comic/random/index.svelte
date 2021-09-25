@@ -164,7 +164,7 @@
 		border-radius: 8px;
 	}
 
-	.comicLink:focus:not(:focus-visible) {
+	.comicLink:focus:not(.focus-visible) {
 		outline: none;
 	}
 

@@ -2,6 +2,7 @@
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import title from '$lib/stores/title';
 	import { navigating } from '$app/stores';
+	import 'focus-visible'; // polyfill :focus-visible for Safari
 	import '../global.css';
 </script>
 
