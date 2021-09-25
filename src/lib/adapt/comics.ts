@@ -104,6 +104,7 @@ function getRoleEnum(role: string): Role {
 		case 'digital coordinator':
 		case 'digital production manager':
 		case 'editor in chief':
+		case 'production':
 			return Role.Unknown;
 		default:
 			console.log('unknown role', role);

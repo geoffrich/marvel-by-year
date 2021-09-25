@@ -69,7 +69,7 @@ export default class RedisClient {
 
 	async getCachedComicsMulti(year: number, pages: number[]): Promise<ComicDataWrapper[]> {
 		if (this.closed) return [];
-		const keys = pages.map((p) => getComicKey(year, p));
+		const keys = pages.map((p) => getYearKey(year, p));
 		try {
 			const results = await this.redis.mget(...keys);
 			return results.map((r) => unpackResult(r, JSON.parse, COMPRESS_COMICS));
@@ -95,7 +95,7 @@ export default class RedisClient {
 	async addComics(year: number, page: number, value: ComicDataWrapper) {
 		if (this.closed) return;
 		try {
-			const key = getComicKey(year, page);
+			const key = getYearKey(year, page);
 			const imagesKey = getComicWithImagesKey(year);
 			const comics = value.data.results.map((c) => ({
 				id: c.digitalId,
@@ -137,9 +137,8 @@ export default class RedisClient {
 			);
 			console.log(`Adding images for ${comicsWithoutStoredImages.length} comics`);
 			for (let { id, image, ext, title } of comicsWithoutStoredImages) {
-				// TODO: extract common id
 				// TODO: document redis structure
-				pipeline = pipeline.hset(`comic:${id}`, 'image', image, 'ext', ext, 'title', title);
+				pipeline = pipeline.hset(getComicKey(id), 'image', image, 'ext', ext, 'title', title);
 			}
 
 			return await pipeline.exec();
@@ -154,7 +153,7 @@ export default class RedisClient {
 		let pipeline = this.redis.multi();
 
 		for (let id of ids) {
-			pipeline = pipeline.hgetall(`comic:${id}`);
+			pipeline = pipeline.hgetall(getComicKey(id));
 		}
 
 		const imagePaths = await pipeline.exec();
@@ -184,13 +183,13 @@ export default class RedisClient {
 				local count = redis.call('ZCARD', KEYS[1])
 
 				if count ~= 0 then
-					math.randomseed(tonumber(ARGV[3])) 
+					math.randomseed(tonumber(ARGV[3]))
 					local start = redis.call('ZRANGEBYSCORE', KEYS[1], ARGV[1], ARGV[2], 'LIMIT', '0', '1')
 					local last = redis.call('ZREVRANGEBYSCORE', KEYS[1], ARGV[2], ARGV[1], 'LIMIT', '0', '1')
 					local startRank = redis.call('ZRANK', KEYS[1], start[1])
 					local endRank = redis.call('ZRANK', KEYS[1], last[1])
-					
-					local rank = math.random(startRank, endRank) 
+
+					local rank = math.random(startRank, endRank)
 					local range = redis.call('ZRANGE', KEYS[1], rank, rank)
 					return range[1]
 				else
@@ -226,12 +225,19 @@ function unpackResult<T>(result: string, parse: (val: string) => T, compressed =
 	return null;
 }
 
-function getComicKey(year: number, page: number) {
+// Redis key for one page of the year API response
+function getYearKey(year: number, page: number) {
 	return `year:${year}:${page}` + (COMPRESS_COMICS ? ':c' : '');
 }
 
+// Redis key for list of comics with stored images
 function getComicWithImagesKey(year: number) {
 	return `comic:image:${year}`;
+}
+
+// Redis key for subset of data about an individual comic
+function getComicKey(id: string | number) {
+	return `comic:${id}`;
 }
 
 interface RandomComicRedis {

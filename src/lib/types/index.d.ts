@@ -49,7 +49,7 @@ export interface CreatorSummary {
 }
 
 export interface ImageDetail {
-	path: string; // TODO: store base path somehow?
+	path: string;
 	ext: string;
 }
 
