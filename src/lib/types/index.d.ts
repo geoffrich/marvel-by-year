@@ -4,8 +4,6 @@ export interface RandomResponse {
 	comics: RandomComic[];
 }
 
-// NOTE: adding additional fields here will require updating the random decade Lua script
-// this script assumes a static number of properties
 export interface RandomComic {
 	id: string;
 	image: string;
