@@ -1,6 +1,7 @@
 import type { ComicResponse, Comic } from '$lib/types';
 import { Role } from '$lib/types/enums';
 import type { ComicDataWrapper, Comic as ApiComic } from '$lib/types/marvel';
+import { dedupe } from '$lib/util';
 
 export function adaptResponses(responses: ComicDataWrapper[]): ComicResponse {
 	if (responses.length === 0) {
@@ -11,17 +12,9 @@ export function adaptResponses(responses: ComicDataWrapper[]): ComicResponse {
 
 	const comics = responses.flatMap((r) => r.data.results);
 	const adapted = comics.map(mapComic);
-	// remove duplicate ids
-	const deduped = adapted.filter((c, idx) => {
-		const matchingIdIndex = adapted.findIndex((c2) => c.id === c2.id);
-		if (matchingIdIndex === idx) {
-			return true;
-		}
 
-		// if we find duplicates, this likely means we are missing other comics
-		console.log('duplicate', adapted[matchingIdIndex].title);
-		return false;
-	});
+	// remove duplicate ids
+	const deduped = dedupe(adapted, (c) => c.id);
 
 	return {
 		attr: responses[0].attributionText,

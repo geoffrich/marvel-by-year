@@ -2,6 +2,7 @@ import md5 from 'crypto-js/md5.js';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import type { RandomComic } from '$lib/types';
 import type RedisClient from '$lib/redis';
+import { dedupe } from '$lib/util';
 import { performance } from 'perf_hooks';
 
 const PUBLIC_KEY = process.env['MARVEL_PUBLIC_KEY'];
@@ -69,8 +70,8 @@ export default class MarvelApi {
 	async getRandomComics(startYear?: number, endYear?: number): Promise<RandomComic[]> {
 		if (startYear && endYear) {
 			const seed = Date.now();
-			const result = this.redis.getRandomComicsForYear(startYear, endYear, seed);
-			return result;
+			const result = await this.redis.getRandomComicsForYear(startYear, endYear, seed);
+			return dedupe(result, (x) => x.id);
 		}
 		return await this.redis.getRandomComics();
 	}

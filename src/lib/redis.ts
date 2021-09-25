@@ -35,7 +35,7 @@ const redisConfig: Redis.RedisOptions = {
 };
 
 interface ExtendedRedis extends Redis.Redis {
-	randomYear(key: string, startYear: number, endYear: number, seed: number): Promise<string[]>;
+	randomYear(key: string, startYear: number, endYear: number, seed: number): Promise<string[][]>;
 }
 
 export default class RedisClient {
@@ -194,37 +194,53 @@ export default class RedisClient {
 					local startRank = redis.call('ZRANK', KEYS[1], start[1])
 					local endRank = redis.call('ZRANK', KEYS[1], last[1])
 
-					local ids = {}
+					local comics = {}
 					for i=1,${RANDOM_COMIC_LIMIT},1 do
 						local rank = math.random(startRank, endRank)
 						local range = redis.call('ZRANGE', KEYS[1], rank, rank)
-						ids[i] = range[1]
+						local comic = redis.call('HGETALL', 'comic:' .. range[1])
+						comic[7] = "id"
+						comic[8] = range[1]
+						comics[i] = comic
 					end
 
-					
-					return ids
+					return comics
 				else
 					return {}
 				end
 			`
 		});
 
-		const ids = await (this.redis as ExtendedRedis).randomYear(
+		const result = await (this.redis as ExtendedRedis).randomYear(
 			COMIC_ID_KEY_WITH_YEAR,
 			startYear,
 			endYear,
 			seed
 		);
 
-		const comic = await this.redis.hgetall(`comic:${ids[0]}`);
-		return [
-			{
-				id: ids[0],
-				title: comic.title,
-				image: comic.image,
-				ext: comic.ext
+		let comics: RandomComic[] = [];
+		// Sample item:
+		// 	[
+		// 		'image',
+		// 		'http://i.annihil.us/u/prod/marvel/i/mg/e/03/51068e41589f3',
+		// 		'ext',
+		// 		'jpg',
+		// 		'title',
+		// 		'Tales to Astonish (1959) #30',
+		// 		'id',
+		// 		'4746'
+		// 	]
+		for (let i = 0; i < result.length; i++) {
+			let comic = {};
+			for (let j = 0; j < result[i].length; j += 2) {
+				const key = result[i][j];
+				const value = result[i][j + 1];
+				comic[key] = value;
 			}
-		];
+			comics.push(comic as RandomComic);
+		}
+
+		return comics;
 	}
 
 	async quit() {
