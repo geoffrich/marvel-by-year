@@ -2,17 +2,9 @@
 	import Select from '$lib/components/form/Select.svelte';
 	import { decades } from '$lib/years';
 
-	const options = ['Select a decade', ...decades];
-	const values = ['', ...decades.map(mapDecade)];
+	const options = ['Select a decade', ...decades.map((d) => d.text)];
+	const values = ['', ...decades.map((d) => d.startYear)];
 	export let selected: string | number;
-
-	function mapDecade(decade: string): number {
-		if (decade.includes('pre')) {
-			return 1940;
-		} else {
-			return parseInt(decade.slice(0, 4));
-		}
-	}
 </script>
 
 <!-- TODO: submit client-side if JS available -->
