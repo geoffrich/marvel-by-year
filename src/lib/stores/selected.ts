@@ -1,6 +1,7 @@
 import type { Comic } from '$lib/types';
 import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
+import { onDestroy } from 'svelte';
 
 interface ComicStore<T> extends Writable<T> {
 	applyNewComics: (comics: Comic[]) => void;
@@ -8,7 +9,7 @@ interface ComicStore<T> extends Writable<T> {
 
 export function createSelectedStores(
 	mapping: (c: Comic) => string | string[]
-): [ComicStore<Set<string>>, Writable<Set<string>>, () => void] {
+): [ComicStore<Set<string>>, Writable<Set<string>>] {
 	const items = writable(new Set<string>());
 	let oldItems = new Set<string>();
 
@@ -31,10 +32,10 @@ export function createSelectedStores(
 		_selectedItems = $selected;
 	});
 
-	const cleanup = () => {
+	onDestroy(() => {
 		unsubscribeItems();
 		unsubscribeSelected();
-	};
+	});
 
 	return [
 		{
@@ -46,7 +47,6 @@ export function createSelectedStores(
 				});
 			}
 		},
-		selectedItems,
-		cleanup
+		selectedItems
 	];
 }

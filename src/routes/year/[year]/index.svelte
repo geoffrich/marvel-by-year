@@ -107,21 +107,14 @@
 	$: title = `Comics for ${year}`;
 	$: $titleStore = title;
 
-	let [series, selectedSeries, unsub1] = createSelectedStores(getSeries);
+	let [series, selectedSeries] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
 
-	let [creators, selectedCreators, unsub2] = createSelectedStores(getCreators);
+	let [creators, selectedCreators] = createSelectedStores(getCreators);
 	$: creators.applyNewComics(comics);
 
-	let [events, selectedEvents, unsub3] = createSelectedStores(getEvents);
+	let [events, selectedEvents] = createSelectedStores(getEvents);
 	$: events.applyNewComics(comics);
-
-	// TODO: move to store method
-	onDestroy(() => {
-		unsub1();
-		unsub2();
-		unsub3();
-	});
 
 	// TODO: can this be more efficient?
 	// with simulated CPU slowdown, there's lag when clearing the text field
