@@ -22,7 +22,8 @@ export default class MarvelApi {
 	async getComics(
 		year: number,
 		page: number,
-		cache: Record<number, ComicDataWrapper>
+		cache: Record<number, ComicDataWrapper>,
+		comicIdsWithImages: Set<string>
 	): Promise<ComicDataWrapper> {
 		console.log(`retrieving ${year} page ${page}`);
 
@@ -42,7 +43,7 @@ export default class MarvelApi {
 
 		const parsedResult: ComicDataWrapper = await result.json();
 		if (parsedResult.code === 200) {
-			await this.redis.addComics(year, page, parsedResult);
+			await this.redis.addComics(year, page, parsedResult, comicIdsWithImages);
 		}
 		console.log('updated redis in', (performance.now() - start) / 1000);
 

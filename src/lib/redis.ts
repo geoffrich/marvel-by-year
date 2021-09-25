@@ -97,7 +97,19 @@ export default class RedisClient {
 		}
 	}
 
-	async addComics(year: number, page: number, value: ComicDataWrapper) {
+	async getComicIdsWithImages(year: number): Promise<Set<string>> {
+		if (this.closed) return new Set();
+		const imagesKey = getComicWithImagesKey(year);
+		const imageSetMembers = await this.redis.smembers(imagesKey);
+		return new Set(imageSetMembers);
+	}
+
+	async addComics(
+		year: number,
+		page: number,
+		value: ComicDataWrapper,
+		comicIdsWithImages: Set<string>
+	) {
 		if (this.closed) return;
 		try {
 			const key = getYearKey(year, page);
@@ -116,10 +128,6 @@ export default class RedisClient {
 			const compressed = COMPRESS_COMICS ? compress(stringified) : stringified;
 			const ids = comics.map((c) => c.id);
 			const idsWithYear = comics.flatMap((c) => [year, c.id]);
-
-			// TODO: is there a way to combine this command with the previous get?
-			const imageSetMembers = await this.redis.smembers(imagesKey);
-			const comicIdsWithImages = new Set(imageSetMembers);
 
 			let pipeline = this.redis
 				.multi()

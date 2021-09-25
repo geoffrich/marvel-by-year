@@ -39,10 +39,13 @@ const get: RequestHandler = async function get({ params, query }) {
 	}
 
 	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
-	const cache = ignoreCache ? {} : await buildCache(year, pages);
+	const cachePromise = ignoreCache ? Promise.resolve({}) : buildCache(year, pages);
+	const comicIdPromise = redis.getComicIdsWithImages(year);
+
+	const [cache, comicIdsWithImages] = await Promise.all([cachePromise, comicIdPromise]);
 	console.log('cache checked in', (performance.now() - start) / 1000);
 
-	const requests = pages.map((i) => api.getComics(year, i, cache));
+	const requests = pages.map((i) => api.getComics(year, i, cache, comicIdsWithImages));
 	const results = await Promise.all(requests);
 
 	redis.quit();
