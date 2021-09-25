@@ -9,6 +9,7 @@ const DEFAULT_EXPIRY = 24 * 60 * 60;
 const COMIC_ID_KEY = 'comics:ids';
 const COMIC_ID_KEY_WITH_YEAR = 'comics:year-ids';
 const COMPRESS_COMICS = true;
+const RANDOM_COMIC_LIMIT = 18;
 const { compressToUTF16: compress, decompressFromUTF16: decompress } = LZString;
 
 enum Status {
@@ -32,6 +33,10 @@ const redisConfig: Redis.RedisOptions = {
 	},
 	connectTimeout: 500
 };
+
+interface ExtendedRedis extends Redis.Redis {
+	randomYear(key: string, startYear: number, endYear: number, seed: number): Promise<string[]>;
+}
 
 export default class RedisClient {
 	redis: Redis.Redis;
@@ -149,7 +154,7 @@ export default class RedisClient {
 
 	async getRandomComics(): Promise<RandomComic[]> {
 		if (this.closed) return [];
-		const ids = await this.redis.srandmember(COMIC_ID_KEY, 18);
+		const ids = await this.redis.srandmember(COMIC_ID_KEY, RANDOM_COMIC_LIMIT);
 		let pipeline = this.redis.multi();
 
 		for (let id of ids) {
@@ -169,11 +174,11 @@ export default class RedisClient {
 		});
 	}
 
-	async getRandomComicForYear(
+	async getRandomComicsForYear(
 		startYear: number,
 		endYear: number,
 		seed: number
-	): Promise<RandomComic> {
+	): Promise<RandomComic[]> {
 		if (this.closed) return;
 
 		this.redis.defineCommand('randomYear', {
@@ -189,25 +194,37 @@ export default class RedisClient {
 					local startRank = redis.call('ZRANK', KEYS[1], start[1])
 					local endRank = redis.call('ZRANK', KEYS[1], last[1])
 
-					local rank = math.random(startRank, endRank)
-					local range = redis.call('ZRANGE', KEYS[1], rank, rank)
-					return range[1]
+					local ids = {}
+					for i=1,${RANDOM_COMIC_LIMIT},1 do
+						local rank = math.random(startRank, endRank)
+						local range = redis.call('ZRANGE', KEYS[1], rank, rank)
+						ids[i] = range[1]
+					end
+
+					
+					return ids
 				else
-					return ''
+					return {}
 				end
 			`
 		});
 
-		// TODO: TS
-		const id = await this.redis.randomYear(COMIC_ID_KEY_WITH_YEAR, startYear, endYear, seed);
+		const ids = await (this.redis as ExtendedRedis).randomYear(
+			COMIC_ID_KEY_WITH_YEAR,
+			startYear,
+			endYear,
+			seed
+		);
 
-		const comic = await this.redis.hgetall(`comic:${id}`);
-		return {
-			id,
-			title: comic.title,
-			image: comic.image,
-			ext: comic.ext
-		};
+		const comic = await this.redis.hgetall(`comic:${ids[0]}`);
+		return [
+			{
+				id: ids[0],
+				title: comic.title,
+				image: comic.image,
+				ext: comic.ext
+			}
+		];
 	}
 
 	async quit() {
