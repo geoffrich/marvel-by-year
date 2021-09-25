@@ -91,8 +91,8 @@
 <style>
 	.container {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, 150px);
-		justify-content: center;
+		grid-template-columns: repeat(auto-fill, 130px);
+		justify-content: space-around;
 		justify-items: center;
 		gap: 1rem;
 
