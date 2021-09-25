@@ -8,7 +8,7 @@ const REDIS_CONNECTION = process.env['REDIS_CONNECTION'];
 const DEFAULT_EXPIRY = 24 * 60 * 60;
 const COMIC_ID_KEY = 'comics:ids';
 const COMIC_ID_KEY_WITH_YEAR = 'comics:year-ids';
-const COMPRESS_COMICS = true;
+
 const RANDOM_COMIC_LIMIT = 18;
 const { compressToUTF16: compress, decompressFromUTF16: decompress } = LZString;
 
@@ -55,15 +55,11 @@ export default class RedisClient {
 		return this.status === Status.End;
 	}
 
-	async get<T>(
-		key: string,
-		compressed = false,
-		parse: (val: string) => T = JSON.parse
-	): Promise<T> {
+	async get<T>(key: string, parse: (val: string) => T = JSON.parse): Promise<T> {
 		if (this.closed) return;
 		try {
 			const result = await this.redis.get(key);
-			return unpackResult(result, parse, compressed);
+			return parse(result);
 		} catch (e) {
 			console.log('Unable to retrieve', key);
 			console.log(e);
@@ -77,7 +73,7 @@ export default class RedisClient {
 		const keys = pages.map((p) => getYearKey(year, p));
 		try {
 			const results = await this.redis.mget(...keys);
-			return results.map((r) => unpackResult(r, JSON.parse, COMPRESS_COMICS));
+			return results.map((r) => unpackResult(r, JSON.parse));
 		} catch (e) {
 			console.log('Unable to retrieve', ...keys);
 			console.log(e);
@@ -86,12 +82,11 @@ export default class RedisClient {
 		return [];
 	}
 
-	async set<T>(key: string, value: T, expiry: number = DEFAULT_EXPIRY, shouldCompress = false) {
+	async set<T>(key: string, value: T, expiry: number = DEFAULT_EXPIRY) {
 		if (this.closed) return;
 		try {
 			const stringified = JSON.stringify(value);
-			const compressed = shouldCompress ? compress(stringified) : stringified;
-			return await this.redis.set(key, compressed, 'EX', expiry);
+			return await this.redis.set(key, stringified, 'EX', expiry);
 		} catch (e) {
 			console.log(e);
 		}
@@ -125,7 +120,7 @@ export default class RedisClient {
 			}
 
 			const stringified = JSON.stringify(value);
-			const compressed = COMPRESS_COMICS ? compress(stringified) : stringified;
+			const compressed = compress(stringified);
 			const ids = comics.map((c) => c.id);
 			const idsWithYear = comics.flatMap((c) => [year, c.id]);
 
@@ -231,9 +226,9 @@ export default class RedisClient {
 	}
 }
 
-function unpackResult<T>(result: string, parse: (val: string) => T, compressed = false) {
+function unpackResult<T>(result: string, parse: (val: string) => T) {
 	if (result) {
-		const uncompressed = COMPRESS_COMICS ? decompress(result) : result;
+		const uncompressed = decompress(result);
 		return parse(uncompressed);
 	}
 
@@ -242,7 +237,7 @@ function unpackResult<T>(result: string, parse: (val: string) => T, compressed =
 
 // Redis key for one page of the year API response
 function getYearKey(year: number, page: number) {
-	return `year:${year}:${page}` + (COMPRESS_COMICS ? ':c' : '');
+	return `year:${year}:${page}:c`;
 }
 
 // Redis key for list of comics with stored images

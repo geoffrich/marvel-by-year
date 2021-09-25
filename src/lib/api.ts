@@ -52,7 +52,7 @@ export default class MarvelApi {
 
 	async getTotalComics(year: number): Promise<number> {
 		const key = `year:${year}:total`;
-		const val = await this.redis.get<number>(key, false, parseInt);
+		const val = await this.redis.get<number>(key, parseInt);
 		if (val && !this.ignoreCache) {
 			return val;
 		}
