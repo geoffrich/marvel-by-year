@@ -31,6 +31,7 @@
 <script lang="ts">
 	import type { RandomComic } from '$lib/types';
 	import DecadeForm from '$lib/components/DecadeForm.svelte';
+	import ComicGrid from '$lib/components/ComicGrid.svelte';
 	import { getImage, ImageSize } from '$lib/comics';
 	import { blur } from 'svelte/transition';
 	import title from '$lib/stores/title';
@@ -74,28 +75,27 @@
 
 <DecadeForm selected={decade} />
 
-<ul class="container">
-	{#each comics as comic, idx (comic.id)}
-		<li class="card" in:blur>
-			<a class="comicLink" href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
-				<img src={getImage(comic.image, ImageSize.XXLarge, comic.ext)} alt="{comic.title} cover" />
-				<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
-			</a>
-			<span class="q" aria-hidden="true">?</span>
-		</li>
-	{/each}
-</ul>
+<div class="container">
+	<ComicGrid>
+		{#each comics as comic, idx (comic.id)}
+			<li class="card" in:blur>
+				<a class="comicLink" href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
+					<img
+						src={getImage(comic.image, ImageSize.XXLarge, comic.ext)}
+						alt="{comic.title} cover"
+					/>
+					<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
+				</a>
+				<span class="q" aria-hidden="true">?</span>
+			</li>
+		{/each}
+	</ComicGrid>
+</div>
 
 <button on:click={refresh}>Refresh</button>
 
 <style>
 	.container {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, 130px);
-		justify-content: space-around;
-		justify-items: center;
-		gap: 1rem;
-
 		--red: hsl(0deg 75% 60%);
 		--orange: hsl(30deg 95% 60%);
 		--yellow: hsl(60deg 80% 65%);
@@ -104,11 +104,6 @@
 		--purple: hsl(280deg 100% 80%);
 
 		margin-bottom: 1rem;
-	}
-
-	ul {
-		padding: 0;
-		list-style: none;
 	}
 
 	.card {

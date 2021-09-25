@@ -61,6 +61,7 @@
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
+	import ComicGrid from '$lib/components/ComicGrid.svelte';
 	import Select from '$lib/components/form/Select.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
 	import titleStore from '$lib/stores/title';
@@ -115,6 +116,7 @@
 	let [events, selectedEvents, unsub3] = createSelectedStores(getEvents);
 	$: events.applyNewComics(comics);
 
+	// TODO: move to store method
 	onDestroy(() => {
 		unsub1();
 		unsub2();
@@ -229,7 +231,7 @@
 	</div>
 </details>
 
-<ul>
+<ComicGrid oneColOnMobile={true}>
 	{#each orderedComics as comic, idx (comic.id)}
 		<li>
 			<ComicSummary
@@ -241,7 +243,7 @@
 	{:else}
 		<li>Nothing to show!</li>
 	{/each}
-</ul>
+</ComicGrid>
 <PageLinks {year} />
 
 {#if response.attr}
@@ -249,14 +251,6 @@
 {/if}
 
 <style>
-	ul {
-		list-style: none;
-		padding: 0;
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 1rem;
-	}
-
 	.filters {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -282,10 +276,6 @@
 	}
 
 	@media screen and (min-width: 450px) {
-		ul {
-			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-		}
-
 		.search {
 			flex-direction: row;
 		}
