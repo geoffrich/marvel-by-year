@@ -5,7 +5,7 @@ export const MIN_YEAR = 1939;
 export const years = Array.from(Array(MAX_YEAR - MIN_YEAR + 1).keys()).map((x) => x + MIN_YEAR);
 
 export const decades = [
-	{ text: 'pre-1960', startYear: 1930, endYear: 1959 },
+	{ text: 'pre-1960s', startYear: 1930, endYear: 1959 },
 	{ text: '1960s', startYear: 1960, endYear: 1969 },
 	{ text: '1970s', startYear: 1970, endYear: 1979 },
 	{ text: '1980s', startYear: 1980, endYear: 1989 },

@@ -34,6 +34,7 @@
 	import { getImage, ImageSize } from '$lib/comics';
 	import { blur } from 'svelte/transition';
 	import title from '$lib/stores/title';
+	import { decades } from '$lib/years';
 
 	export let comics: RandomComic[];
 	export let decade: number;
@@ -48,11 +49,7 @@
 	$: allComicsShowing = randomList.length >= comics.length;
 
 	function getDecadeAsString(decade: number) {
-		if (decade < 1960) {
-			return 'pre-1960s';
-		} else {
-			return `${decade}s`;
-		}
+		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;
 	}
 
 	function showMore() {
