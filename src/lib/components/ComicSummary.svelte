@@ -114,6 +114,7 @@
 	}
 	img {
 		width: 100%;
+		box-shadow: var(--shadow-med);
 	}
 
 	a {
