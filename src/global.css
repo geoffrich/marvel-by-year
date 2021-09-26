@@ -47,6 +47,7 @@ button {
 input,
 select {
 	font-size: inherit;
+	accent-color: var(--primary);
 }
 
 a {
