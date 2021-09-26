@@ -98,6 +98,7 @@
 		grid-template-columns: 100px 1fr;
 		grid-template-rows: repeat(3, auto);
 		gap: 0.5rem;
+		line-height: 1.3;
 	}
 
 	/* There might be a more elegant way, but this number was chosen to line up with the grid sizing */

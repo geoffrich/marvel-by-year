@@ -9,7 +9,7 @@
 <style>
 	.container {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, 130px);
+		grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
 		justify-content: space-around;
 		justify-items: center;
 
