@@ -29,7 +29,7 @@
 		<li><a href="/year/{MIN_YEAR}">Start at the beginning</a></li>
 		<li><a href="/year/{MAX_YEAR}">See what's current</a></li>
 		<li><a href="/comic/random">Get a random comic</a></li>
-		<li><a href="/year/1965?search=Daredevil%208">Stilts be praised</a></li>
+		<li><a href="/year/1965?search=Daredevil%208">Sky crimes</a></li>
 	</ul>
 </div>
 
