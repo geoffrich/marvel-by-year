@@ -42,7 +42,7 @@
 	export let refreshUrl: string;
 
 	let shouldFocusFirstElement = false;
-	$: $title = decade ? `Random comic from the ${getDecadeAsString(decade)}` : 'Random comic';
+	$: $title = decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics';
 
 	function getDecadeAsString(decade: number) {
 		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;

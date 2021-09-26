@@ -9,7 +9,7 @@ const DEFAULT_EXPIRY = 24 * 60 * 60;
 const COMIC_ID_KEY = 'comics:ids';
 const COMIC_ID_KEY_WITH_YEAR = 'comics:year-ids';
 
-const RANDOM_COMIC_LIMIT = 18;
+const RANDOM_COMIC_LIMIT = 12;
 const { compressToUTF16: compress, decompressFromUTF16: decompress } = LZString;
 
 enum Status {
