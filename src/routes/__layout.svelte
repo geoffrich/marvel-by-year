@@ -50,10 +50,10 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
+		margin-left: -0.25rem;
 		display: flex;
 		flex-wrap: wrap;
-		column-gap: 1rem;
-		row-gap: 0.5rem;
+		column-gap: 0.5rem;
 	}
 
 	footer {
@@ -63,9 +63,5 @@
 
 	a {
 		padding: 0.25rem;
-	}
-
-	a:first-child {
-		margin-left: -0.25rem;
 	}
 </style>

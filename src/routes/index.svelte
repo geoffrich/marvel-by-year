@@ -13,27 +13,31 @@
 	<h1>Browse Marvel Unlimited by Year</h1>
 	<p>
 		This site allows you to see what issues are available on Marvel Unlimited for a given year. Tap
-		the comic's cover to be taken directly to the comic in Marvel Unlimited or the web-based reader.
-		You can also filter the available issues for a given year by series, creators, or events.
+		the comic's cover to be taken directly to the comic in Marvel Unlimited or the web-based reader,
+		depending on your device. You can also filter the available issues for a given year by series,
+		creators, or events.
+	</p>
+	<p>
+		Note that some of the pages may use up quite a bit of data due to the size of the API response
+		and the images. Each cover image is about 13KB, so a year with 1000 comics released will use up
+		approximately 13MB of data. Tread carefully if you're on a mobile device with a limited amount
+		of data.
 	</p>
 
 	<ul>
 		<li><a href="/year/{MIN_YEAR}">Start at the beginning</a></li>
 		<li><a href="/year/{MAX_YEAR}">See what's current</a></li>
-		<li><a href="/comic/random">Choose a comic for me</a></li>
+		<li><a href="/comic/random">Get a random comic</a></li>
 		<li><a href="/year/1965?search=Daredevil%208">Stilts be praised</a></li>
 	</ul>
 </div>
 
 <style>
-	p {
-		margin-bottom: 2rem;
-	}
-
 	ul {
 		list-style: none;
 		padding: 0;
 		margin: 0;
+		margin-top: 2rem;
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 		gap: 1rem;
