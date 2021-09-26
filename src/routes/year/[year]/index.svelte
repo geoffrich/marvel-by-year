@@ -258,6 +258,7 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		flex-wrap: wrap;
+		align-items: baseline;
 	}
 
 	input[type='checkbox'] {
