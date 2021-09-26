@@ -118,7 +118,7 @@
 		box-shadow: var(--shadow-med);
 	}
 
-	a {
+	.container > :global(:first-child) {
 		grid-row: 1 / -1;
 	}
 

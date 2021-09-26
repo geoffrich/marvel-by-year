@@ -29,6 +29,7 @@
 		// In the browser, we don't want to fail too early.
 		try {
 			const apiCall = fetch(url, { credentials: 'omit' });
+			const search = page.query.get('search');
 			const res = browser ? await apiCall : await promiseTimeout(DEFAULT_TIMEOUT, apiCall);
 			const response: ComicResponse = await res.json();
 
@@ -36,7 +37,8 @@
 				return {
 					props: {
 						response,
-						year: parseInt(page.params.year)
+						year: parseInt(page.params.year),
+						search: search || ''
 					},
 					maxage: 86400
 				};
@@ -80,6 +82,7 @@
 
 	export let response: ComicResponse;
 	export let year: number;
+	export let search = '';
 
 	enum SortOption {
 		BestMatch = 'best match',
@@ -91,7 +94,7 @@
 	const sortingOptions = Object.values(SortOption);
 
 	let sortBy = SortOption.BestMatch;
-	let searchText = '';
+	let searchText = search;
 	let timer: ReturnType<typeof setTimeout>;
 	let sortDescending = true;
 
