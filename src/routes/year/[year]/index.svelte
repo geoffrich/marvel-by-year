@@ -75,7 +75,6 @@
 		isCreatorSelected,
 		compareUnlimitedDates
 	} from '$lib/comics';
-	import { onDestroy } from 'svelte';
 	import { matchSorter } from 'match-sorter';
 	import type { MatchSorterOptions } from 'match-sorter';
 

@@ -32,18 +32,20 @@
 	import type { RandomComic } from '$lib/types';
 	import DecadeForm from '$lib/components/DecadeForm.svelte';
 	import ComicGrid from '$lib/components/ComicGrid.svelte';
+	import ComicLink from '$lib/components/ComicLink.svelte';
 	import { getImage, ImageSize } from '$lib/comics';
 	import { blur } from 'svelte/transition';
 	import title from '$lib/stores/title';
 	import { decades } from '$lib/years';
+	import { tick } from 'svelte';
 
 	export let comics: RandomComic[];
 	export let decade: number;
 	export let refreshUrl: string;
 
-	let shouldFocusFirstElement = false;
 	let refreshing = false;
 	let error = false;
+	let container;
 	$: $title = decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics';
 
 	function getDecadeAsString(decade: number) {
@@ -52,25 +54,18 @@
 
 	function refresh() {
 		refreshing = true;
-		shouldFocusFirstElement = true;
 		fetch(refreshUrl)
 			.then((res) => res.json())
 			.then((res) => {
 				comics = res.comics;
 				refreshing = false;
 				error = false;
+				tick().then(() => container.querySelector('a').focus());
 			})
 			.catch(() => {
 				error = true;
 				refreshing = false;
 			});
-	}
-
-	function focusFirst(node: HTMLElement, index: number) {
-		// only focus the first element after the list has been updated, not on initial load
-		if (index === 0 && shouldFocusFirstElement) {
-			node.focus();
-		}
 	}
 </script>
 
@@ -84,17 +79,17 @@
 
 <DecadeForm selected={decade} />
 
-<div class="container">
+<div class="container" bind:this={container}>
 	<ComicGrid>
-		{#each comics as comic, idx (comic.id)}
+		{#each comics as comic (comic.id)}
 			<li class="card" in:blur>
-				<a class="comicLink" href="https://read.marvel.com/#/book/{comic.id}" use:focusFirst={idx}>
+				<ComicLink id={comic.id} title={comic.title}>
 					<img
 						src={getImage(comic.image, ImageSize.XXLarge, comic.ext)}
 						alt="{comic.title} cover"
 					/>
 					<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
-				</a>
+				</ComicLink>
 				<span class="q" aria-hidden="true">?</span>
 			</li>
 		{/each}
@@ -126,10 +121,8 @@
 		width: 133px;
 		display: grid;
 		place-items: center;
-		--shadow-color: 0deg 0% 50%;
-		box-shadow: 1px 2px 2px hsl(var(--shadow-color) / 0.333),
-			2px 4px 4px hsl(var(--shadow-color) / 0.333), 3px 6px 6px hsl(var(--shadow-color) / 0.333);
-		border-radius: 8px;
+		box-shadow: var(--shadow-med);
+		border-radius: 0.5rem;
 
 		position: relative;
 	}
@@ -158,14 +151,12 @@
 		background-color: var(--purple);
 	}
 
-	.comicLink:focus {
-		outline: 0.25rem solid black;
-		outline-offset: 0.25rem;
-		border-radius: 8px;
-	}
-
-	.comicLink:focus:not(.focus-visible) {
-		outline: none;
+	.card > :global(:first-child) {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 	}
 
 	.q {
@@ -180,14 +171,6 @@
 		margin-left: auto;
 		margin-right: auto;
 		display: block;
-	}
-
-	.comicLink {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
 	}
 
 	img {

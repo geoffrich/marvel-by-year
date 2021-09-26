@@ -43,7 +43,7 @@
 		left: 0;
 		top: 0;
 		height: 100%;
-		background-color: var(--primary);
+		background-color: var(--loading);
 		transition: width 0.4s;
 	}
 

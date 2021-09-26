@@ -27,7 +27,7 @@
 		background-color: var(--secondary);
 	}
 
-	ul a {
+	a {
 		display: block;
 		padding: 0.5rem;
 	}

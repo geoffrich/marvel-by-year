@@ -23,4 +23,12 @@
 		display: flex;
 		gap: 1rem;
 	}
+
+	a {
+		padding: 0.25rem;
+	}
+
+	a:first-child {
+		margin-left: -0.25rem;
+	}
 </style>

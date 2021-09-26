@@ -1,7 +1,8 @@
 :root {
-	--primary: #57a4d1;
-	--secondary: lightblue;
-	--error: #ed1d24;
+	--primary: hsl(202, 74%, 26%);
+	--secondary: hsl(195, 53%, 79%);
+	--loading: hsl(202, 74%, 50%);
+	--error: hsl(358, 85%, 52%);
 	--shadow-color: 0deg 0% 50%;
 	--shadow-med: 1px 2px 2px hsl(var(--shadow-color) / 0.333),
 		2px 4px 4px hsl(var(--shadow-color) / 0.333), 3px 6px 6px hsl(var(--shadow-color) / 0.333);
@@ -45,4 +46,24 @@ button {
 input,
 select {
 	font-size: inherit;
+}
+
+a {
+	color: var(--primary);
+}
+
+a:focus {
+	color: white;
+	background-color: var(--primary);
+}
+
+a:focus:not(.focus-visible) {
+	color: var(--primary);
+	background-color: inherit;
+}
+
+details:focus,
+summary:focus {
+	outline: 0.125rem solid black;
+	border-radius: 0.5rem;
 }

@@ -4,6 +4,7 @@
 
 	import { Plus, Minus } from '$lib/icons';
 	import IconButton from '$lib/components/IconButton.svelte';
+	import ComicLink from '$lib/components/ComicLink.svelte';
 
 	export let comic: Comic;
 	export let lazyLoad = true;
@@ -58,7 +59,7 @@
 </script>
 
 <div class="container">
-	<a href="https://read.marvel.com/#/book/{comic.digitalId}">
+	<ComicLink id={comic.digitalId} title={comic.title}>
 		<picture>
 			<source srcset={getImageSrc(comic, ImageSize.XXLarge)} media="(min-width: 450px)" />
 			<img
@@ -68,7 +69,7 @@
 			/>
 		</picture>
 		<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
-	</a>
+	</ComicLink>
 	<p><a href={comic.detailUrl}>{comic.title}</a></p>
 	<div>
 		<p>

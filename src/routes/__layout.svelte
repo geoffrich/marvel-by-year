@@ -60,4 +60,12 @@
 		margin-top: auto;
 		padding: 1rem 0;
 	}
+
+	a {
+		padding: 0.25rem;
+	}
+
+	a:first-child {
+		margin-left: -0.25rem;
+	}
 </style>
