@@ -125,7 +125,7 @@
 		border-radius: 0.5rem;
 
 		position: relative;
-		transition: transform 0.2s;
+		transition: transform 0.2s ease-out;
 	}
 
 	.card:hover {
