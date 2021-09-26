@@ -1,38 +1,21 @@
-# create-svelte
+# marvel-by-year
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+## Commands
 
-## Creating a project
+- `npm run dev` run dev server
+- `npm run build` build for production
 
-If you're seeing this, you've probably already done this step. Congrats!
+See also the [SvelteKit CLI docs](https://kit.svelte.dev/docs#command-line-interface).
 
-```bash
-# create a new project in the current directory
-npm init svelte@next
+## Marvel API
 
-# create a new project in my-app
-npm init svelte@next my-app
+To develop this site, you will need to sign up for a [Marvel API key](https://developer.marvel.com/documentation/getting_started). Once you have the keys, create a `.env` file and store the keys in environment variables.
+
+```
+MARVEL_PRIVATE_KEY=key_goes_here
+MARVEL_PUBLIC_KEY=key_goes_here
 ```
 
-> Note: the `@next` is temporary
+## Redis
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
-
-```bash
-npm run build
-```
-
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+This site caches the Marvel API responses in Redis. You do not need a valid Redis connection to develop, though setting one up will prevent reaching the Marvel API rate limit. Either provide a REDIS_CONNECTION environment variable or start a [local Redis server](https://redis.io/topics/quickstart).

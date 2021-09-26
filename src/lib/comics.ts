@@ -1,15 +1,14 @@
-import type { Comic } from '$lib/types/marvel';
-import { default as dayjs } from 'dayjs';
+import type { Comic } from '$lib/types';
+import dayjs from './dayjs';
 
 const NO_EVENT = '(no event)';
 const NO_CREATOR = '(unknown)';
 
-export function getComicSeries(c: Comic): string {
+export function getSeries(c: Comic): string {
 	return c.series.name;
 }
 
-export function getComicCreators(c: Comic): string[] {
-	const creators = c.creators.items;
+export function getCreators({ creators }: Comic): string[] {
 	if (creators.length > 0) {
 		return creators.map((cr) => cr.name);
 	} else {
@@ -17,8 +16,7 @@ export function getComicCreators(c: Comic): string[] {
 	}
 }
 
-export function getComicEvents(c: Comic): string[] {
-	const events = c.events.items;
+export function getEvents({ events }: Comic): string[] {
 	if (events.length > 0) {
 		return events.map((e) => e.name);
 	} else {
@@ -26,44 +24,63 @@ export function getComicEvents(c: Comic): string[] {
 	}
 }
 
-export function compareComicDates(a: Comic, b: Comic) {
-	return getComicDate(a).diff(getComicDate(b));
+export function compareDates(a: Comic, b: Comic) {
+	return getOnSaleDate(a).diff(getOnSaleDate(b));
 }
 
-export function compareComicTitles(a: Comic, b: Comic) {
-	return compareStrings(a.title, b.title);
+export function compareUnlimitedDates(a: Comic, b: Comic) {
+	return getUnlimitedDate(a).diff(getUnlimitedDate(b));
 }
 
-export function isEventSelected(comic: Comic, selectedEvents: Set<string>) {
-	const eventList = comic.events.items;
+export function compareTitles({ title: titleA }: Comic, { title: titleB }: Comic) {
+	// TODO: possible perf enhancement
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare#performance
+	return titleA.localeCompare(titleB, undefined, { numeric: true, sensitivity: 'base' });
+}
 
+export function isEventSelected({ events }: Comic, selectedEvents: Set<string>) {
 	return (
-		eventList.find((e) => selectedEvents.has(e.name)) !== undefined ||
-		(selectedEvents.has(NO_EVENT) && eventList.length === 0)
+		events.find((e) => selectedEvents.has(e.name)) !== undefined ||
+		(selectedEvents.has(NO_EVENT) && events.length === 0)
 	);
 }
 
-export function isCreatorSelected(comic: Comic, selectedCreators: Set<string>) {
-	const creatorList = comic.creators.items;
-
+// TODO: make more efficient
+export function isCreatorSelected({ creators }: Comic, selectedCreators: Set<string>) {
 	return (
-		creatorList.find((e) => selectedCreators.has(e.name)) !== undefined ||
-		(selectedCreators.has(NO_CREATOR) && creatorList.length === 0)
+		creators.find((e) => selectedCreators.has(e.name)) !== undefined ||
+		(selectedCreators.has(NO_CREATOR) && creators.length === 0)
 	);
 }
 
-export function getComicDate(comic: Comic) {
-	return dayjs(comic.dates.find((d) => d.type === 'onsaleDate').date);
+export function getOnSaleDate(comic: Comic) {
+	return dayjs.utc(comic.dates.onSale);
 }
 
-function compareStrings(a, b) {
-	if (a < b) {
-		return -1;
+export function getUnlimitedDate(comic: Comic) {
+	return dayjs.utc(comic.dates.unlimited);
+}
+
+export function getImage(path: string, size: ImageSize, ext?: string) {
+	if (path === undefined) {
+		return '';
+	}
+	if (ext === undefined) {
+		// assume the extension is included in the path
+		let splitPath = path.split('.');
+		ext = splitPath.pop();
+		path = splitPath.join('.');
 	}
 
-	if (a > b) {
-		return 1;
-	}
+	return `${path.replace('http:', 'https:')}/${size}.${ext}`;
+}
 
-	return 0;
+// documented at https://developer.marvel.com/documentation/images
+export enum ImageSize {
+	Small = 'portrait_small', // 50x75
+	Medium = 'portrait_medium', // 100x150
+	Large = 'portrait_xlarge', // 150x225
+	XLarge = 'portrait_fantastic', // 168x252
+	XXLarge = 'portrait_incredible', // 216x324
+	XXXLarge = 'portrait_uncanny' // 300x450
 }

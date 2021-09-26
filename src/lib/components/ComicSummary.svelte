@@ -1,49 +1,48 @@
 <script lang="ts">
-	import type { Comic } from '$lib/types/marvel';
-	import { default as dayjs } from 'dayjs';
-	import { getComicDate } from '$lib/comics';
+	import type { Comic } from '$lib/types';
+	import { ImageSize, getOnSaleDate, getUnlimitedDate, getImage } from '$lib/comics';
 
-	// TODO: bring up more details on separate page
+	import { Plus, Minus } from '$lib/icons';
+	import IconButton from '$lib/components/IconButton.svelte';
+	import ComicLink from '$lib/components/ComicLink.svelte';
 
 	export let comic: Comic;
 	export let lazyLoad = true;
+	export let showUnlimitedDate = false;
 
-	// documented at https://developer.marvel.com/documentation/images
-	enum ImageSize {
-		Small = 'portrait_small', // 50x75
-		Medium = 'portrait_medium', // 100x150
-		Large = 'portrait_xlarge', // 150x225
-		XLarge = 'portrait_fantastic', // 168x252
-		XXLarge = 'portrait_incredible', // 216x324
-		XXXLarge = 'portrait_uncanny' // 300x450
-	}
+	let showAllCreators = false;
 
-	$: onSaleDate = dayjs(getComicDate(comic))
-		.add(1, 'day') // TODO: days are off by one due to timezone issues, this is a hack
-		.format('D MMM YYYY');
+	const MAX_CREATORS = 3;
 
-	$: detailUrl = comic.urls.find((u) => u.type === 'detail').url;
+	$: onSaleDate = getOnSaleDate(comic).format('D MMM YYYY');
+	$: unlimitedDate = getUnlimitedDate(comic).format('D MMM YYYY');
 
-	$: creatorText = getCreatorText(comic.creators.items.map((c) => c.name));
+	$: creatorCount = comic.creators.length;
+	$: creatorText = getCreatorText(
+		comic.creators.map((c) => c.name),
+		showAllCreators ? creatorCount : MAX_CREATORS
+	);
 
 	function getImageSrc(comic: Comic, size: ImageSize) {
-		return `${comic.thumbnail.path.replace('http:', 'https:')}/${size}.${
-			comic.thumbnail.extension
-		}`;
+		return getImage(comic.cover.path, size, comic.cover.ext);
 	}
 
-	function getCreatorText(creators: string[]) {
+	function getCreatorText(creators: string[], max: number) {
 		if (creators.length === 0) {
 			return 'Unknown';
 		}
 		if (creators.length === 1) {
 			return creators[0];
 		}
-		if (creators.length <= 3) {
+		if (creators.length <= max) {
 			return commaSeparate(creators);
 		} else {
-			const additionalCount = creators.length - 3;
-			const subset = creators.slice(0, 3);
+			const additionalCount = creators.length - max;
+			if (additionalCount === 1) {
+				// adding "and 1 others" will be the same length as the name
+				return commaSeparate(creators);
+			}
+			const subset = creators.slice(0, max);
 			subset.push(`${additionalCount} others`);
 			return commaSeparate(subset);
 		}
@@ -53,10 +52,14 @@
 		const last = arr.pop();
 		return arr.join(', ') + ' and ' + last;
 	}
+
+	function toggleCreators() {
+		showAllCreators = !showAllCreators;
+	}
 </script>
 
 <div class="container">
-	<a href="https://read.marvel.com/#/book/{comic.digitalId}">
+	<ComicLink id={comic.digitalId} title={comic.title}>
 		<picture>
 			<source srcset={getImageSrc(comic, ImageSize.XXLarge)} media="(min-width: 450px)" />
 			<img
@@ -66,11 +69,28 @@
 			/>
 		</picture>
 		<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>
-	</a>
-	<p><a href={detailUrl}>{comic.title}</a></p>
-	<p>{onSaleDate}</p>
-	<!-- TODO: click to expand? -->
-	<p>By {creatorText}</p>
+	</ComicLink>
+	<p><a href={comic.detailUrl}>{comic.title}</a></p>
+	<div>
+		<p>
+			{onSaleDate}
+		</p>
+		{#if showUnlimitedDate}<p>MU: {unlimitedDate}</p>{/if}
+	</div>
+	<p>
+		<span>By {creatorText}</span>
+		{#if creatorCount > MAX_CREATORS + 1}
+			{#if showAllCreators}
+				<IconButton altText="Show less" on:click={toggleCreators}>
+					<Minus />
+				</IconButton>
+			{:else}
+				<IconButton altText="Show more" on:click={toggleCreators}>
+					<Plus />
+				</IconButton>
+			{/if}
+		{/if}
+	</p>
 </div>
 
 <style>
@@ -79,6 +99,7 @@
 		grid-template-columns: 100px 1fr;
 		grid-template-rows: repeat(3, auto);
 		gap: 0.5rem;
+		line-height: 1.3;
 	}
 
 	/* There might be a more elegant way, but this number was chosen to line up with the grid sizing */
@@ -94,9 +115,14 @@
 	}
 	img {
 		width: 100%;
+		box-shadow: var(--shadow-med);
 	}
 
-	a {
+	.container > :global(:first-child) {
 		grid-row: 1 / -1;
+	}
+
+	p {
+		margin: 0;
 	}
 </style>

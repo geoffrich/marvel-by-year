@@ -2,57 +2,64 @@
 	export const prerender = true;
 </script>
 
-<script lang="ts">
-	import { years } from '$lib/years';
+<script>
+	import title from '$lib/stores/title';
+	import { MIN_YEAR, MAX_YEAR } from '$lib/years';
+
+	$title = 'Home';
 </script>
 
-<svelte:head>
-	<title>Browse Marvel Unlimited by Year</title>
-</svelte:head>
+<div class="container">
+	<h1>Browse Marvel Unlimited by Year</h1>
+	<p>
+		This site allows you to see what issues are available on Marvel Unlimited for a given year. Tap
+		the comic's cover to be taken directly to the comic in Marvel Unlimited or the web-based reader,
+		depending on your device. You can also filter the available issues for a given year by series,
+		creators, or events.
+	</p>
+	<p>
+		Note that some of the pages may use up quite a bit of data due to the size of the API response
+		and the images. Each cover image is about 13KB, so a year with 1000 comics released will use up
+		approximately 13MB of data. Tread carefully if you're on a mobile device with a limited amount
+		of data.
+	</p>
 
-<h1>Browse Marvel Unlimited by Year</h1>
-<p>
-	This site allows you to see what issues are available on Marvel Unlimited for a given year. Tap
-	the comic's cover to be taken directly to the comic in Marvel Unlimited or the web-based reader.
-</p>
-<p>
-	You can also filter the available issues for a given year by series, creators, or events. Note
-	that the data is paginated&mdash;you may not see all series for a given year until you have
-	navigated to further pages.
-</p>
-<p>
-	This site is a work in progress. Due to limitations of the Marvel API, you may experience issues
-	such as timeouts and rate-limiting. Marvel limits developers to 3000 API calls/day&mdash;caching
-	is implemented to try and mitigate that, but it still may be an issue. If you can't get a page to
-	load, try again tomorrow.
-</p>
-<p>
-	Because of these API limits, please <em>do not</em> share links to this site on social media for the
-	time being.
-</p>
-<h2>Jump to a year</h2>
-<ul>
-	{#each years as year (year)}
-		<li><a href="/year/{year}/0">{year}</a></li>
-	{/each}
-</ul>
+	<ul>
+		<li><a href="/year">Browse all years</a></li>
+		<li><a href="/year/{MIN_YEAR}">Start at the beginning</a></li>
+		<li><a href="/year/{MAX_YEAR}">See what's current</a></li>
+		<li><a href="/comic/random">Get a random comic</a></li>
+		<li><a href="/year/1965?search=Daredevil%208">Sky crimes</a></li>
+	</ul>
+</div>
 
 <style>
 	ul {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, 50px);
 		list-style: none;
 		padding: 0;
-		gap: 0.5rem;
-		justify-content: center;
-	}
-
-	li {
-		background-color: var(--secondary);
+		margin: 0;
+		margin-top: 2rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 1rem;
+		align-content: stretch;
 	}
 
 	a {
+		color: white;
+		background-color: var(--primary);
+		padding: 3rem 1rem;
+		text-align: center;
+		font-size: 1.25rem;
 		display: block;
-		padding: 0.5rem;
+		border-radius: 0.5rem;
+		height: 100%;
+		text-decoration: none;
+	}
+
+	a:hover:not(:active),
+	a:focus {
+		color: var(--primary);
+		background-color: var(--secondary);
 	}
 </style>

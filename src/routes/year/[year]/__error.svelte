@@ -9,17 +9,35 @@
 	}
 </script>
 
-<script>
+<script lang="ts">
+	import { goto } from '$app/navigation';
+
+	import { page } from '$app/stores';
+
+	let reloading = false;
+
 	export let status;
-	export let error;
+	export let error: Error;
+
+	let isTimeout = status === 502 || (error && error.message && error.message.includes('Timed out'));
+
+	function reloadPage() {
+		reloading = true;
+		goto($page.path).then(() => {
+			reloading = false;
+		});
+	}
 </script>
 
-<h1>Error: received status {status}</h1>
-{#if error && error.message}
-	<p>{error.message}</p>
-{/if}
-{#if status === 502}
-	<p>This could mean the Marvel API didn't respond in time. Try refreshing the page.</p>
+{#if isTimeout}
+	<h1>Request timed out</h1>
+	<p>The Marvel API didn't respond in time. Try reloading the page.</p>
+	<button on:click={reloadPage} disabled={reloading}>{reloading ? 'Reloading' : 'Reload'}</button>
+{:else}
+	<h1>Error: received status {status}</h1>
+	{#if error && error.message}
+		<p>{error.message}</p>
+	{/if}
 {/if}
 
 <style>

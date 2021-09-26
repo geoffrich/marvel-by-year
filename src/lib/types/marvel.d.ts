@@ -20,10 +20,10 @@ export interface Comic {
 	id: number;
 	digitalId: number;
 	title: string;
-	issueNumber: double;
+	issueNumber: number;
 	variantDescription: string;
 	description: string;
-	modified: Date;
+	modified: string;
 	isbn: string;
 	upc: string;
 	diamondCode: string;
@@ -71,7 +71,7 @@ export interface ComicSummary {
 
 export interface ComicDate {
 	type: string;
-	date: Date;
+	date: string;
 }
 
 export interface ComicPrice {
