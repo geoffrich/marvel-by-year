@@ -25,6 +25,7 @@
 	</p>
 
 	<ul>
+		<li><a href="/year">Browse all years</a></li>
 		<li><a href="/year/{MIN_YEAR}">Start at the beginning</a></li>
 		<li><a href="/year/{MAX_YEAR}">See what's current</a></li>
 		<li><a href="/comic/random">Get a random comic</a></li>

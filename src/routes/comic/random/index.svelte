@@ -125,6 +125,11 @@
 		border-radius: 0.5rem;
 
 		position: relative;
+		transition: transform 0.2s;
+	}
+
+	.card:hover {
+		transform: rotateX(-3deg) rotateY(-20deg);
 	}
 
 	.card:nth-child(6n + 1) {
