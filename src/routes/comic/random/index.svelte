@@ -42,6 +42,8 @@
 	export let refreshUrl: string;
 
 	let shouldFocusFirstElement = false;
+	let refreshing = false;
+	let error = false;
 	$: $title = decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics';
 
 	function getDecadeAsString(decade: number) {
@@ -49,11 +51,18 @@
 	}
 
 	function refresh() {
+		refreshing = true;
 		shouldFocusFirstElement = true;
 		fetch(refreshUrl)
 			.then((res) => res.json())
 			.then((res) => {
 				comics = res.comics;
+				refreshing = false;
+				error = false;
+			})
+			.catch(() => {
+				error = true;
+				refreshing = false;
 			});
 	}
 
@@ -92,7 +101,13 @@
 	</ComicGrid>
 </div>
 
-<button on:click={refresh}>Refresh</button>
+<button disabled={refreshing} on:click={refresh}>{refreshing ? 'Loading' : 'Refresh'}</button>
+
+<p aria-live="polite" class="error">
+	{#if error}
+		Something went wrong! Try again?
+	{/if}
+</p>
 
 <style>
 	.container {
@@ -181,5 +196,10 @@
 
 	img[src=''] {
 		display: none;
+	}
+
+	.error {
+		color: var(--error);
+		text-align: center;
 	}
 </style>
