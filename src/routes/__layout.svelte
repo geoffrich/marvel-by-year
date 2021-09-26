@@ -61,7 +61,7 @@
 		padding: 1rem 0;
 	}
 
-	a {
+	nav a {
 		padding: 0.25rem;
 	}
 </style>
