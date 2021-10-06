@@ -24,7 +24,8 @@
 	<p>
 		This site allows you to see what issues are available on Marvel Unlimited for a given year. Tap
 		the comic's cover to be taken directly to the comic in Marvel Unlimited or the web-based reader,
-		depending on your device. You can also filter the available issues for a given year by series,
+		depending on your device. If you're on Android, you may have to use the issue's title link
+		instead to launch the app. You can also filter the available issues for a given year by series,
 		creators, or events.
 	</p>
 	<p>
