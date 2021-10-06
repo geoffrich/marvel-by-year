@@ -33,6 +33,12 @@
 		approximately 13MB of data. Tread carefully if you're on a mobile device with a limited amount
 		of data.
 	</p>
+	<p>
+		Curious about how I built this? Browse the <a href="https://github.com/geoffrich/marvel-by-year"
+			>source code</a
+		>
+		or read my <a href="https://geoffrich.net/posts/marvel-unlimited-by-year/">blog post</a>.
+	</p>
 
 	<ul>
 		<li><a href="/year">Browse all years</a></li>
@@ -55,7 +61,7 @@
 		align-content: stretch;
 	}
 
-	a {
+	li a {
 		color: white;
 		background-color: var(--primary);
 		padding: 3rem 1rem;
@@ -67,8 +73,8 @@
 		text-decoration: none;
 	}
 
-	a:hover:not(:active),
-	a:focus {
+	li a:hover:not(:active),
+	li a:focus {
 		color: var(--primary);
 		background-color: var(--secondary);
 	}
