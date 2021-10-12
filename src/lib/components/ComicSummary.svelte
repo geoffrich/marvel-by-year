@@ -66,6 +66,8 @@
 				loading={lazyLoad ? 'lazy' : undefined}
 				src={getImageSrc(comic, ImageSize.Large)}
 				alt="{comic.title} cover"
+				height="228"
+				width="152"
 			/>
 		</picture>
 		<span class="visually-hidden">Read {comic.title} on Marvel Unlimited</span>

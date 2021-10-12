@@ -21,7 +21,7 @@
 	 * @type {import('@sveltejs/kit').Load}
 	 */
 	export async function load({ page, fetch }) {
-		const url = `/year/${page.params.year}.json?${page.query.toString()}`;
+		const url = `/year/${page.params.year}.json`;
 		// Netlify functions have a execution time limit of 10 seconds
 		// The Marvel API can be slow and take 20+ seconds in some cases
 		// If we don't hear back in time, throw an error so the user can easily retry
@@ -29,7 +29,6 @@
 		// In the browser, we don't want to fail too early.
 		try {
 			const apiCall = fetch(url, { credentials: 'omit' });
-			const search = page.query.get('search');
 			const res = browser ? await apiCall : await promiseTimeout(DEFAULT_TIMEOUT, apiCall);
 			const response: ComicResponse = await res.json();
 
@@ -37,8 +36,7 @@
 				return {
 					props: {
 						response,
-						year: parseInt(page.params.year),
-						search: search || ''
+						year: parseInt(page.params.year)
 					},
 					maxage: 86400
 				};
@@ -75,14 +73,17 @@
 		compareTitles,
 		isEventSelected,
 		isCreatorSelected,
-		compareUnlimitedDates
+		compareUnlimitedDates,
+		getOnSaleDate
 	} from '$lib/comics';
 	import { matchSorter } from 'match-sorter';
 	import type { MatchSorterOptions } from 'match-sorter';
+	import { page } from '$app/stores';
 
 	export let response: ComicResponse;
 	export let year: number;
-	export let search = '';
+
+	let search = $page.query.get('search') || '';
 
 	enum SortOption {
 		BestMatch = 'best match',
@@ -92,6 +93,26 @@
 	}
 
 	const sortingOptions = Object.values(SortOption);
+
+	const months = [
+		'all',
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec'
+	];
+
+	let startMonth = $page.query.get('month');
+	let month = months[startMonth ? startMonth : 0];
+	$: monthIndex = months.indexOf(month) - 1;
 
 	let sortBy = SortOption.BestMatch;
 	let searchText = search;
@@ -106,7 +127,7 @@
 	}
 
 	$: comics = response.comics;
-	$: title = `Comics for ${year}`;
+	$: title = `Comics for ${monthIndex >= 0 ? month : ''} ${year}`;
 	$: $titleStore = title;
 
 	let [series, selectedSeries] = createSelectedStores(getSeries);
@@ -120,7 +141,13 @@
 
 	// TODO: can this be more efficient?
 	// with simulated CPU slowdown, there's lag when clearing the text field
-	$: filteredComics = filterComics(comics, $selectedSeries, $selectedCreators, $selectedEvents);
+	$: filteredComics = filterComics(
+		comics,
+		$selectedSeries,
+		$selectedCreators,
+		$selectedEvents,
+		monthIndex
+	);
 
 	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
 
@@ -130,16 +157,15 @@
 		comics: Comic[],
 		selectedSeries: Set<string>,
 		selectedCreators: Set<string>,
-		selectedEvents: Set<string>
+		selectedEvents: Set<string>,
+		monthIndex: number
 	) {
 		let noCreatorsSelected = selectedCreators.size === $creators.size;
 		let noEventsSelected = selectedEvents.size === $events.size;
 		let noSeriesSelected = selectedSeries.size === $series.size;
-		if (noCreatorsSelected && noEventsSelected && noSeriesSelected) {
-			return comics;
-		}
 		return comics.filter(
 			(c) =>
+				(monthIndex < 0 || getOnSaleDate(c).month() == monthIndex) &&
 				(noSeriesSelected || selectedSeries.has(c.series.name)) &&
 				(noCreatorsSelected || isCreatorSelected(c, selectedCreators)) &&
 				(noEventsSelected || isEventSelected(c, selectedEvents))
@@ -181,6 +207,7 @@
 		$selectedSeries = new Set($series);
 		$selectedEvents = new Set($events);
 		searchText = '';
+		month = months[0];
 	}
 </script>
 
@@ -211,6 +238,9 @@
 	</div>
 	<div>
 		<Select options={sortingOptions} id="sorting" bind:value={sortBy}>Sort by</Select>
+	</div>
+	<div>
+		<Select options={months} id="month" bind:value={month}>Release Month</Select>
 	</div>
 	<div>
 		<label><input type="checkbox" bind:checked={sortDescending} />Descending</label>
