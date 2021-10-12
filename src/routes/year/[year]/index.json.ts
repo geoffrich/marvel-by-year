@@ -9,10 +9,10 @@ import { performance } from 'perf_hooks';
 import { dev } from '$app/env';
 
 //@ts-ignore
-const get: RequestHandler = async function get({ params, query }) {
+const get: RequestHandler = async function get({ params }) {
 	const start = performance.now();
 	const year = parseInt(params.year);
-	const ignoreCache = !!query.get('ignoreCache');
+	const ignoreCache = false;
 
 	if (year < MIN_YEAR || year > MAX_YEAR) {
 		return {
