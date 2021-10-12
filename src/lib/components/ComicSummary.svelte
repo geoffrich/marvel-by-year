@@ -117,6 +117,7 @@
 	}
 	img {
 		width: 100%;
+		height: auto;
 		box-shadow: var(--shadow-med);
 	}
 
