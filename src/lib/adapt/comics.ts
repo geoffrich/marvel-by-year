@@ -42,24 +42,33 @@ function mapComic(comic: ApiComic): Comic {
 		modified,
 		pageCount,
 		detailUrl,
-		series: {
-			id: getIdFromApiUrl(comic.series.resourceURI),
-			name: comic.series.name
-		},
+		// some series are coming back null
+		// TODO: try to derive from name
+		series: comic.series
+			? {
+					id: getIdFromApiUrl(comic.series.resourceURI),
+					name: comic.series.name
+			  }
+			: {
+					id: -1,
+					name: '(unknown)'
+			  },
 		dates: { onSale, unlimited },
-		creators: comic.creators.items.map((c) => ({
-			id: getIdFromApiUrl(c.resourceURI),
-			name: c.name,
-			role: getRoleEnum(c.role)
-		})),
+		creators:
+			comic.creators?.items.map((c) => ({
+				id: getIdFromApiUrl(c.resourceURI),
+				name: c.name,
+				role: getRoleEnum(c.role)
+			})) ?? [],
 		cover: {
 			path: comic.thumbnail.path,
 			ext: comic.thumbnail.extension
 		},
-		events: comic.events.items.map((e) => ({
-			id: getIdFromApiUrl(e.resourceURI),
-			name: e.name
-		}))
+		events:
+			comic.events?.items.map((e) => ({
+				id: getIdFromApiUrl(e.resourceURI),
+				name: e.name
+			})) ?? []
 	};
 }
 
