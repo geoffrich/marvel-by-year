@@ -163,7 +163,8 @@
 	}
 </script>
 
-<h1>{$page.stuff.title}</h1>
+<!-- TODO: this is possibly a bug with SvelteKit. When a request times out and we show an error page, hitting reload does not populate stuff -->
+<h1>{$page.stuff.title || `Comics for ${year}`}</h1>
 <PageLinks {year} />
 
 <p>
