@@ -1,30 +1,17 @@
-<script context="module" lang="ts">
-	import type { RandomResponse } from '$lib/types';
-
-	/**
-	 * @type {import('@sveltejs/kit').Load}
-	 */
-	export async function load({ fetch, page }) {
-		const decade = parseInt(page.query.get('decade'));
-		const url = `/comic/random.json${decade ? `?decade=${decade}` : ''}`;
-		const res = await fetch(url, { credentials: 'omit' });
-		const response: RandomResponse = await res.json();
-
-		if (res.ok) {
-			return {
-				// TODO: more type safety here
-				props: {
-					comics: response.comics,
-					decade,
-					refreshUrl: url
-				}
-			};
-		}
-
+<script lang="ts" context="module">
+	import type { Load } from '@sveltejs/kit';
+	export const load: Load = function ({ props }) {
+		const { decade } = props;
 		return {
-			status: res.status,
-			error: new Error(`Could not load ${url}`)
+			props,
+			stuff: {
+				title: decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics'
+			}
 		};
+	};
+
+	function getDecadeAsString(decade: number) {
+		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;
 	}
 </script>
 
@@ -35,27 +22,24 @@
 	import ComicLink from '$lib/components/ComicLink.svelte';
 	import { getImage, ImageSize } from '$lib/comics';
 	import { blur } from 'svelte/transition';
-	import title from '$lib/stores/title';
 	import { decades } from '$lib/years';
 	import { tick } from 'svelte';
+	import { page } from '$app/stores';
 
 	export let comics: RandomComic[];
 	export let decade: number;
-	export let refreshUrl: string;
 
 	let refreshing = false;
 	let error = false;
 	let container;
-	$: $title = decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics';
-
-	function getDecadeAsString(decade: number) {
-		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;
-	}
 
 	function refresh() {
 		refreshing = true;
-		fetch(refreshUrl)
-			.then((res) => res.json())
+		fetch($page.url.toString(), { headers: { accept: 'application/json' } })
+			.then((res) => {
+				if (res.ok) return res.json();
+				throw res;
+			})
 			.then((res) => {
 				comics = res.comics;
 				refreshing = false;
@@ -69,7 +53,7 @@
 	}
 </script>
 
-<h1>{$title}</h1>
+<h1>{$page.stuff.title}</h1>
 
 <p>
 	Tap the covers below to view a random comic on Marvel Unlimited. Depending on your device, it will

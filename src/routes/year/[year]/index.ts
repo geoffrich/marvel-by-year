@@ -4,12 +4,34 @@ import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 
 import MarvelApi from '$lib/api';
 import Redis from '$lib/redis';
+import { promiseTimeout } from '$lib/util';
 import { adaptResponses } from '$lib/adapt/comics';
 import { performance } from 'perf_hooks';
 import { dev } from '$app/env';
 
+const DEFAULT_TIMEOUT = 9000;
+
 //@ts-ignore
-const get: RequestHandler = async function get({ params }) {
+export const get: RequestHandler = async function get(event) {
+	try {
+		const { request } = event;
+		// Netlify functions have a execution time limit of 10 seconds
+		// The Marvel API can be slow and take 20+ seconds in some cases
+		// If we don't hear back in time, throw an error so the user can easily retry
+		// Only do this when rendering a page so the user sees a useful error page
+		// In the browser, we don't want to fail too early.
+		const isPageRequest = request.headers.get('accept').includes('html');
+		const apiCall = getComics(event);
+		return isPageRequest ? await promiseTimeout(DEFAULT_TIMEOUT, apiCall) : await apiCall;
+	} catch (e) {
+		const message = e instanceof Error ? e.message : e.toString();
+		return {
+			status: message.includes('Timed out') ? 502 : 500
+		};
+	}
+};
+
+async function getComics({ params }) {
 	const start = performance.now();
 	const year = parseInt(params.year);
 	const ignoreCache = false;
@@ -33,10 +55,10 @@ const get: RequestHandler = async function get({ params }) {
 		};
 	}
 
-	// // reduce API calls/cache hits when developing
-	// if (dev) {
-	// 	totalComics = Math.min(200, totalComics);
-	// }
+	// reduce API calls/cache hits when developing
+	if (dev) {
+		totalComics = Math.min(200, totalComics);
+	}
 
 	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
 	const cachePromise = ignoreCache ? Promise.resolve({}) : buildCache(year, pages);
@@ -56,7 +78,10 @@ const get: RequestHandler = async function get({ params }) {
 		const response = adaptResponses(results);
 
 		return {
-			body: response,
+			body: {
+				response,
+				year
+			},
 			headers: {
 				'cache-control': 'public, max-age=86400'
 			}
@@ -83,6 +108,4 @@ const get: RequestHandler = async function get({ params }) {
 		}
 		return cache;
 	}
-};
-
-export { get };
+}

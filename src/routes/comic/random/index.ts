@@ -4,16 +4,17 @@ import Redis from '$lib/redis';
 import { decades } from '$lib/years';
 import type { RandomComic } from '$lib/types';
 
-const get: RequestHandler = async function get({ query }) {
+//@ts-ignore
+const get: RequestHandler = async function get({ url }) {
 	try {
+		const query = url.searchParams;
 		const redis = new Redis();
 		const api = new Api(redis);
-		const decadeQuery = query.get('decade');
+		const decadeQuery = parseInt(query.get('decade'));
 		let comics: RandomComic[] = [];
 
 		if (decadeQuery) {
-			const parsedDecade = parseInt(decadeQuery);
-			const decade = decades.find((d) => d.startYear === parsedDecade);
+			const decade = decades.find((d) => d.startYear === decadeQuery);
 			if (!decade) {
 				return {
 					status: 400
@@ -26,7 +27,8 @@ const get: RequestHandler = async function get({ query }) {
 
 		return {
 			body: {
-				comics
+				comics,
+				decade: decadeQuery
 			}
 		};
 	} catch (e) {

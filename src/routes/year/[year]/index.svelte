@@ -1,59 +1,14 @@
-<script context="module" lang="ts">
-	import { browser } from '$app/env';
+<script lang="ts" context="module">
+	import type { Load } from '@sveltejs/kit';
 
-	// https://italonascimento.github.io/applying-a-timeout-to-your-promises/
-	const promiseTimeout = function (ms: number, promise) {
-		// Create a promise that rejects in <ms> milliseconds
-		let timeout = new Promise((_, reject) => {
-			let id = setTimeout(() => {
-				clearTimeout(id);
-				reject('Timed out in ' + ms + 'ms.');
-			}, ms);
-		});
-
-		// Returns a race between our timeout and the passed in promise
-		return Promise.race([promise, timeout]);
-	};
-
-	const DEFAULT_TIMEOUT = 9000;
-
-	/**
-	 * @type {import('@sveltejs/kit').Load}
-	 */
-	export async function load({ page, fetch }) {
-		const url = `/year/${page.params.year}.json`;
-		// Netlify functions have a execution time limit of 10 seconds
-		// The Marvel API can be slow and take 20+ seconds in some cases
-		// If we don't hear back in time, throw an error so the user can easily retry
-		// Only do this on server render so the user sees a useful error page
-		// In the browser, we don't want to fail too early.
-		try {
-			const apiCall = fetch(url, { credentials: 'omit' });
-			const res = browser ? await apiCall : await promiseTimeout(DEFAULT_TIMEOUT, apiCall);
-			const response: ComicResponse = await res.json();
-
-			if (res.ok) {
-				return {
-					props: {
-						response,
-						year: parseInt(page.params.year)
-					},
-					maxage: 86400
-				};
+	export const load: Load = function ({ props }) {
+		return {
+			props,
+			stuff: {
+				title: `Comics for ${props.year}`
 			}
-
-			return {
-				status: res.status,
-				error: new Error(`Could not load ${url}`)
-			};
-		} catch (e) {
-			console.log(page.params.year, e);
-			return {
-				status: 500,
-				error: e
-			};
-		}
-	}
+		};
+	};
 </script>
 
 <script lang="ts">
@@ -64,7 +19,6 @@
 	import ComicGrid from '$lib/components/ComicGrid.svelte';
 	import Select from '$lib/components/form/Select.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
-	import titleStore from '$lib/stores/title';
 	import {
 		getSeries,
 		getCreators,
@@ -83,7 +37,7 @@
 	export let response: ComicResponse;
 	export let year: number;
 
-	let search = $page.query.get('search') || '';
+	let search = $page.url.searchParams.get('search') || '';
 
 	enum SortOption {
 		BestMatch = 'best match',
@@ -110,7 +64,7 @@
 		'Dec'
 	];
 
-	let startMonth = $page.query.get('month');
+	let startMonth = $page.url.searchParams.get('month');
 	let month = months[startMonth ? startMonth : 0];
 	$: monthIndex = months.indexOf(month) - 1;
 
@@ -127,8 +81,6 @@
 	}
 
 	$: comics = response.comics;
-	$: title = `Comics for ${monthIndex >= 0 ? month : ''} ${year}`;
-	$: $titleStore = title;
 
 	let [series, selectedSeries] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
@@ -211,7 +163,7 @@
 	}
 </script>
 
-<h1>{title}</h1>
+<h1>{$page.stuff.title}</h1>
 <PageLinks {year} />
 
 <p>
