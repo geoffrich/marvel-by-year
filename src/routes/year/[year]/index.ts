@@ -33,10 +33,10 @@ const get: RequestHandler = async function get({ params }) {
 		};
 	}
 
-	// // reduce API calls/cache hits when developing
-	// if (dev) {
-	// 	totalComics = Math.min(200, totalComics);
-	// }
+	// reduce API calls/cache hits when developing
+	if (dev) {
+		totalComics = Math.min(200, totalComics);
+	}
 
 	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
 	const cachePromise = ignoreCache ? Promise.resolve({}) : buildCache(year, pages);
@@ -56,7 +56,10 @@ const get: RequestHandler = async function get({ params }) {
 		const response = adaptResponses(results);
 
 		return {
-			body: response,
+			body: {
+				response,
+				year
+			},
 			headers: {
 				'cache-control': 'public, max-age=86400'
 			}

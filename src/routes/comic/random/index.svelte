@@ -1,33 +1,3 @@
-<script context="module" lang="ts">
-	import type { RandomResponse } from '$lib/types';
-
-	/**
-	 * @type {import('@sveltejs/kit').Load}
-	 */
-	export async function load({ fetch, page }) {
-		const decade = parseInt(page.query.get('decade'));
-		const url = `/comic/random.json${decade ? `?decade=${decade}` : ''}`;
-		const res = await fetch(url, { credentials: 'omit' });
-		const response: RandomResponse = await res.json();
-
-		if (res.ok) {
-			return {
-				// TODO: more type safety here
-				props: {
-					comics: response.comics,
-					decade,
-					refreshUrl: url
-				}
-			};
-		}
-
-		return {
-			status: res.status,
-			error: new Error(`Could not load ${url}`)
-		};
-	}
-</script>
-
 <script lang="ts">
 	import type { RandomComic } from '$lib/types';
 	import DecadeForm from '$lib/components/DecadeForm.svelte';
@@ -38,10 +8,10 @@
 	import title from '$lib/stores/title';
 	import { decades } from '$lib/years';
 	import { tick } from 'svelte';
+	import { page } from '$app/stores';
 
 	export let comics: RandomComic[];
 	export let decade: number;
-	export let refreshUrl: string;
 
 	let refreshing = false;
 	let error = false;
@@ -54,7 +24,8 @@
 
 	function refresh() {
 		refreshing = true;
-		fetch(refreshUrl)
+		// todo: can we use invalidate here?
+		fetch($page.url.toString(), { headers: { accept: 'application/json' } })
 			.then((res) => res.json())
 			.then((res) => {
 				comics = res.comics;

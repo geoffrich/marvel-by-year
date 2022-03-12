@@ -2,9 +2,10 @@
 	"name": "marvel-by-year",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "svelte-kit dev --host",
+		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
 		"preview": "svelte-kit preview",
+		"prepare": "svelte-kit sync",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. .",
@@ -12,7 +13,7 @@
 		"redis": "redis-server"
 	},
 	"devDependencies": {
-		"@sveltejs/kit": "^1.0.0-next.165",
+		"@sveltejs/kit": "^1.0.0-next.295",
 		"@types/crypto-js": "^4.0.2",
 		"@types/ioredis": "^4.27.2",
 		"dotenv": "^10.0.0",
@@ -23,11 +24,11 @@
 		"svelte-check": "^2.0.0",
 		"svelte-preprocess": "^4.0.0",
 		"tslib": "^2.0.0",
-		"typescript": "^4.0.0"
+		"typescript": "^4.6.2"
 	},
 	"type": "module",
 	"dependencies": {
-		"@sveltejs/adapter-netlify": "^1.0.0-next.30",
+		"@sveltejs/adapter-netlify": "^1.0.0-next.50",
 		"crypto-js": "^4.1.1",
 		"dayjs": "^1.10.6",
 		"ioredis": "^4.27.9",
