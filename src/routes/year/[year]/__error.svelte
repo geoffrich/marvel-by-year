@@ -1,12 +1,13 @@
-<script context="module">
-	export function load({ error, status }) {
+<script context="module" lang="ts">
+	import type { ErrorLoad } from '@sveltejs/kit';
+	export const load: ErrorLoad = function ({ error, status }) {
 		return {
 			props: {
 				status,
 				error
 			}
 		};
-	}
+	};
 </script>
 
 <script lang="ts">
@@ -16,20 +17,18 @@
 
 	let reloading = false;
 
-	export let status;
+	export let status: number;
 	export let error: Error;
-
-	let isTimeout = status === 502 || (error && error.message && error.message.includes('Timed out'));
 
 	function reloadPage() {
 		reloading = true;
-		goto($page.path).then(() => {
+		goto($page.url.toString()).then(() => {
 			reloading = false;
 		});
 	}
 </script>
 
-{#if isTimeout}
+{#if status === 502}
 	<h1>Request timed out</h1>
 	<p>The Marvel API didn't respond in time. Try reloading the page.</p>
 	<button on:click={reloadPage} disabled={reloading}>{reloading ? 'Reloading' : 'Reload'}</button>
