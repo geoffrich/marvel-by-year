@@ -21,14 +21,14 @@
 <style>
 	.links {
 		display: flex;
-		gap: 1rem;
+		gap: var(--size-3);
 	}
 
 	a {
-		padding: 0.25rem;
+		padding: var(--size-1);
 	}
 
 	a:first-child {
-		margin-left: -0.25rem;
+		margin-left: var(--size-00);
 	}
 </style>

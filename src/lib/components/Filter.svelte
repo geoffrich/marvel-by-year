@@ -66,11 +66,11 @@
 <style>
 	label {
 		display: block;
-		margin-bottom: 0.25rem;
+		margin-bottom: var(--size-1);
 	}
 
 	fieldset {
-		max-height: 300px;
+		max-height: var(--size-14);
 		overflow: auto;
 		align-self: start;
 		position: relative;
@@ -79,11 +79,11 @@
 	.buttons {
 		position: sticky;
 		top: 0;
-		background: white;
-		padding: 0.25rem;
+		background: white; /* TODO: dark mode / prop */
+		padding: var(--size-1);
 		transform: translateY(-7px);
 		display: flex;
-		gap: 0.25rem;
+		gap: var(--size-1);
 		align-items: center;
 	}
 

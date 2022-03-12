@@ -98,10 +98,10 @@
 <style>
 	.container {
 		display: grid;
-		grid-template-columns: 100px 1fr;
+		grid-template-columns: 6.25rem 1fr;
 		grid-template-rows: repeat(3, auto);
-		gap: 0.5rem;
-		line-height: 1.3;
+		gap: var(--size-2);
+		line-height: var(--font-lineheight-2);
 	}
 
 	/* There might be a more elegant way, but this number was chosen to line up with the grid sizing */

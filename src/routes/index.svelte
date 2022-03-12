@@ -62,21 +62,21 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
-		margin-top: 2rem;
+		margin-top: var(--size-7);
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(15.625rem, 1fr));
+		gap: var(--size-3);
 		align-content: stretch;
 	}
 
 	li a {
 		color: white;
 		background-color: var(--primary);
-		padding: 3rem 1rem;
+		padding: var(--size-8) var(--size-3);
 		text-align: center;
-		font-size: 1.25rem;
+		font-size: var(--font-size-3);
 		display: block;
-		border-radius: 0.5rem;
+		border-radius: var(--radius-2);
 		height: 100%;
 		text-decoration: none;
 	}

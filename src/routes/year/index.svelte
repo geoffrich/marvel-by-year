@@ -22,10 +22,10 @@
 <style>
 	ul {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, 50px);
+		grid-template-columns: repeat(auto-fit, var(--size-8));
 		list-style: none;
 		padding: 0;
-		gap: 0.5rem;
+		gap: var(--size-2);
 		justify-content: center;
 	}
 
@@ -35,6 +35,6 @@
 
 	a {
 		display: block;
-		padding: 0.5rem;
+		padding: var(--size-2);
 	}
 </style>

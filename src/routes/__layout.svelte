@@ -37,10 +37,10 @@
 
 <style>
 	:global(body) {
-		max-width: 1024px;
+		max-width: 64rem;
 		margin-left: auto;
 		margin-right: auto;
-		padding: 1rem;
+		padding: var(--size-3);
 		padding-bottom: 0;
 	}
 
@@ -53,18 +53,18 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
-		margin-left: -0.25rem;
+		margin-left: -var(--size-1);
 		display: flex;
 		flex-wrap: wrap;
-		column-gap: 0.5rem;
+		column-gap: var(--size-2);
 	}
 
 	footer {
 		margin-top: auto;
-		padding: 1rem 0;
+		padding: var(--size-3) 0;
 	}
 
 	nav a {
-		padding: 0.25rem;
+		padding: var(--size-1);
 	}
 </style>

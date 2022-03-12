@@ -9,11 +9,11 @@
 <style>
 	.container {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(8.125rem, 1fr));
 		justify-content: space-around;
 		justify-items: center;
 
-		gap: 1rem;
+		gap: var(--size-3);
 		padding: 0;
 		list-style: none;
 	}

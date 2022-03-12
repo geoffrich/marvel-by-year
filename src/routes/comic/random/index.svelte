@@ -90,14 +90,14 @@
 
 <style>
 	.container {
-		--red: hsl(0deg 75% 60%);
-		--orange: hsl(30deg 95% 60%);
-		--yellow: hsl(60deg 80% 65%);
-		--green: hsl(140deg 50% 80%);
-		--blue: hsl(220deg 100% 80%);
-		--purple: hsl(280deg 100% 80%);
+		--red: var(--red-7);
+		--orange: var(--orange-5);
+		--yellow: var(--yellow-2);
+		--green: var(--green-3);
+		--blue: var(--blue-3);
+		--purple: var(--grape-3);
 
-		margin-bottom: 1rem;
+		margin-bottom: var(--size-3);
 	}
 
 	.card {
@@ -106,7 +106,7 @@
 		display: grid;
 		place-items: center;
 		box-shadow: var(--shadow-med);
-		border-radius: 0.5rem;
+		border-radius: var(--radius-2);
 
 		position: relative;
 		transition: transform 0.2s ease-out;
@@ -150,13 +150,13 @@
 
 	.q {
 		color: white;
-		font-size: 3rem;
+		font-size: var(--font-size-7);
 	}
 
 	button {
-		max-width: 20rem;
+		max-width: var(--size-14);
 		width: 100%;
-		height: 3rem;
+		height: var(--size-8);
 		margin-left: auto;
 		margin-right: auto;
 		display: block;

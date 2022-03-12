@@ -1,24 +1,20 @@
-:root {
-	--primary: hsl(202, 74%, 26%);
-	--secondary: hsl(195, 53%, 79%);
-	--loading: hsl(202, 74%, 50%);
-	--error: hsl(358, 85%, 52%);
-	--shadow-color: 0deg 0% 50%;
-	--shadow-med: 1px 2px 2px hsl(var(--shadow-color) / 0.333),
-		2px 4px 4px hsl(var(--shadow-color) / 0.333), 3px 6px 6px hsl(var(--shadow-color) / 0.333);
-	--grey: hsl(0, 0%, 60%);
-}
+@import 'open-props/style';
+@import 'open-props/normalize';
+@import 'open-props/buttons';
 
-*,
-*::after,
-*::before {
-	box-sizing: border-box;
+:root {
+	--primary: var(--blue-9);
+	--secondary: var(--blue-2);
+	--loading: var(--blue-5);
+	--error: var(--red-8);
+	--shadow-med: var(--shadow-3);
+	--grey: var(--gray-6);
+	--brand: var(--primary);
 }
 
 body {
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-family: var(--font-sans);
 	margin: 0;
-	line-height: 1.5;
 }
 
 body,
@@ -39,18 +35,9 @@ div#svelte {
 	white-space: nowrap;
 }
 
-button {
-	font-size: 1rem;
-	padding: 0.25rem 0.5rem;
-}
+/* TODO: link styles? */
 
-input,
-select {
-	font-size: inherit;
-	accent-color: var(--primary);
-}
-
-a {
+/* a {
 	color: var(--primary);
 }
 
@@ -69,3 +56,4 @@ summary:focus {
 	outline: 0.125rem solid var(--grey);
 	border-radius: 0.5rem;
 }
+*/
