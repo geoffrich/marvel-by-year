@@ -35,9 +35,11 @@
 
 	function refresh() {
 		refreshing = true;
-		// todo: can we use invalidate here?
 		fetch($page.url.toString(), { headers: { accept: 'application/json' } })
-			.then((res) => res.json())
+			.then((res) => {
+				if (res.ok) return res.json();
+				throw res;
+			})
 			.then((res) => {
 				comics = res.comics;
 				refreshing = false;
