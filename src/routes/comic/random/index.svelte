@@ -1,3 +1,20 @@
+<script lang="ts" context="module">
+	import type { Load } from '@sveltejs/kit';
+	export const load: Load = function ({ props }) {
+		const { decade } = props;
+		return {
+			props,
+			stuff: {
+				title: decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics'
+			}
+		};
+	};
+
+	function getDecadeAsString(decade: number) {
+		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;
+	}
+</script>
+
 <script lang="ts">
 	import type { RandomComic } from '$lib/types';
 	import DecadeForm from '$lib/components/DecadeForm.svelte';
@@ -5,7 +22,6 @@
 	import ComicLink from '$lib/components/ComicLink.svelte';
 	import { getImage, ImageSize } from '$lib/comics';
 	import { blur } from 'svelte/transition';
-	import title from '$lib/stores/title';
 	import { decades } from '$lib/years';
 	import { tick } from 'svelte';
 	import { page } from '$app/stores';
@@ -16,11 +32,6 @@
 	let refreshing = false;
 	let error = false;
 	let container;
-	$: $title = decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics';
-
-	function getDecadeAsString(decade: number) {
-		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;
-	}
 
 	function refresh() {
 		refreshing = true;
@@ -40,7 +51,7 @@
 	}
 </script>
 
-<h1>{$title}</h1>
+<h1>{$page.stuff.title}</h1>
 
 <p>
 	Tap the covers below to view a random comic on Marvel Unlimited. Depending on your device, it will

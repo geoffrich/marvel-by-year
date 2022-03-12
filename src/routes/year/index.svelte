@@ -1,8 +1,14 @@
-<script lang="ts">
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit';
 	import { years } from '$lib/years';
-	import title from '$lib/stores/title';
 
-	$title = 'Years';
+	export const load: Load = function () {
+		return {
+			stuff: {
+				title: 'Years'
+			}
+		};
+	};
 </script>
 
 <h1>Years</h1>

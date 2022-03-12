@@ -1,3 +1,16 @@
+<script lang="ts" context="module">
+	import type { Load } from '@sveltejs/kit';
+
+	export const load: Load = function ({ props }) {
+		return {
+			props,
+			stuff: {
+				title: `Comics for ${props.year}`
+			}
+		};
+	};
+</script>
+
 <script lang="ts">
 	import type { ComicResponse, Comic } from '$lib/types';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
@@ -6,7 +19,6 @@
 	import ComicGrid from '$lib/components/ComicGrid.svelte';
 	import Select from '$lib/components/form/Select.svelte';
 	import { createSelectedStores } from '$lib/stores/selected';
-	import titleStore from '$lib/stores/title';
 	import {
 		getSeries,
 		getCreators,
@@ -69,8 +81,6 @@
 	}
 
 	$: comics = response.comics;
-	$: title = `Comics for ${monthIndex >= 0 ? month : ''} ${year}`;
-	$: $titleStore = title;
 
 	let [series, selectedSeries] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
@@ -153,7 +163,7 @@
 	}
 </script>
 
-<h1>{title}</h1>
+<h1>{$page.stuff.title}</h1>
 <PageLinks {year} />
 
 <p>

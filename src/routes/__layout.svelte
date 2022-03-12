@@ -1,9 +1,12 @@
-<script lang="ts">
+<script context="module" lang="ts">
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
-	import title from '$lib/stores/title';
-	import { navigating } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import 'focus-visible'; // polyfill :focus-visible for Safari
 	import '../global.css';
+</script>
+
+<script lang="ts">
+	$: title = $page.stuff.title;
 </script>
 
 {#if $navigating}
@@ -11,7 +14,7 @@
 {/if}
 
 <svelte:head>
-	<title>{$title ? $title + ' | ' : ''}MU by Year</title>
+	<title>{title ? title + ' | ' : ''}MU by Year</title>
 </svelte:head>
 
 <nav>
