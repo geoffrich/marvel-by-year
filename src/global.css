@@ -5,7 +5,7 @@
 
 :root {
 	--primary: var(--blue-9);
-	--secondary: var(--blue-2);
+	--secondary: var(--blue-1);
 	--loading: var(--blue-5);
 	--error: var(--red-8);
 	--shadow-med: var(--shadow-3);
