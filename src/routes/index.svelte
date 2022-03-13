@@ -82,7 +82,27 @@
 
 	li a:hover:not(:active),
 	li a:focus {
-		color: var(--primary);
-		background-color: var(--secondary);
+		outline: 2px solid var(--primary);
+		outline-offset: 5px;
+	}
+
+	li:nth-child(1) a {
+		background-image: var(--gradient-1);
+	}
+
+	li:nth-child(2) a {
+		background-image: var(--gradient-2);
+	}
+
+	li:nth-child(3) a {
+		background-image: var(--gradient-3);
+	}
+
+	li:nth-child(4) a {
+		background-image: var(--gradient-7);
+	}
+
+	li:nth-child(5) a {
+		background-image: var(--gradient-10);
 	}
 </style>
