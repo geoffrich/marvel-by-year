@@ -48,13 +48,22 @@
 	}
 
 	.fade {
+		--fade-color: var(--gray-0-hsl);
 		position: fixed;
 		width: 100%;
 		height: 100%;
-		background-color: rgba(255, 255, 255, 0.3); /* TODO: prop */
+		background-color: hsl(var(--fade-color) / 20%);
 		pointer-events: none;
 		z-index: calc(var(--layer-important) - 1);
 		animation: fade 0.4s;
+		top: 0;
+		left: 0;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.fade {
+			--fade-color: var(--gray-9-hsl);
+		}
 	}
 
 	@keyframes fade {

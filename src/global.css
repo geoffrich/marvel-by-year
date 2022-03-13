@@ -1,6 +1,7 @@
 @import 'open-props/style';
 @import 'open-props/normalize';
 @import 'open-props/buttons';
+@import 'open-props/gray-hsl';
 
 :root {
 	--primary: var(--blue-9);
@@ -10,6 +11,17 @@
 	--shadow-med: var(--shadow-3);
 	--grey: var(--gray-6);
 	--brand: var(--primary);
+
+	--link: var(--primary);
+	--link-visited: var(--link);
+
+	--background: var(--surface-1); /* Set by normalize */
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--link: var(--secondary);
+	}
 }
 
 body {
@@ -35,25 +47,43 @@ div#svelte {
 	white-space: nowrap;
 }
 
-/* TODO: link styles? */
+h1 {
+	background-image: var(--gradient-22);
+	border-radius: var(--border-size-3);
+	padding: var(--size-2);
+}
 
-/* a {
-	color: var(--primary);
+@media (prefers-color-scheme: dark) {
+	h1 {
+		background-image: var(--gradient-23);
+	}
+}
+
+a {
+	text-decoration: underline;
+	text-decoration-color: var(--link);
+	display: inline-block;
 }
 
 a:focus {
-	color: white;
-	background-color: var(--primary);
+	color: var(--background);
+	background-color: var(--link);
+	outline: none;
 }
 
 a:focus:not(.focus-visible) {
-	color: var(--primary);
+	color: var(--link);
 	background-color: inherit;
+	outline: none;
 }
 
 details:focus,
 summary:focus {
-	outline: 0.125rem solid var(--grey);
-	border-radius: 0.5rem;
+	outline: var(--size-1) solid var(--brand);
+	border-radius: var(--border-size-3);
 }
-*/
+
+.spaced {
+	display: grid;
+	gap: var(--size-4);
+}

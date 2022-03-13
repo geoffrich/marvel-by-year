@@ -156,10 +156,8 @@
 	button {
 		max-width: var(--size-14);
 		width: 100%;
-		height: var(--size-8);
 		margin-left: auto;
 		margin-right: auto;
-		display: block;
 	}
 
 	img {

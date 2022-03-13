@@ -42,15 +42,13 @@
 		<div class="buttons">
 			<button on:click={checkAll}>Check all</button>
 			<button on:click={uncheckAll}>Uncheck all</button>
-			{#if showItems}
-				<IconButton size="1.5rem" altText="Hide" on:click={updateShowItems}>
+			<IconButton size="1.5rem" altText={showItems ? 'Hide' : 'Show'} on:click={updateShowItems}>
+				{#if showItems}
 					<Minus />
-				</IconButton>
-			{:else}
-				<IconButton size="1.5rem" altText="Show" on:click={updateShowItems}>
+				{:else}
 					<Plus />
-				</IconButton>
-			{/if}
+				{/if}
+			</IconButton>
 		</div>
 		{#if showItems}
 			{#each sortedItems as i (i)}
@@ -74,12 +72,12 @@
 		overflow: auto;
 		align-self: start;
 		position: relative;
+		border-color: var(--secondary);
 	}
 
 	.buttons {
 		position: sticky;
 		top: 0;
-		background: white; /* TODO: dark mode / prop */
 		padding: var(--size-1);
 		transform: translateY(-7px);
 		display: flex;

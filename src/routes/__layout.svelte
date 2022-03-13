@@ -18,15 +18,13 @@
 </svelte:head>
 
 <nav>
-	<ul>
-		<a href="/" sveltekit:prefetch>Home</a>
-		<a href="/year" sveltekit:prefetch>Years</a>
-		<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
-		<a href="/year/random" sveltekit:prefetch>Random Year</a>
-	</ul>
+	<a href="/" sveltekit:prefetch>Home</a>
+	<a href="/year" sveltekit:prefetch>Years</a>
+	<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
+	<a href="/year/random" sveltekit:prefetch>Random Year</a>
 </nav>
 
-<main>
+<main class="spaced">
 	<slot />
 </main>
 
@@ -49,14 +47,13 @@
 		flex-direction: column;
 	}
 
-	ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		margin-left: -var(--size-1);
+	nav {
+		margin-left: var(--size-1);
 		display: flex;
 		flex-wrap: wrap;
-		column-gap: var(--size-2);
+		column-gap: var(--size-3);
+		font-size: var(--font-size-2);
+		margin-bottom: var(--size-3);
 	}
 
 	footer {

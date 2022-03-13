@@ -26,7 +26,7 @@
 	<meta name="twitter:creator" content="@geoffrich_" />
 </svelte:head>
 
-<div class="container">
+<div class="container spaced">
 	<h1>Browse Marvel Unlimited by Year</h1>
 	<p>
 		This site allows you to see what issues are available on Marvel Unlimited for a given year. Tap
@@ -62,7 +62,6 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
-		margin-top: var(--size-7);
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(15.625rem, 1fr));
 		gap: var(--size-3);

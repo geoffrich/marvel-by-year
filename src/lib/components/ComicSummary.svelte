@@ -82,15 +82,13 @@
 	<p>
 		<span>By {creatorText}</span>
 		{#if creatorCount > MAX_CREATORS + 1}
-			{#if showAllCreators}
-				<IconButton altText="Show less" on:click={toggleCreators}>
+			<IconButton altText="Show {showAllCreators ? 'less' : 'more'}" on:click={toggleCreators}>
+				{#if showAllCreators}
 					<Minus />
-				</IconButton>
-			{:else}
-				<IconButton altText="Show more" on:click={toggleCreators}>
+				{:else}
 					<Plus />
-				</IconButton>
-			{/if}
+				{/if}
+			</IconButton>
 		{/if}
 	</p>
 </div>

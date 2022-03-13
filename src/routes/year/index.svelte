@@ -22,7 +22,7 @@
 <style>
 	ul {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, var(--size-8));
+		grid-template-columns: repeat(auto-fit, var(--size-9));
 		list-style: none;
 		padding: 0;
 		gap: var(--size-2);
@@ -30,11 +30,21 @@
 	}
 
 	li {
-		background-color: var(--secondary);
+		padding: 0;
 	}
 
 	a {
+		background-color: var(--secondary);
+		color: var(--primary);
 		display: block;
 		padding: var(--size-2);
+		margin: 0;
+		width: 100%;
+		text-align: center;
+	}
+
+	a:focus {
+		color: white;
+		background-color: var(--primary);
 	}
 </style>

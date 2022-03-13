@@ -3,7 +3,7 @@
 	export let size = null;
 </script>
 
-<button on:click style:--size={size}>
+<button on:click style:--_icon-size={size}>
 	<slot />
 	<span class="visually-hidden">{altText}</span>
 </button>
@@ -12,19 +12,17 @@
 	button {
 		all: unset;
 		box-sizing: border-box;
-		height: var(--size, var(--size-4));
-		width: var(--size, var(--size-4));
 		vertical-align: middle;
 		color: var(--primary);
 	}
 
 	button:hover,
 	button:active {
-		filter: brightness(1.8);
+		filter: brightness(1.5);
 	}
 
 	button:focus {
-		border: 2px solid black; /* TODO: dark mode / prop */
+		outline: var(--size-1) solid var(--brand);
 		border-radius: var(--radius-round);
 	}
 

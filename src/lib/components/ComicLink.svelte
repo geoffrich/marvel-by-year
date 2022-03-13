@@ -10,7 +10,8 @@
 
 <style>
 	a:focus {
-		outline: var(--size-1) solid black; /* TODO: dark mode */
+		outline: var(--size-1) solid var(--brand);
+		background: none;
 		outline-offset: var(--size-1);
 		border-radius: var(--size-2);
 	}
