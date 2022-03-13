@@ -42,5 +42,6 @@
 <style>
 	h1 {
 		color: var(--error);
+		background-image: none;
 	}
 </style>
