@@ -80,7 +80,6 @@
 		text-decoration: none;
 	}
 
-	li a:hover:not(:active),
 	li a:focus {
 		outline: 2px solid var(--primary);
 		outline-offset: 5px;
