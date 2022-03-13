@@ -83,6 +83,19 @@ summary:focus {
 	border-radius: var(--border-size-3);
 }
 
+input,
+select {
+	border: var(--border-size-1) solid var(--gray-5);
+	border-radius: var(--radius-2);
+}
+
+@media (prefers-color-scheme: dark) {
+	input,
+	select {
+		border-color: var(--gray-7);
+	}
+}
+
 .spaced {
 	display: grid;
 	gap: var(--size-4);

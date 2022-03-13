@@ -172,7 +172,7 @@
 </p>
 <p>
 	(Filtered: {sortedComics.length} / {comics.length})
-	<button on:click={resetFilters}>Reset filters</button>
+	<button class="reset" on:click={resetFilters}>Reset filters</button>
 </p>
 
 <div class="search">
@@ -258,5 +258,9 @@
 		.search {
 			flex-direction: row;
 		}
+	}
+
+	.reset {
+		margin-left: var(--size-2);
 	}
 </style>

@@ -88,4 +88,8 @@
 	.buttons > :global(:last-child) {
 		margin-left: auto;
 	}
+
+	button {
+		padding-inline: var(--size-2);
+	}
 </style>
