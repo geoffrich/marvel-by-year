@@ -1,24 +1,32 @@
+@import 'open-props/style';
+@import 'open-props/normalize';
+@import 'open-props/buttons';
+@import 'open-props/gray-hsl';
+
 :root {
-	--primary: hsl(202, 74%, 26%);
-	--secondary: hsl(195, 53%, 79%);
-	--loading: hsl(202, 74%, 50%);
-	--error: hsl(358, 85%, 52%);
-	--shadow-color: 0deg 0% 50%;
-	--shadow-med: 1px 2px 2px hsl(var(--shadow-color) / 0.333),
-		2px 4px 4px hsl(var(--shadow-color) / 0.333), 3px 6px 6px hsl(var(--shadow-color) / 0.333);
-	--grey: hsl(0, 0%, 60%);
+	--primary: var(--blue-9);
+	--secondary: var(--blue-1);
+	--loading: var(--blue-5);
+	--error: var(--red-8);
+	--shadow-med: var(--shadow-3);
+	--grey: var(--gray-6);
+	--brand: var(--primary);
+
+	--link: var(--primary);
+	--link-visited: var(--link);
+
+	--background: var(--surface-1); /* Set by normalize */
 }
 
-*,
-*::after,
-*::before {
-	box-sizing: border-box;
+@media (prefers-color-scheme: dark) {
+	:root {
+		--link: var(--secondary);
+	}
 }
 
 body {
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-family: var(--font-sans);
 	margin: 0;
-	line-height: 1.5;
 }
 
 body,
@@ -39,33 +47,56 @@ div#svelte {
 	white-space: nowrap;
 }
 
-button {
-	font-size: 1rem;
-	padding: 0.25rem 0.5rem;
+h1 {
+	background-image: var(--gradient-22);
+	border-radius: var(--border-size-3);
+	padding: var(--size-2);
 }
 
-input,
-select {
-	font-size: inherit;
-	accent-color: var(--primary);
+@media (prefers-color-scheme: dark) {
+	h1 {
+		background-image: var(--gradient-23);
+	}
 }
 
 a {
-	color: var(--primary);
+	text-decoration: underline;
+	text-decoration-color: var(--link);
+	display: inline-block;
 }
 
 a:focus {
-	color: white;
-	background-color: var(--primary);
+	color: var(--background);
+	background-color: var(--link);
+	outline: none;
 }
 
 a:focus:not(.focus-visible) {
-	color: var(--primary);
+	color: var(--link);
 	background-color: inherit;
+	outline: none;
 }
 
 details:focus,
 summary:focus {
-	outline: 0.125rem solid var(--grey);
-	border-radius: 0.5rem;
+	outline: var(--size-1) solid var(--brand);
+	border-radius: var(--border-size-3);
+}
+
+input,
+select {
+	border: var(--border-size-1) solid var(--gray-5);
+	border-radius: var(--radius-2);
+}
+
+@media (prefers-color-scheme: dark) {
+	input,
+	select {
+		border-color: var(--gray-7);
+	}
+}
+
+.spaced {
+	display: grid;
+	gap: var(--size-4);
 }

@@ -1,11 +1,9 @@
 <script>
 	export let altText;
-	export let size = '';
-
-	$: style = size ? `--size: ${size}; ` : '';
+	export let size = null;
 </script>
 
-<button on:click {style}>
+<button on:click style:--_icon-size={size}>
 	<slot />
 	<span class="visually-hidden">{altText}</span>
 </button>
@@ -14,20 +12,18 @@
 	button {
 		all: unset;
 		box-sizing: border-box;
-		height: var(--size, 1.25rem);
-		width: var(--size, 1.25rem);
 		vertical-align: middle;
 		color: var(--primary);
 	}
 
 	button:hover,
 	button:active {
-		filter: brightness(1.8);
+		filter: brightness(1.5);
 	}
 
 	button:focus {
-		border: 2px solid black;
-		border-radius: 50%;
+		outline: var(--size-1) solid var(--brand);
+		border-radius: var(--radius-round);
 	}
 
 	button:focus:not(:focus-visible) {

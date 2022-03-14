@@ -26,7 +26,7 @@
 	<meta name="twitter:creator" content="@geoffrich_" />
 </svelte:head>
 
-<div class="container">
+<div class="container spaced">
 	<h1>Browse Marvel Unlimited by Year</h1>
 	<p>
 		This site allows you to see what issues are available on Marvel Unlimited for a given year. Tap
@@ -62,28 +62,46 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
-		margin-top: 2rem;
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(15.625rem, 1fr));
+		gap: var(--size-3);
 		align-content: stretch;
 	}
 
 	li a {
 		color: white;
 		background-color: var(--primary);
-		padding: 3rem 1rem;
+		padding: var(--size-8) var(--size-3);
 		text-align: center;
-		font-size: 1.25rem;
+		font-size: var(--font-size-3);
 		display: block;
-		border-radius: 0.5rem;
+		border-radius: var(--radius-2);
 		height: 100%;
 		text-decoration: none;
 	}
 
-	li a:hover:not(:active),
 	li a:focus {
-		color: var(--primary);
-		background-color: var(--secondary);
+		outline: 2px solid var(--primary);
+		outline-offset: 5px;
+	}
+
+	li:nth-child(1) a {
+		background-image: var(--gradient-1);
+	}
+
+	li:nth-child(2) a {
+		background-image: var(--gradient-2);
+	}
+
+	li:nth-child(3) a {
+		background-image: var(--gradient-3);
+	}
+
+	li:nth-child(4) a {
+		background-image: var(--gradient-7);
+	}
+
+	li:nth-child(5) a {
+		background-image: var(--gradient-10);
 	}
 </style>

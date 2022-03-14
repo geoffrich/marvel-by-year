@@ -18,15 +18,13 @@
 </svelte:head>
 
 <nav>
-	<ul>
-		<a href="/" sveltekit:prefetch>Home</a>
-		<a href="/year" sveltekit:prefetch>Years</a>
-		<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
-		<a href="/year/random" sveltekit:prefetch>Random Year</a>
-	</ul>
+	<a href="/" sveltekit:prefetch>Home</a>
+	<a href="/year" sveltekit:prefetch>Years</a>
+	<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
+	<a href="/year/random" sveltekit:prefetch>Random Year</a>
 </nav>
 
-<main>
+<main class="spaced">
 	<slot />
 </main>
 
@@ -37,10 +35,10 @@
 
 <style>
 	:global(body) {
-		max-width: 1024px;
+		max-width: 64rem;
 		margin-left: auto;
 		margin-right: auto;
-		padding: 1rem;
+		padding: var(--size-3);
 		padding-bottom: 0;
 	}
 
@@ -49,22 +47,21 @@
 		flex-direction: column;
 	}
 
-	ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		margin-left: -0.25rem;
+	nav {
+		margin-left: var(--size-1);
 		display: flex;
 		flex-wrap: wrap;
-		column-gap: 0.5rem;
+		column-gap: var(--size-3);
+		font-size: var(--font-size-2);
+		margin-bottom: var(--size-3);
 	}
 
 	footer {
 		margin-top: auto;
-		padding: 1rem 0;
+		padding: var(--size-3) 0;
 	}
 
 	nav a {
-		padding: 0.25rem;
+		padding: var(--size-1);
 	}
 </style>

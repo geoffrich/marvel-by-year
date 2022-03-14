@@ -34,8 +34,8 @@
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 4px;
-		z-index: 999;
+		height: var(--size-1);
+		z-index: var(--layer-important);
 	}
 
 	.progress {
@@ -48,13 +48,22 @@
 	}
 
 	.fade {
+		--fade-color: var(--gray-0-hsl);
 		position: fixed;
 		width: 100%;
 		height: 100%;
-		background-color: rgba(255, 255, 255, 0.3);
+		background-color: hsl(var(--fade-color) / 20%);
 		pointer-events: none;
-		z-index: 998;
+		z-index: calc(var(--layer-important) - 1);
 		animation: fade 0.4s;
+		top: 0;
+		left: 0;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.fade {
+			--fade-color: var(--gray-9-hsl);
+		}
 	}
 
 	@keyframes fade {

@@ -82,15 +82,13 @@
 	<p>
 		<span>By {creatorText}</span>
 		{#if creatorCount > MAX_CREATORS + 1}
-			{#if showAllCreators}
-				<IconButton altText="Show less" on:click={toggleCreators}>
+			<IconButton altText="Show {showAllCreators ? 'less' : 'more'}" on:click={toggleCreators}>
+				{#if showAllCreators}
 					<Minus />
-				</IconButton>
-			{:else}
-				<IconButton altText="Show more" on:click={toggleCreators}>
+				{:else}
 					<Plus />
-				</IconButton>
-			{/if}
+				{/if}
+			</IconButton>
 		{/if}
 	</p>
 </div>
@@ -98,10 +96,10 @@
 <style>
 	.container {
 		display: grid;
-		grid-template-columns: 100px 1fr;
+		grid-template-columns: 6.25rem 1fr;
 		grid-template-rows: repeat(3, auto);
-		gap: 0.5rem;
-		line-height: 1.3;
+		gap: var(--size-2);
+		line-height: var(--font-lineheight-2);
 	}
 
 	/* There might be a more elegant way, but this number was chosen to line up with the grid sizing */

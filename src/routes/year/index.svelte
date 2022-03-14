@@ -22,19 +22,29 @@
 <style>
 	ul {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, 50px);
+		grid-template-columns: repeat(auto-fit, var(--size-9));
 		list-style: none;
 		padding: 0;
-		gap: 0.5rem;
+		gap: var(--size-2);
 		justify-content: center;
 	}
 
 	li {
-		background-color: var(--secondary);
+		padding: 0;
 	}
 
 	a {
+		background-color: var(--secondary);
+		color: var(--primary);
 		display: block;
-		padding: 0.5rem;
+		padding: var(--size-2);
+		margin: 0;
+		width: 100%;
+		text-align: center;
+	}
+
+	a:focus {
+		color: white;
+		background-color: var(--primary);
 	}
 </style>

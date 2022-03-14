@@ -172,7 +172,7 @@
 </p>
 <p>
 	(Filtered: {sortedComics.length} / {comics.length})
-	<button on:click={resetFilters}>Reset filters</button>
+	<button class="reset" on:click={resetFilters}>Reset filters</button>
 </p>
 
 <div class="search">
@@ -231,32 +231,36 @@
 <style>
 	.filters {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 0.5rem;
+		grid-template-columns: repeat(auto-fit, minmax(15.625rem, 1fr));
+		gap: var(--size-2);
 	}
 
 	.search {
-		margin: 0.5rem 0;
+		margin: var(--size-2) 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: var(--size-2);
 		flex-wrap: wrap;
 		align-items: baseline;
 	}
 
 	input[type='checkbox'] {
-		height: 1rem;
-		width: 1rem;
-		margin-right: 0.25rem;
+		height: var(--size-3);
+		width: var(--size-3);
+		margin-right: var(--size-1);
 	}
 
 	summary {
-		padding: 0.5rem;
+		padding: var(--size-2);
 	}
 
 	@media screen and (min-width: 450px) {
 		.search {
 			flex-direction: row;
 		}
+	}
+
+	.reset {
+		margin-left: var(--size-2);
 	}
 </style>

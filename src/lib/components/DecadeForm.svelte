@@ -34,7 +34,7 @@
 <style>
 	form {
 		display: flex;
-		gap: 1rem;
+		gap: var(--size-3);
 		align-items: center;
 	}
 </style>

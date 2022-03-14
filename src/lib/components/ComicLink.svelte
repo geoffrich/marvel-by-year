@@ -10,9 +10,10 @@
 
 <style>
 	a:focus {
-		outline: 0.25rem solid black;
-		outline-offset: 0.25rem;
-		border-radius: 0.5rem;
+		outline: var(--size-1) solid var(--brand);
+		background: none;
+		outline-offset: var(--size-1);
+		border-radius: var(--size-2);
 	}
 
 	a:focus:not(.focus-visible) {
