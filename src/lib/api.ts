@@ -74,7 +74,8 @@ export default class MarvelApi {
 			const result = await this.redis.getRandomComicsForYear(startYear, endYear, seed);
 			return dedupe(result, (x) => x.id);
 		}
-		return await this.redis.getRandomComics();
+		const result = await this.redis.getRandomComics();
+		return dedupe(result, (x) => x.id);
 	}
 
 	async callMarvelApi(urlString: string, params: Record<string, string>): Promise<Response> {
