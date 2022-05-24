@@ -1,5 +1,9 @@
 # marvel-by-year
 
+A site to browse the Marvel Unlimited reading service by release year. Built with [SvelteKit](https://kit.svelte.dev/), TypeScript, Redis (via [Upstash](https://upstash.com/)), and [Open Props](https://open-props.style/), and hosted on Netlify.
+
+For more about how and why I built this, see my [blog post](https://geoffrich.net/posts/marvel-unlimited-by-year/).
+
 ## Commands
 
 - `npm run dev` run dev server
