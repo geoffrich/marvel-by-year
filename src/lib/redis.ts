@@ -211,8 +211,6 @@ export default class RedisClient {
 			`
 		});
 
-		console.log(`retrieving random comics with seed ${seed}`);
-
 		const ids = await (this.redis as ExtendedRedis).randomYear(
 			COMIC_ID_KEY_WITH_YEAR,
 			startYear,
