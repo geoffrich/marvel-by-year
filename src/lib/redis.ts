@@ -153,7 +153,8 @@ export default class RedisClient {
 
 	async getRandomComics(): Promise<RandomComic[]> {
 		if (this.closed) return [];
-		const ids = await this.redis.srandmember(COMIC_ID_KEY, RANDOM_COMIC_LIMIT);
+		// temporary fix for https://github.com/upstash/issues/issues/25
+		const ids = await this.redis.srandmember(COMIC_ID_KEY, RANDOM_COMIC_LIMIT * -1);
 		return await this.getRandomComicsFromIds(ids);
 	}
 
