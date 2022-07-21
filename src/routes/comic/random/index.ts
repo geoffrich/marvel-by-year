@@ -4,8 +4,7 @@ import Redis from '$lib/redis';
 import { decades } from '$lib/years';
 import type { RandomComic } from '$lib/types';
 
-//@ts-ignore
-const get: RequestHandler = async function get({ url }) {
+const GET: RequestHandler = async function get({ url }) {
 	try {
 		const query = url.searchParams;
 		const redis = new Redis();
@@ -39,4 +38,4 @@ const get: RequestHandler = async function get({ url }) {
 	}
 };
 
-export { get };
+export { GET };

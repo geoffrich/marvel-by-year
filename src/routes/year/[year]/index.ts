@@ -11,8 +11,7 @@ import { dev } from '$app/env';
 
 const DEFAULT_TIMEOUT = 9000;
 
-//@ts-ignore
-export const get: RequestHandler = async function get(event) {
+export const GET: RequestHandler = async function get(event) {
 	try {
 		const { request } = event;
 		// Netlify functions have a execution time limit of 10 seconds
@@ -32,63 +31,67 @@ export const get: RequestHandler = async function get(event) {
 };
 
 async function getComics({ params }) {
-	const start = performance.now();
-	const year = parseInt(params.year);
-	const ignoreCache = false;
+	try {
+		const start = performance.now();
+		const year = parseInt(params.year);
+		const ignoreCache = false;
 
-	if (year < MIN_YEAR || year > MAX_YEAR) {
-		return {
-			status: 400
-		};
+		if (year < MIN_YEAR || year > MAX_YEAR) {
+			return {
+				status: 400
+			};
+		}
+
+		const redis = new Redis();
+		const api = new MarvelApi(redis, ignoreCache);
+
+		console.log(`Getting comics for ${year}`);
+		let totalComics = await api.getTotalComics(year);
+		console.log(`Total comics: ${totalComics}`);
+		if (totalComics === -1) {
+			console.log(`unable to fetch total comics for ${year}`);
+			return {
+				status: 500
+			};
+		}
+
+		// reduce API calls/cache hits when developing
+		if (dev) {
+			totalComics = Math.min(200, totalComics);
+		}
+
+		const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
+		const cachePromise = ignoreCache ? Promise.resolve({}) : buildCache(year, pages);
+		const comicIdPromise = redis.getComicIdsWithImages(year);
+
+		const [cache, comicIdsWithImages] = await Promise.all([cachePromise, comicIdPromise]);
+		console.log('cache checked in', (performance.now() - start) / 1000);
+
+		const requests = pages.map((i) => api.getComics(year, i, cache, comicIdsWithImages));
+		const results = await Promise.all(requests);
+
+		redis.quit();
+		console.log('elapsed', (performance.now() - start) / 1000);
+
+		const badStatus = results.find((r) => r.code !== 200);
+		if (badStatus === undefined) {
+			const response = adaptResponses(results);
+
+			return {
+				body: {
+					response,
+					year
+				},
+				headers: {
+					'cache-control': 'public, max-age=86400'
+				}
+			};
+		}
+
+		console.log({ code: badStatus.code, message: badStatus.message });
+	} catch (e) {
+		console.error(e);
 	}
-
-	const redis = new Redis();
-	const api = new MarvelApi(redis, ignoreCache);
-
-	console.log(`Getting comics for ${year}`);
-	let totalComics = await api.getTotalComics(year);
-	console.log(`Total comics: ${totalComics}`);
-	if (totalComics === -1) {
-		console.log(`unable to fetch total comics for ${year}`);
-		return {
-			status: 500
-		};
-	}
-
-	// reduce API calls/cache hits when developing
-	if (dev) {
-		totalComics = Math.min(200, totalComics);
-	}
-
-	const pages = Array.from(Array(Math.ceil(totalComics / 100)).keys());
-	const cachePromise = ignoreCache ? Promise.resolve({}) : buildCache(year, pages);
-	const comicIdPromise = redis.getComicIdsWithImages(year);
-
-	const [cache, comicIdsWithImages] = await Promise.all([cachePromise, comicIdPromise]);
-	console.log('cache checked in', (performance.now() - start) / 1000);
-
-	const requests = pages.map((i) => api.getComics(year, i, cache, comicIdsWithImages));
-	const results = await Promise.all(requests);
-
-	redis.quit();
-	console.log('elapsed', (performance.now() - start) / 1000);
-
-	const badStatus = results.find((r) => r.code !== 200);
-	if (badStatus === undefined) {
-		const response = adaptResponses(results);
-
-		return {
-			body: {
-				response,
-				year
-			},
-			headers: {
-				'cache-control': 'public, max-age=86400'
-			}
-		};
-	}
-
-	console.log({ code: badStatus.code, message: badStatus.message });
 	return {
 		status: 500
 	};
