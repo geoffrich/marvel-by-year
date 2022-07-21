@@ -1,4 +1,4 @@
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './__types/index';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 
@@ -11,8 +11,7 @@ import { dev } from '$app/env';
 
 const DEFAULT_TIMEOUT = 9000;
 
-//@ts-ignore
-export const get: RequestHandler = async function get(event) {
+export const GET: RequestHandler = async function get(event) {
 	try {
 		const { request } = event;
 		// Netlify functions have a execution time limit of 10 seconds
@@ -89,6 +88,7 @@ async function getComics({ params }) {
 	}
 
 	console.log({ code: badStatus.code, message: badStatus.message });
+
 	return {
 		status: 500
 	};
