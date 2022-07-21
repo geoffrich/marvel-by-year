@@ -1,10 +1,15 @@
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './__types/index';
 import Api from '$lib/api';
 import Redis from '$lib/redis';
 import { decades } from '$lib/years';
 import type { RandomComic } from '$lib/types';
 
-const GET: RequestHandler = async function get({ url }) {
+interface GetResponse {
+	comics: RandomComic[];
+	decade: number;
+}
+
+const GET: RequestHandler<GetResponse> = async function get({ url }) {
 	try {
 		const query = url.searchParams;
 		const redis = new Redis();

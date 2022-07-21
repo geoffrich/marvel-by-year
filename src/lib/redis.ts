@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import type { RedisOptions } from 'ioredis';
 import LZString from '$lib/lz-string';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import type { RandomComic } from '$lib/types';
@@ -21,7 +22,7 @@ enum Status {
 	Connect = 'connect'
 }
 
-const redisConfig: Redis.RedisOptions = {
+const redisConfig: RedisOptions = {
 	retryStrategy: (times) => {
 		if (times > 0) {
 			console.log('unable to connect to redis');
@@ -34,12 +35,12 @@ const redisConfig: Redis.RedisOptions = {
 	connectTimeout: 500
 };
 
-interface ExtendedRedis extends Redis.Redis {
+interface ExtendedRedis extends Redis {
 	randomYear(key: string, startYear: number, endYear: number, seed: number): Promise<string[]>;
 }
 
 export default class RedisClient {
-	redis: Redis.Redis;
+	redis: Redis;
 
 	constructor() {
 		this.redis = REDIS_CONNECTION
@@ -154,7 +155,7 @@ export default class RedisClient {
 	async getRandomComics(): Promise<RandomComic[]> {
 		if (this.closed) return [];
 		// temporary fix for https://github.com/upstash/issues/issues/25
-		const ids = await this.redis.srandmember(COMIC_ID_KEY, RANDOM_COMIC_LIMIT * -1);
+		const ids = (await this.redis.srandmember(COMIC_ID_KEY, RANDOM_COMIC_LIMIT * -1)) as string[];
 		return await this.getRandomComicsFromIds(ids);
 	}
 
