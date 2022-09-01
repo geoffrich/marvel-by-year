@@ -1,15 +1,17 @@
-import type { RequestHandler } from './__types/index';
+import type { PageServerLoad } from './$types';
 import Api from '$lib/api';
 import Redis from '$lib/redis';
 import { decades } from '$lib/years';
 import type { RandomComic } from '$lib/types';
+import { error } from '@sveltejs/kit';
 
 interface GetResponse {
 	comics: RandomComic[];
 	decade: number;
 }
 
-const GET: RequestHandler<GetResponse> = async function get({ url }) {
+// @migration TODO: figure out typing
+export const load: PageServerLoad = async function get({ url }) {
 	try {
 		const query = url.searchParams;
 		const redis = new Redis();
@@ -20,9 +22,7 @@ const GET: RequestHandler<GetResponse> = async function get({ url }) {
 		if (decadeQuery) {
 			const decade = decades.find((d) => d.startYear === decadeQuery);
 			if (!decade) {
-				return {
-					status: 400
-				};
+				throw error(400);
 			}
 			comics = await api.getRandomComics(decade.startYear, decade.endYear);
 		} else {
@@ -30,17 +30,11 @@ const GET: RequestHandler<GetResponse> = async function get({ url }) {
 		}
 
 		return {
-			body: {
-				comics,
-				decade: decadeQuery
-			}
+			comics,
+			decade: decadeQuery
 		};
 	} catch (e) {
 		console.log('Error when getting random: ', e);
-		return {
-			status: 500
-		};
+		throw error(500);
 	}
 };
-
-export { GET };

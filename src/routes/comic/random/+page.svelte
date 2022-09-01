@@ -1,21 +1,5 @@
-<script lang="ts" context="module">
-	import type { Load } from '@sveltejs/kit';
-	export const load: Load = function ({ props }) {
-		const { decade } = props;
-		return {
-			props,
-			stuff: {
-				title: decade ? `Random comics from the ${getDecadeAsString(decade)}` : 'Random comics'
-			}
-		};
-	};
-
-	function getDecadeAsString(decade: number) {
-		return decades.find((d) => d.startYear >= decade && decade <= d.endYear).text;
-	}
-</script>
-
 <script lang="ts">
+	import type { PageData } from './$types';
 	import type { RandomComic } from '$lib/types';
 	import DecadeForm from '$lib/components/DecadeForm.svelte';
 	import ComicGrid from '$lib/components/ComicGrid.svelte';
@@ -26,14 +10,14 @@
 	import { tick } from 'svelte';
 	import { page } from '$app/stores';
 
-	export let comics: RandomComic[];
-	export let decade: number;
+	export let data: PageData;
 
 	let refreshing = false;
 	let error = false;
 	let container;
 
 	function refresh() {
+		// @migration TODO: use invalidate?
 		refreshing = true;
 		fetch($page.url.toString(), { headers: { accept: 'application/json' } })
 			.then((res) => {
@@ -41,7 +25,7 @@
 				throw res;
 			})
 			.then((res) => {
-				comics = res.comics;
+				data.comics = res.comics;
 				refreshing = false;
 				error = false;
 				tick().then(() => container.querySelector('a').focus());
@@ -53,7 +37,7 @@
 	}
 </script>
 
-<h1>{$page.stuff.title}</h1>
+<h1>{$page.data.title}</h1>
 
 <p>
 	Tap the covers below to view a random comic on Marvel Unlimited. Depending on your device, it will
@@ -61,11 +45,11 @@
 	include comics from a given decade.
 </p>
 
-<DecadeForm selected={decade} />
+<DecadeForm selected={data.decade} />
 
 <div class="container" bind:this={container}>
 	<ComicGrid>
-		{#each comics as comic (comic.id)}
+		{#each data.comics as comic (comic.id)}
 			<li class="card" in:blur>
 				<ComicLink id={comic.id} title={comic.title}>
 					<img

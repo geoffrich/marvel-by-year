@@ -1,14 +1,5 @@
-<script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+<script lang="ts">
 	import { years } from '$lib/years';
-
-	export const load: Load = function () {
-		return {
-			stuff: {
-				title: 'Years'
-			}
-		};
-	};
 </script>
 
 <h1>Years</h1>

@@ -1,12 +1,10 @@
-<script context="module" lang="ts">
+<script lang="ts">
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import { navigating, page } from '$app/stores';
 	import 'focus-visible'; // polyfill :focus-visible for Safari
 	import '../global.css';
-</script>
 
-<script lang="ts">
-	$: title = $page.stuff.title;
+	$: title = $page.data.title;
 </script>
 
 {#if $navigating}

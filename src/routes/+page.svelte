@@ -1,17 +1,3 @@
-<script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
-
-	export const prerender = true;
-
-	export const load: Load = function () {
-		return {
-			stuff: {
-				title: 'Home'
-			}
-		};
-	};
-</script>
-
 <script>
 	import { MIN_YEAR, MAX_YEAR } from '$lib/years';
 </script>
