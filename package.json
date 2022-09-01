@@ -29,7 +29,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@sveltejs/adapter-netlify": "^1.0.0-next.70",
+		"@sveltejs/adapter-netlify": "^1.0.0-next.76",
 		"crypto-js": "^4.1.1",
 		"dayjs": "^1.10.6",
 		"ioredis": "^5.2.1",
