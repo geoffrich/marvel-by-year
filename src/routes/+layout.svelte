@@ -15,11 +15,11 @@
 	<title>{title ? title + ' | ' : ''}MU by Year</title>
 </svelte:head>
 
-<nav>
-	<a href="/" sveltekit:prefetch>Home</a>
-	<a href="/year" sveltekit:prefetch>Years</a>
-	<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
-	<a href="/year/random" sveltekit:prefetch>Random Year</a>
+<nav data-sveltekit-prefetch>
+	<a href="/">Home</a>
+	<a href="/year">Years</a>
+	<a href="/comic/random">Random Comic</a>
+	<a href="/year/random">Random Year</a>
 </nav>
 
 <main class="spaced">

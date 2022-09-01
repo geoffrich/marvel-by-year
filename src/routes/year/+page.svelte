@@ -4,9 +4,9 @@
 
 <h1>Years</h1>
 <p>Select a year to see all the comics available on Marvel Unlimited for that year.</p>
-<ul>
+<ul data-sveltekit-prefetch>
 	{#each years as year (year)}
-		<li><a href="/year/{year}" sveltekit:prefetch>{year}</a></li>
+		<li><a href="/year/{year}">{year}</a></li>
 	{/each}
 </ul>
 

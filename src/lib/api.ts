@@ -5,6 +5,7 @@ import type RedisClient from '$lib/redis';
 import { dedupe } from '$lib/util';
 import { performance } from 'perf_hooks';
 
+// @migration TODO: $env module
 const PUBLIC_KEY = process.env['MARVEL_PUBLIC_KEY'];
 const PRIVATE_KEY = process.env['MARVEL_PRIVATE_KEY'];
 

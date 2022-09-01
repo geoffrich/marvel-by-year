@@ -12,7 +12,8 @@
 
 	function submit() {
 		const formData = new FormData(form);
-		goto(`${action}?decade=${formData.get('decade')}`, { keepfocus: true, noscroll: true });
+		// @ts-ignore https://github.com/microsoft/TypeScript/issues/30584
+		goto(`${action}?${new URLSearchParams(formData).toString()}`, { keepfocus: true, noscroll: true });
 	}
 
 	function handleEnter(e: KeyboardEvent) {

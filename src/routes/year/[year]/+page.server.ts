@@ -7,7 +7,7 @@ import Redis from '$lib/redis';
 import { promiseTimeout } from '$lib/util';
 import { adaptResponses } from '$lib/adapt/comics';
 import { performance } from 'perf_hooks';
-import { dev } from '$app/env';
+import { dev } from '$app/environment';
 import { error } from '@sveltejs/kit';
 import type { ComicResponse } from '$lib/types';
 
@@ -72,6 +72,7 @@ async function getComics({ params, setHeaders }) {
 	if (badStatus === undefined) {
 		const response = adaptResponses(results);
 
+		// TODO: not currently working due to https://github.com/sveltejs/kit/issues/6477
 		setHeaders({
 			'cache-control': 'public, max-age=86400'
 		});

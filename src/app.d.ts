@@ -10,4 +10,6 @@ declare namespace App {
 	interface Stuff {
 		title: string;
 	}
+
+	// @migration TODO: use PageData
 }
