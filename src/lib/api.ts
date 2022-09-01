@@ -4,10 +4,10 @@ import type { RandomComic } from '$lib/types';
 import type RedisClient from '$lib/redis';
 import { dedupe } from '$lib/util';
 import { performance } from 'perf_hooks';
-
-// @migration TODO: $env module
-const PUBLIC_KEY = process.env['MARVEL_PUBLIC_KEY'];
-const PRIVATE_KEY = process.env['MARVEL_PRIVATE_KEY'];
+import {
+	MARVEL_PRIVATE_KEY as PRIVATE_KEY,
+	MARVEL_PUBLIC_KEY as PUBLIC_KEY
+} from '$env/static/private';
 
 const COMICS_ENDPOINT = 'https://gateway.marvel.com/v1/public/comics';
 const MAX_LIMIT = 100;

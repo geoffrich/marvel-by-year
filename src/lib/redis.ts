@@ -3,8 +3,7 @@ import type { RedisOptions } from 'ioredis';
 import LZString from '$lib/lz-string';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import type { RandomComic } from '$lib/types';
-
-const REDIS_CONNECTION = process.env['REDIS_CONNECTION'];
+import { REDIS_CONNECTION } from '$env/static/private';
 
 const DEFAULT_EXPIRY = 24 * 60 * 60;
 const COMIC_ID_KEY = 'comics:ids';
