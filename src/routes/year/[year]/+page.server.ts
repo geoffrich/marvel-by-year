@@ -1,4 +1,4 @@
-import type { RequestHandler } from './__types/index';
+import type { PageServerLoad } from './$types';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 
@@ -7,11 +7,12 @@ import Redis from '$lib/redis';
 import { promiseTimeout } from '$lib/util';
 import { adaptResponses } from '$lib/adapt/comics';
 import { performance } from 'perf_hooks';
-import { dev } from '$app/env';
+import { dev } from '$app/environment';
+import { error } from '@sveltejs/kit';
 
 const DEFAULT_TIMEOUT = 9000;
 
-export const GET: RequestHandler = async function get(event) {
+export const load: PageServerLoad = async function get(event) {
 	try {
 		const { request } = event;
 		// Netlify functions have a execution time limit of 10 seconds
@@ -24,21 +25,17 @@ export const GET: RequestHandler = async function get(event) {
 		return isPageRequest ? await promiseTimeout(DEFAULT_TIMEOUT, apiCall) : await apiCall;
 	} catch (e) {
 		const message = e instanceof Error ? e.message : e.toString();
-		return {
-			status: message.includes('Timed out') ? 502 : 500
-		};
+		throw error(message.includes('Timed out') ? 502 : 500);
 	}
 };
 
-async function getComics({ params }) {
+async function getComics({ params, setHeaders }) {
 	const start = performance.now();
 	const year = parseInt(params.year);
 	const ignoreCache = false;
 
 	if (year < MIN_YEAR || year > MAX_YEAR) {
-		return {
-			status: 400
-		};
+		throw error(400);
 	}
 
 	const redis = new Redis();
@@ -49,9 +46,7 @@ async function getComics({ params }) {
 	console.log(`Total comics: ${totalComics}`);
 	if (totalComics === -1) {
 		console.log(`unable to fetch total comics for ${year}`);
-		return {
-			status: 500
-		};
+		throw error(500);
 	}
 
 	// reduce API calls/cache hits when developing
@@ -76,22 +71,20 @@ async function getComics({ params }) {
 	if (badStatus === undefined) {
 		const response = adaptResponses(results);
 
+		// TODO: not currently working due to https://github.com/sveltejs/kit/issues/6477
+		setHeaders({
+			'cache-control': 'public, max-age=86400'
+		});
+
 		return {
-			body: {
-				response,
-				year
-			},
-			headers: {
-				'cache-control': 'public, max-age=86400'
-			}
+			response,
+			year
 		};
 	}
 
 	console.log({ code: badStatus.code, message: badStatus.message });
 
-	return {
-		status: 500
-	};
+	throw error(500);
 
 	async function buildCache(
 		year: number,

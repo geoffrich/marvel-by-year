@@ -1,18 +1,6 @@
-<script lang="ts" context="module">
-	import type { Load } from '@sveltejs/kit';
-
-	export const load: Load = function ({ props }) {
-		return {
-			props,
-			stuff: {
-				title: `Comics for ${props.year}`
-			}
-		};
-	};
-</script>
-
 <script lang="ts">
-	import type { ComicResponse, Comic } from '$lib/types';
+	import type { PageData } from './$types';
+	import type { Comic } from '$lib/types';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
@@ -34,8 +22,7 @@
 	import type { MatchSorterOptions } from 'match-sorter';
 	import { page } from '$app/stores';
 
-	export let response: ComicResponse;
-	export let year: number;
+	export let data: PageData;
 
 	let search = $page.url.searchParams.get('search') || '';
 
@@ -80,7 +67,7 @@
 		}, 250);
 	}
 
-	$: comics = response.comics;
+	$: comics = data.response.comics;
 
 	let [series, selectedSeries] = createSelectedStores(getSeries);
 	$: series.applyNewComics(comics);
@@ -164,8 +151,8 @@
 </script>
 
 <!-- TODO: this is possibly a bug with SvelteKit. When a request times out and we show an error page, hitting reload does not populate stuff -->
-<h1>{$page.stuff.title || `Comics for ${year}`}</h1>
-<PageLinks {year} />
+<h1>{$page.data.title || `Comics for ${data.year}`}</h1>
+<PageLinks year={data.year} />
 
 <p>
 	Displaying {comics.length} comics
@@ -222,10 +209,10 @@
 		<li>Nothing to show!</li>
 	{/each}
 </ComicGrid>
-<PageLinks {year} />
+<PageLinks year={data.year} />
 
-{#if response.attr}
-	<p>{response.attr}</p>
+{#if data.response.attr}
+	<p>{data.response.attr}</p>
 {/if}
 
 <style>

@@ -1,15 +1,3 @@
-<script context="module" lang="ts">
-	import type { ErrorLoad } from '@sveltejs/kit';
-	export const load: ErrorLoad = function ({ error, status }) {
-		return {
-			props: {
-				status,
-				error
-			}
-		};
-	};
-</script>
-
 <script lang="ts">
 	import { goto } from '$app/navigation';
 
@@ -17,8 +5,8 @@
 
 	let reloading = false;
 
-	export let status: number;
-	export let error: Error;
+	$: status = $page.status;
+	$: error = $page.error;
 
 	function reloadPage() {
 		reloading = true;

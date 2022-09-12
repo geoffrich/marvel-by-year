@@ -1,17 +1,8 @@
-<script context="module">
-	export function load({ error, status }) {
-		return {
-			props: {
-				status,
-				error
-			}
-		};
-	}
-</script>
-
 <script>
-	export let status;
-	export let error;
+	import { page } from '$app/stores';
+
+	$: status = $page.status;
+	$: error = $page.error
 </script>
 
 <h1>Error: received status {status}</h1>

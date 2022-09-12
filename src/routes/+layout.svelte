@@ -1,12 +1,10 @@
-<script context="module" lang="ts">
+<script lang="ts">
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import { navigating, page } from '$app/stores';
 	import 'focus-visible'; // polyfill :focus-visible for Safari
 	import '../global.css';
-</script>
 
-<script lang="ts">
-	$: title = $page.stuff.title;
+	$: title = $page.data.title;
 </script>
 
 {#if $navigating}
@@ -17,11 +15,11 @@
 	<title>{title ? title + ' | ' : ''}MU by Year</title>
 </svelte:head>
 
-<nav>
-	<a href="/" sveltekit:prefetch>Home</a>
-	<a href="/year" sveltekit:prefetch>Years</a>
-	<a href="/comic/random" sveltekit:prefetch>Random Comic</a>
-	<a href="/year/random" sveltekit:prefetch>Random Year</a>
+<nav data-sveltekit-prefetch>
+	<a href="/">Home</a>
+	<a href="/year">Years</a>
+	<a href="/comic/random">Random Comic</a>
+	<a href="/year/random">Random Year</a>
 </nav>
 
 <main class="spaced">
