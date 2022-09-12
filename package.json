@@ -12,7 +12,7 @@
 		"redis": "redis-server"
 	},
 	"devDependencies": {
-		"@sveltejs/kit": "^1.0.0-next.463",
+		"@sveltejs/kit": "^1.0.0-next.481",
 		"@types/crypto-js": "^4.0.2",
 		"@types/ioredis": "^4.27.2",
 		"dotenv": "^16.0.1",
@@ -29,7 +29,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@sveltejs/adapter-netlify": "^1.0.0-next.76",
+		"@sveltejs/adapter-netlify": "^1.0.0-next.77",
 		"crypto-js": "^4.1.1",
 		"dayjs": "^1.10.6",
 		"ioredis": "^5.2.1",
