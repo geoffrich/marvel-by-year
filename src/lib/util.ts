@@ -16,9 +16,9 @@ export function dedupe<Item>(arr: Item[], getId: (arg: Item) => any): Item[] {
 }
 
 // https://italonascimento.github.io/applying-a-timeout-to-your-promises/
-export function promiseTimeout(ms: number, promise) {
+export function promiseTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
 	// Create a promise that rejects in <ms> milliseconds
-	let timeout = new Promise((_, reject) => {
+	let timeout = new Promise<T>((_, reject) => {
 		let id = setTimeout(() => {
 			clearTimeout(id);
 			reject('Timed out in ' + ms + 'ms.');

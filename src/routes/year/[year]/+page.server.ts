@@ -9,7 +9,6 @@ import { adaptResponses } from '$lib/adapt/comics';
 import { performance } from 'perf_hooks';
 import { dev } from '$app/environment';
 import { error } from '@sveltejs/kit';
-import type { ComicResponse } from '$lib/types';
 
 const DEFAULT_TIMEOUT = 9000;
 

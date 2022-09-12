@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import type { ComicResponse, Comic } from '$lib/types';
+	import type { Comic } from '$lib/types';
 	import ComicSummary from '$lib/components/ComicSummary.svelte';
 	import Filter from '$lib/components/Filter.svelte';
 	import PageLinks from '$lib/components/PageLinks.svelte';
@@ -22,7 +22,7 @@
 	import type { MatchSorterOptions } from 'match-sorter';
 	import { page } from '$app/stores';
 
-	export let data: PageData; // @migration TODO: how to type this?
+	export let data: PageData;
 
 	let search = $page.url.searchParams.get('search') || '';
 

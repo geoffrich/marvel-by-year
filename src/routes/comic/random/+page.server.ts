@@ -5,11 +5,6 @@ import { decades } from '$lib/years';
 import type { RandomComic } from '$lib/types';
 import { error } from '@sveltejs/kit';
 
-interface GetResponse {
-	comics: RandomComic[];
-	decade: number;
-}
-
 // @migration TODO: figure out typing
 export const load: PageServerLoad = async function get({ url }) {
 	try {
