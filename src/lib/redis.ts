@@ -184,7 +184,6 @@ export default class RedisClient {
 		seed: number
 	): Promise<RandomComic[]> {
 		if (this.closed) return;
-
 		this.redis.defineCommand('randomYear', {
 			numberOfKeys: 1,
 			lua: `
