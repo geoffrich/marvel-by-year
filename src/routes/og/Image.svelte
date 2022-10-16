@@ -22,7 +22,7 @@ padding: 2rem;"
 >
 	<p
 		style="
-    font-size: 100px; 
+    font-size: 90px; 
     color: white; 
     background-color: #e03131;
     "

@@ -8,7 +8,7 @@
 
 <div class="years">
 	{#each years as year}
-		<img src="/og/{year}" on:error={handleError} />
+		<img src="/og/{year}.png" on:error={handleError} alt="" />
 	{/each}
 </div>
 

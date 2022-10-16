@@ -19,8 +19,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	console.log('Generating social image for ', year);
 	const redis = new Redis();
 	const api = new Api(redis);
-	const comics = await api.getRandomComics(year, year + 1);
-	const images = comics.map((c) => getImage(c.image, ImageSize.XXLarge, c.ext)).slice(0, 5);
-	console.log(images);
-	return componentToPng(Image, { text: year, images }, 630, 1200);
+	const comics = await api.getRandomComics(year, year + 1, 5);
+	const images = comics.map((c) => getImage(c.image, ImageSize.XXLarge, c.ext));
+	return componentToPng(Image, { text: `Marvel Comics from ${year}`, images }, 630, 1200);
 };
