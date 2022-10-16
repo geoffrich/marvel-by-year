@@ -8,10 +8,7 @@ const config = {
 	preprocess: preprocess(),
 
 	kit: {
-		adapter: netlify(),
-		prerender: {
-			entries: ['/', '/og/1995.png']
-		}
+		adapter: netlify()
 	}
 };
 

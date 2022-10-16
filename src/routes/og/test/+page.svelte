@@ -7,7 +7,7 @@
 </script>
 
 <div class="years">
-	{#each years as year}
+	{#each years.filter((y) => y >= 1990 && y <= 1999) as year}
 		<img src="/og/{year}.png" on:error={handleError} alt="" />
 	{/each}
 </div>
