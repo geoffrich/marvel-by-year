@@ -16,6 +16,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	if (year < MIN_YEAR || year > MAX_YEAR || isNaN(year)) {
 		throw error(400, 'Not a valid year');
 	}
+	console.log('Generating social image for ', year);
 	const redis = new Redis();
 	const api = new Api(redis);
 	const comics = await api.getRandomComics(year, year + 1);

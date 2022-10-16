@@ -10,7 +10,7 @@ const config = {
 	kit: {
 		adapter: netlify(),
 		prerender: {
-			entries: ['/', '/og/1995']
+			entries: ['/', '/og/1995.png']
 		}
 	}
 };
