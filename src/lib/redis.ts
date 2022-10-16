@@ -181,10 +181,10 @@ export default class RedisClient {
 	async getRandomComicsForYear(
 		startYear: number,
 		endYear: number,
-		seed: number
+		seed: number,
+		numComics: number = RANDOM_COMIC_LIMIT
 	): Promise<RandomComic[]> {
 		if (this.closed) return;
-
 		this.redis.defineCommand('randomYear', {
 			numberOfKeys: 1,
 			lua: `
@@ -198,7 +198,7 @@ export default class RedisClient {
 					local endRank = redis.call('ZRANK', KEYS[1], last[1])
 
 					local ids = {}
-					for i=1,${RANDOM_COMIC_LIMIT},1 do
+					for i=1,${numComics},1 do
 						local rank = math.random(startRank, endRank)
 						local range = redis.call('ZRANGE', KEYS[1], rank, rank)
 						ids[i] = range[1]

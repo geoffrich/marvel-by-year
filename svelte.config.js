@@ -8,6 +8,7 @@ const config = {
 	preprocess: preprocess(),
 
 	kit: {
+		// TODO: possible to pass flag that only prerenders all social images on master?
 		adapter: netlify()
 	}
 };

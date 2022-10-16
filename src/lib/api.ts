@@ -69,10 +69,14 @@ export default class MarvelApi {
 		return -1;
 	}
 
-	async getRandomComics(startYear?: number, endYear?: number): Promise<RandomComic[]> {
+	async getRandomComics(
+		startYear?: number,
+		endYear?: number,
+		numComics?: number
+	): Promise<RandomComic[]> {
 		if (startYear && endYear) {
 			const seed = Date.now();
-			const result = await this.redis.getRandomComicsForYear(startYear, endYear, seed);
+			const result = await this.redis.getRandomComicsForYear(startYear, endYear, seed, numComics);
 			return dedupe(result, (x) => x.id);
 		}
 		const result = await this.redis.getRandomComics();

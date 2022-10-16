@@ -13,6 +13,19 @@
 
 <svelte:head>
 	<title>{title ? title + ' | ' : ''}MU by Year</title>
+	<meta property="og:site_name" content="Marvel Unlimited by Year" />
+	<meta property="og:title" content="{title} - Marvel Unlimited by Year" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://marvel.geoffrich.net/" />
+	<meta
+		property="og:description"
+		content={$page.data.description || 'See what issues are available on MU for a given year.'}
+	/>
+	<meta content="summary_large_image" name="twitter:card" />
+	<meta name="twitter:creator" content="@geoffrich_" />
+	{#if $page.data.image}
+		<meta content={$page.data.image} property="og:image" />
+	{/if}
 </svelte:head>
 
 <nav data-sveltekit-prefetch>
