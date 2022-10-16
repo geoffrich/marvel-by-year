@@ -29,9 +29,7 @@ padding: 2rem;"
 	>
 		{text}
 	</p>
-	<div
-		style="display: flex; justify-content: space-between; width: 100%; margin-left: -20px; margin-top: 50px;"
-	>
+	<div style="display: flex; justify-content: space-between; width: 100%; margin-top: 50px;">
 		{#each images as image}
 			<img src={image} />
 		{/each}
