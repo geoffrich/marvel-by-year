@@ -8,7 +8,7 @@ import Image from '../Image.svelte';
 import { error } from '@sveltejs/kit';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 
-export const prerender = true;
+export const prerender = 'auto';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const year = parseInt(params.year);
