@@ -21,7 +21,7 @@
 		property="og:description"
 		content={$page.data.description || 'See what issues are available on MU for a given year.'}
 	/>
-	<meta name="twitter:card" content="summary" />
+	<meta content="summary_large_image" name="twitter:card" />
 	<meta name="twitter:creator" content="@geoffrich_" />
 	{#if $page.data.image}
 		<meta content={$page.data.image} property="og:image" />
