@@ -9,5 +9,7 @@ declare namespace App {
 
 	interface PageData {
 		title: string;
+		image?: string;
+		description?: string;
 	}
 }

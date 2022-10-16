@@ -2,16 +2,6 @@
 	import { MIN_YEAR, MAX_YEAR } from '$lib/years';
 </script>
 
-<svelte:head>
-	<meta property="og:site_name" content="Marvel Unlimited by Year" />
-	<meta property="og:title" content="Home - Marvel Unlimited by Year" />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://marvel.geoffrich.net/" />
-	<meta property="og:description" content="See what issues are available on MU for a given year." />
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:creator" content="@geoffrich_" />
-</svelte:head>
-
 <div class="container spaced">
 	<h1>Browse Marvel Unlimited by Year</h1>
 	<p>
