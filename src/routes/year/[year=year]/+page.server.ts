@@ -34,10 +34,6 @@ async function getComics({ params, setHeaders, url }: RequestEvent) {
 	const year = parseInt(params.year);
 	const ignoreCache = false;
 
-	if (year < MIN_YEAR || year > MAX_YEAR) {
-		throw error(400);
-	}
-
 	const redis = new Redis();
 	const api = new MarvelApi(redis, url.origin, ignoreCache);
 

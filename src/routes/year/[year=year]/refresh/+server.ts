@@ -4,7 +4,6 @@ import MarvelApi from '$lib/api';
 import Redis from '$lib/redis';
 
 export const POST: RequestHandler = async ({ params, request, url }) => {
-	// TODO: input validation
 	// TODO: prevent multiple in flight requests? probably not a big deal
 	const body: RefreshRequest = await request.json();
 	const redis = new Redis();
