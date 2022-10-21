@@ -1,4 +1,4 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, RequestEvent } from './$types';
 import type { ComicDataWrapper } from '$lib/types/marvel';
 import { MAX_YEAR, MIN_YEAR } from '$lib/years';
 
@@ -29,7 +29,7 @@ export const load: PageServerLoad = async function get(event) {
 	}
 };
 
-async function getComics({ params, setHeaders }) {
+async function getComics({ params, setHeaders, url }: RequestEvent) {
 	const start = performance.now();
 	const year = parseInt(params.year);
 	const ignoreCache = false;
@@ -39,7 +39,7 @@ async function getComics({ params, setHeaders }) {
 	}
 
 	const redis = new Redis();
-	const api = new MarvelApi(redis, ignoreCache);
+	const api = new MarvelApi(redis, url.origin, ignoreCache);
 
 	console.log(`Getting comics for ${year}`);
 	let totalComics = await api.getTotalComics(year);

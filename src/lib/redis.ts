@@ -82,6 +82,19 @@ export default class RedisClient {
 		return [];
 	}
 
+	async hasCachedComicsExpired(year: number, page: number): Promise<boolean> {
+		if (this.closed) return false;
+		const key = getExpiryKey(year, page);
+		try {
+			const result = await this.redis.get(key);
+			return result === null;
+		} catch (e) {
+			console.log('Unable to retrieve', key);
+			console.log(e);
+		}
+		return false;
+	}
+
 	async set<T>(key: string, value: T, expiry: number = DEFAULT_EXPIRY) {
 		if (this.closed) return;
 		try {
@@ -108,6 +121,7 @@ export default class RedisClient {
 		if (this.closed) return;
 		try {
 			const key = getYearKey(year, page);
+			const expiryKey = getExpiryKey(year, page);
 			const imagesKey = getComicWithImagesKey(year);
 			const comics = value.data.results.map((c) => ({
 				id: c.digitalId,
@@ -127,7 +141,9 @@ export default class RedisClient {
 			let pipeline = this.redis
 				.multi()
 				// cache the Marvel API response itself
-				.set(key, compressed, 'EX', DEFAULT_EXPIRY)
+				.set(key, compressed)
+				// this will track whether the data needs to be refreshed
+				.set(expiryKey, 'true', 'EX', DEFAULT_EXPIRY)
 				// set with all Marvel comic IDs
 				.sadd(COMIC_ID_KEY, ids)
 				// add comic IDs to a sorted set, where the score is the year of publication
@@ -249,6 +265,10 @@ function getComicWithImagesKey(year: number) {
 // Redis key for subset of data about an individual comic
 function getComicKey(id: string | number) {
 	return `comic:${id}`;
+}
+
+function getExpiryKey(year: number, page: number) {
+	return getYearKey(year, page) + ':fresh';
 }
 
 interface RandomComicRedis {

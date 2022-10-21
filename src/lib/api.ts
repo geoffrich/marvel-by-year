@@ -1,6 +1,6 @@
 import md5 from 'crypto-js/md5.js';
 import type { ComicDataWrapper } from '$lib/types/marvel';
-import type { RandomComic } from '$lib/types';
+import type { RandomComic, RefreshRequest } from '$lib/types';
 import type RedisClient from '$lib/redis';
 import { dedupe } from '$lib/util';
 import { performance } from 'perf_hooks';
@@ -15,8 +15,11 @@ const MAX_LIMIT = 100;
 export default class MarvelApi {
 	redis: RedisClient;
 	ignoreCache: boolean;
-	constructor(redis: RedisClient, ignoreCache: boolean = false) {
+	appBaseAddress: string;
+	constructor(redis: RedisClient, appBaseAddress: string, ignoreCache: boolean = false) {
 		this.redis = redis;
+		// used to call back into the app in a fire-and-forget way
+		this.appBaseAddress = appBaseAddress;
 		this.ignoreCache = ignoreCache;
 	}
 
@@ -28,11 +31,30 @@ export default class MarvelApi {
 	): Promise<ComicDataWrapper> {
 		console.log(`retrieving ${year} page ${page}`);
 
-		let start = performance.now();
 		if (cache[page]) {
+			const hasExpired = await this.redis.hasCachedComicsExpired(year, page);
+			if (hasExpired) {
+				console.log(`data for ${year} page ${page} is stale, firing refresh request`);
+				const request: RefreshRequest = { page, comicIdsWithImages: [...comicIdsWithImages] };
+				// fire-and-forget request to update the cached data from marvel API
+				// we don't want to wait on it because it takes a long time, so return stale data instead
+				fetch(`${this.appBaseAddress}/year/${year}/refresh`, {
+					body: JSON.stringify(request),
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					method: 'POST'
+				});
+			}
 			console.log(`found ${year} page ${page} in redis cache`);
 			return cache[page];
 		}
+
+		return this.getFromMarvelApiAndCache(year, page, comicIdsWithImages);
+	}
+
+	async getFromMarvelApiAndCache(year: number, page: number, comicIdsWithImages: Set<string>) {
+		let start = performance.now();
 
 		const result = await this.callMarvelApi(
 			COMICS_ENDPOINT,
@@ -47,7 +69,6 @@ export default class MarvelApi {
 			await this.redis.addComics(year, page, parsedResult, comicIdsWithImages);
 		}
 		console.log('updated redis in', (performance.now() - start) / 1000);
-
 		return parsedResult;
 	}
 

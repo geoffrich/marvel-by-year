@@ -57,3 +57,9 @@ export interface EventSummary {
 	name: string;
 	id: number;
 }
+
+export interface RefreshRequest {
+	page: number;
+	// TODO: do we need to pass this?
+	comicIdsWithImages: string[];
+}
