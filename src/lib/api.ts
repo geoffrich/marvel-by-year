@@ -47,6 +47,8 @@ export default class MarvelApi {
 						'Content-Type': 'application/json'
 					},
 					method: 'POST'
+				}).catch((e) => {
+					console.error('Refresh error', e);
 				});
 			}
 			console.log(`found ${year} page ${page} in redis cache`);
