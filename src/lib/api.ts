@@ -34,11 +34,14 @@ export default class MarvelApi {
 		if (cache[page]) {
 			const hasExpired = await this.redis.hasCachedComicsExpired(year, page);
 			if (hasExpired) {
-				console.log(`data for ${year} page ${page} is stale, firing refresh request`);
+				const refreshUrl = `${this.appBaseAddress}/year/${year}/refresh`;
+				console.log(
+					`data for ${year} page ${page} is stale, firing refresh request to ${refreshUrl}`
+				);
 				const request: RefreshRequest = { page, comicIdsWithImages: [...comicIdsWithImages] };
 				// fire-and-forget request to update the cached data from marvel API
 				// we don't want to wait on it because it takes a long time, so return stale data instead
-				fetch(`${this.appBaseAddress}/year/${year}/refresh`, {
+				fetch(refreshUrl, {
 					body: JSON.stringify(request),
 					headers: {
 						'Content-Type': 'application/json'

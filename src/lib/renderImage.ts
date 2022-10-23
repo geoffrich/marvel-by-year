@@ -4,6 +4,7 @@ import { html as toReactNode } from 'satori-html';
 
 // we use a Vite plugin to turn this import into the result of fs.readFileSync during build
 import roboto from '$lib/fonts/Roboto-Regular.ttf';
+import { dev } from '$app/environment';
 
 export async function componentToPng(component, props, height, width) {
 	const result = component.render(props);
@@ -32,7 +33,8 @@ export async function componentToPng(component, props, height, width) {
 
 	return new Response(png.asPng(), {
 		headers: {
-			'content-type': 'image/png'
+			'content-type': 'image/png',
+			'cache-control': dev ? 'no-cache, no-store' : 'public, immutable, no-transform, max-age=86400'
 		}
 	});
 }
