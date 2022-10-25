@@ -31,7 +31,7 @@ padding: 2rem;"
 	</p>
 	<div style="display: flex; justify-content: space-between; width: 100%; margin-top: 50px;">
 		{#each images as image}
-			<img src={image} />
+			<img src={image} width="200" height="300" alt="" />
 		{/each}
 	</div>
 </div>
