@@ -28,7 +28,7 @@
 	{/if}
 </svelte:head>
 
-<nav data-sveltekit-prefetch>
+<nav>
 	<a href="/">Home</a>
 	<a href="/year">Years</a>
 	<a href="/comic/random">Random Comic</a>
