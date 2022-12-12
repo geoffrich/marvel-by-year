@@ -13,7 +13,10 @@
 	function submit() {
 		const formData = new FormData(form);
 		// @ts-ignore https://github.com/microsoft/TypeScript/issues/30584
-		goto(`${action}?${new URLSearchParams(formData).toString()}`, { keepfocus: true, noscroll: true });
+		goto(`${action}?${new URLSearchParams(formData).toString()}`, {
+			keepFocus: true,
+			noScroll: true
+		});
 	}
 
 	function handleEnter(e: KeyboardEvent) {

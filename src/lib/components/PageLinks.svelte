@@ -8,7 +8,7 @@
 </script>
 
 {#if hasPrevious || hasNext}
-	<div class="links" data-sveltekit-prefetch>
+	<div class="links">
 		{#if hasPrevious}
 			<a href="/year/{year - 1}">Previous year</a>
 		{/if}

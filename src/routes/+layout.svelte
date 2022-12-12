@@ -28,7 +28,7 @@
 	{/if}
 </svelte:head>
 
-<nav data-sveltekit-prefetch>
+<nav>
 	<a href="/">Home</a>
 	<a href="/year">Years</a>
 	<a href="/comic/random">Random Comic</a>
@@ -45,19 +45,6 @@
 </footer>
 
 <style>
-	:global(body) {
-		max-width: 64rem;
-		margin-left: auto;
-		margin-right: auto;
-		padding: var(--size-3);
-		padding-bottom: 0;
-	}
-
-	:global(div#svelte) {
-		display: flex;
-		flex-direction: column;
-	}
-
 	nav {
 		margin-left: var(--size-1);
 		display: flex;

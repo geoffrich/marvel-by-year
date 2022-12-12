@@ -27,6 +27,16 @@
 body {
 	font-family: var(--font-sans);
 	margin: 0;
+	max-width: 64rem;
+	margin-left: auto;
+	margin-right: auto;
+	padding: var(--size-3);
+	padding-bottom: 0;
+}
+
+div#svelte {
+	display: flex;
+	flex-direction: column;
 }
 
 body,
