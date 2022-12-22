@@ -21,16 +21,30 @@
 	import { matchSorter } from 'match-sorter';
 	import type { MatchSorterOptions } from 'match-sorter';
 	import { page } from '$app/stores';
+	import debounce from 'just-debounce-it';
+	import { goto } from '$app/navigation';
 
 	export let data: PageData;
-
-	let search = $page.url.searchParams.get('search') || '';
 
 	enum SortOption {
 		BestMatch = 'best match',
 		Title = 'title',
 		PublishDate = 'publish date',
 		UnlimitedDate = 'unlimited date'
+	}
+	const enumValues = Object.values(SortOption) as string[];
+
+	$: search = $page.url.searchParams.get('search') || '';
+	$: sortDescending = !$page.url.searchParams.has('ascending');
+
+	let sortBy = SortOption.BestMatch;
+	$: {
+		// https://stackoverflow.com/a/72050646/14808988
+		const param = $page.url.searchParams.get('sortBy') as SortOption;
+
+		if (enumValues.includes(param)) {
+			sortBy = param;
+		}
 	}
 
 	const sortingOptions = Object.values(SortOption);
@@ -51,21 +65,8 @@
 		'Dec'
 	];
 
-	let startMonth = $page.url.searchParams.get('month');
-	let month = months[startMonth ? startMonth : 0];
+	$: month = $page.url.searchParams.get('month') ?? months[0];
 	$: monthIndex = months.indexOf(month) - 1;
-
-	let sortBy = SortOption.BestMatch;
-	let searchText = search;
-	let timer: ReturnType<typeof setTimeout>;
-	let sortDescending = true;
-
-	function updateSearchText(e: Event) {
-		clearTimeout(timer);
-		timer = setTimeout(() => {
-			searchText = (e.target as HTMLInputElement).value;
-		}, 250);
-	}
 
 	$: comics = data.response.comics;
 
@@ -88,7 +89,7 @@
 		monthIndex
 	);
 
-	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
+	$: sortedComics = sortComics(filteredComics, sortBy, search);
 
 	$: orderedComics = sortDescending ? sortedComics : [...sortedComics].reverse();
 
@@ -145,12 +146,25 @@
 		$selectedCreators = new Set($creators);
 		$selectedSeries = new Set($series);
 		$selectedEvents = new Set($events);
-		searchText = '';
-		month = months[0];
+		goto($page.url.pathname, { replaceState: true, keepFocus: true, noScroll: true });
+	}
+
+	let form: HTMLFormElement;
+	// todo: handle lack of support
+	const requestSubmit = () => form.requestSubmit();
+	const debouncedSubmit = debounce(requestSubmit, 250);
+
+	export function submitReplaceState(e: SubmitEvent) {
+		e.preventDefault();
+		const form = e.target as HTMLFormElement;
+		const url = new URL(form.action);
+		// @ts-expect-error
+		const params = new URLSearchParams(new FormData(form));
+		url.search = params.toString();
+		goto(url, { replaceState: true, keepFocus: true, noScroll: true });
 	}
 </script>
 
-<!-- TODO: this is possibly a bug with SvelteKit. When a request times out and we show an error page, hitting reload does not populate stuff -->
 <h1>{$page.data.title || `Comics for ${data.year}`}</h1>
 <PageLinks year={data.year} />
 
@@ -162,7 +176,13 @@
 	<button class="reset" on:click={resetFilters}>Reset filters</button>
 </p>
 
-<div class="search">
+<form
+	class="search"
+	bind:this={form}
+	on:submit={submitReplaceState}
+	on:input={debouncedSubmit}
+	on:change={requestSubmit}
+>
 	<div>
 		<label
 			>Search <input
@@ -171,21 +191,21 @@
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
-				value={searchText}
-				on:input={updateSearchText}
+				value={search}
+				name="search"
 			/></label
 		>
 	</div>
 	<div>
-		<Select options={sortingOptions} id="sorting" bind:value={sortBy}>Sort by</Select>
+		<Select options={sortingOptions} id="sorting" name="sortBy" value={sortBy}>Sort by</Select>
 	</div>
 	<div>
-		<Select options={months} id="month" bind:value={month}>Release Month</Select>
+		<Select options={months} id="month" value={month} name="month">Release Month</Select>
 	</div>
 	<div>
-		<label><input type="checkbox" bind:checked={sortDescending} />Descending</label>
+		<label><input type="checkbox" name="ascending" />Ascending</label>
 	</div>
-</div>
+</form>
 
 <details>
 	<summary>Filter</summary>
