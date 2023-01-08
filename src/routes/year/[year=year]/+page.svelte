@@ -23,50 +23,14 @@
 	import { page } from '$app/stores';
 	import debounce from 'just-debounce-it';
 	import { goto } from '$app/navigation';
+	import { SortOption, Month, sortOptionText } from './util';
 
 	export let data: PageData;
 
-	enum SortOption {
-		BestMatch = 'best match',
-		Title = 'title',
-		PublishDate = 'publish date',
-		UnlimitedDate = 'unlimited date'
-	}
-	const enumValues = Object.values(SortOption) as string[];
-
-	$: search = $page.url.searchParams.get('search') || '';
-	$: sortDescending = !$page.url.searchParams.has('ascending');
-
-	let sortBy = SortOption.BestMatch;
-	$: {
-		// https://stackoverflow.com/a/72050646/14808988
-		const param = $page.url.searchParams.get('sortBy') as SortOption;
-
-		if (enumValues.includes(param)) {
-			sortBy = param;
-		}
-	}
-
 	const sortingOptions = Object.values(SortOption);
+	const months = Object.values(Month);
 
-	const months = [
-		'all',
-		'Jan',
-		'Feb',
-		'Mar',
-		'Apr',
-		'May',
-		'Jun',
-		'Jul',
-		'Aug',
-		'Sep',
-		'Oct',
-		'Nov',
-		'Dec'
-	];
-
-	$: month = $page.url.searchParams.get('month') ?? months[0];
-	$: monthIndex = months.indexOf(month) - 1;
+	$: monthIndex = months.indexOf(data.month) - 1;
 
 	$: comics = data.response.comics;
 
@@ -89,9 +53,9 @@
 		monthIndex
 	);
 
-	$: sortedComics = sortComics(filteredComics, sortBy, search);
+	$: sortedComics = sortComics(filteredComics, data.sortBy, data.search);
 
-	$: orderedComics = sortDescending ? sortedComics : [...sortedComics].reverse();
+	$: orderedComics = data.ascending ? [...sortedComics].reverse() : sortedComics;
 
 	function filterComics(
 		comics: Comic[],
@@ -112,9 +76,8 @@
 		);
 	}
 
-	function sortComics(comics: Comic[], sortBy: string, searchText: string) {
+	function sortComics(comics: Comic[], sortBy: keyof typeof SortOption, searchText: string) {
 		let sortFunction: MatchSorterOptions<Comic>['sorter'];
-
 		switch (sortBy) {
 			case SortOption.PublishDate:
 				sortFunction = (matchItems) => matchItems.sort((a, b) => compareDates(a.item, b.item));
@@ -191,16 +154,22 @@
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
-				value={search}
+				value={data.search}
 				name="search"
 			/></label
 		>
 	</div>
 	<div>
-		<Select options={sortingOptions} id="sorting" name="sortBy" value={sortBy}>Sort by</Select>
+		<Select
+			options={sortOptionText}
+			values={sortingOptions}
+			id="sorting"
+			name="sortBy"
+			value={data.sortBy}>Sort by</Select
+		>
 	</div>
 	<div>
-		<Select options={months} id="month" value={month} name="month">Release Month</Select>
+		<Select options={months} id="month" value={data.month} name="month">Release Month</Select>
 	</div>
 	<div>
 		<label><input type="checkbox" name="ascending" />Ascending</label>
@@ -222,7 +191,7 @@
 			<ComicSummary
 				{comic}
 				lazyLoad={idx > 10}
-				showUnlimitedDate={sortBy === SortOption.UnlimitedDate}
+				showUnlimitedDate={data.sortBy === SortOption.UnlimitedDate}
 			/>
 		</li>
 	{:else}
