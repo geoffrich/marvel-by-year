@@ -17,24 +17,16 @@
 		included = included;
 	}
 
-	function checkAll() {
-		included = new Set(Object.keys(items).map((x) => Number(x)));
-	}
-
 	function updateShowItems() {
 		showItems = !showItems;
 	}
-
-	// TODO: confusing that `included` may have items not in this set after a page navigation. remove entirely?
-	// also confusing since 0 === everything
 </script>
 
 {#if sortedItems.length > 1}
 	<fieldset>
-		<legend>{legend} {included.size} / {sortedItems.length}</legend>
+		<legend>{legend}</legend>
 		<div class="buttons">
-			<button on:click={checkAll}>Check all</button>
-			<button on:click={uncheckAll}>Uncheck all</button>
+			<button on:click={uncheckAll}>Show all</button>
 			<IconButton size="1.5rem" altText={showItems ? 'Hide' : 'Show'} on:click={updateShowItems}>
 				{#if showItems}
 					<Minus />

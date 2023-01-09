@@ -200,7 +200,7 @@
 			/>
 		</li>
 	{:else}
-		<li>Nothing to show!</li>
+		<li>Nothing to show! Try clearing the filters?</li>
 	{/each}
 </ComicGrid>
 <PageLinks year={data.year} />
