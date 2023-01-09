@@ -22,37 +22,28 @@
 	import { page } from '$app/stores';
 	import debounce from 'just-debounce-it';
 	import { goto } from '$app/navigation';
-	import { SortOption, Month, sortOptionText } from './util';
+	import { SortOption, Month, sortOptionText, filterSchema } from './util';
+	import { toMapping } from '$lib/util';
 
 	export let data: PageData;
 
 	const sortingOptions = Object.values(SortOption);
 	const months = Object.values(Month);
 
-	$: monthIndex = months.indexOf(data.month) - 1;
+	$: filter = filterSchema.parse($page.url.searchParams);
+
+	$: monthIndex = months.indexOf(filter.month) - 1;
 
 	$: comics = data.response.comics;
 
-	// TODO: these run on every form mutation. not ideal.
-	// could instead bring filter param stuff back into +page.svelte
-	$: selectedSeries = new Set(data.series);
+	$: selectedSeries = new Set(filter.series);
 	$: seriesMap = toMapping(comics, getSeries);
 
-	$: selectedCreators = new Set(data.creators);
+	$: selectedCreators = new Set(filter.creators);
 	$: creatorsMap = toMapping(comics, getCreators);
 
-	$: selectedEvents = new Set(data.events);
+	$: selectedEvents = new Set(filter.events);
 	$: eventsMap = toMapping(comics, getEvents);
-
-	function toMapping(
-		comics: Comic[],
-		mapping: (c: Comic) => { id: number; name: string } | { id: number; name: string }[]
-	): Record<number, string> {
-		return comics.flatMap(mapping).reduce<Record<number, string>>((acc, cur) => {
-			acc[cur.id] = cur.name;
-			return acc;
-		}, {});
-	}
 
 	// TODO: can this be more efficient?
 	// with simulated CPU slowdown, there's lag when clearing the text field
@@ -64,9 +55,9 @@
 		monthIndex
 	);
 
-	$: sortedComics = sortComics(filteredComics, data.sortBy, data.search);
+	$: sortedComics = sortComics(filteredComics, filter.sortBy, filter.search);
 
-	$: orderedComics = data.ascending ? [...sortedComics].reverse() : sortedComics;
+	$: orderedComics = filter.ascending ? [...sortedComics].reverse() : sortedComics;
 
 	function filterComics(
 		comics: Comic[],
@@ -167,7 +158,7 @@
 					autocorrect="off"
 					autocapitalize="off"
 					spellcheck="false"
-					value={data.search}
+					value={filter.search}
 					name="search"
 				/></label
 			>
@@ -178,11 +169,11 @@
 				values={sortingOptions}
 				id="sorting"
 				name="sortBy"
-				value={data.sortBy}>Sort by</Select
+				value={filter.sortBy}>Sort by</Select
 			>
 		</div>
 		<div>
-			<Select options={months} id="month" value={data.month} name="month">Release Month</Select>
+			<Select options={months} id="month" value={filter.month} name="month">Release Month</Select>
 		</div>
 		<div>
 			<label><input type="checkbox" name="ascending" />Ascending</label>
@@ -205,7 +196,7 @@
 			<ComicSummary
 				{comic}
 				lazyLoad={idx > 10}
-				showUnlimitedDate={data.sortBy === SortOption.UnlimitedDate}
+				showUnlimitedDate={filter.sortBy === SortOption.UnlimitedDate}
 			/>
 		</li>
 	{:else}
