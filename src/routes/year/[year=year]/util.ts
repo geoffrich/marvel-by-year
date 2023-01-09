@@ -28,7 +28,10 @@ export const filterSchema = zfd.formData({
 	ascending: zfd.checkbox(),
 	// use catch in case no value or bad value passed
 	sortBy: zfd.text(SortOptionEnum.catch('BestMatch')),
-	month: zfd.text(MonthEnum.catch('all'))
+	month: zfd.text(MonthEnum.catch('all')),
+	series: zfd.repeatable(z.array(zfd.numeric())).catch([]),
+	creators: zfd.repeatable(z.array(zfd.numeric())).catch([]),
+	events: zfd.repeatable(z.array(zfd.numeric())).catch([])
 });
 
 function splitPascalCase(s: string) {

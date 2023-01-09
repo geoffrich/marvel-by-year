@@ -6,7 +6,6 @@
 	import PageLinks from '$lib/components/PageLinks.svelte';
 	import ComicGrid from '$lib/components/ComicGrid.svelte';
 	import Select from '$lib/components/form/Select.svelte';
-	import { createSelectedStores } from '$lib/stores/selected';
 	import {
 		getSeries,
 		getCreators,
@@ -34,22 +33,34 @@
 
 	$: comics = data.response.comics;
 
-	let [series, selectedSeries] = createSelectedStores(getSeries);
-	$: series.applyNewComics(comics);
+	// TODO: these run on every form mutation. not ideal.
+	// could instead bring filter param stuff back into +page.svelte
+	$: selectedSeries = new Set(data.series);
+	$: seriesMap = toMapping(comics, getSeries);
 
-	let [creators, selectedCreators] = createSelectedStores(getCreators);
-	$: creators.applyNewComics(comics);
+	$: selectedCreators = new Set(data.creators);
+	$: creatorsMap = toMapping(comics, getCreators);
 
-	let [events, selectedEvents] = createSelectedStores(getEvents);
-	$: events.applyNewComics(comics);
+	$: selectedEvents = new Set(data.events);
+	$: eventsMap = toMapping(comics, getEvents);
+
+	function toMapping(
+		comics: Comic[],
+		mapping: (c: Comic) => { id: number; name: string } | { id: number; name: string }[]
+	): Record<number, string> {
+		return comics.flatMap(mapping).reduce<Record<number, string>>((acc, cur) => {
+			acc[cur.id] = cur.name;
+			return acc;
+		}, {});
+	}
 
 	// TODO: can this be more efficient?
 	// with simulated CPU slowdown, there's lag when clearing the text field
 	$: filteredComics = filterComics(
 		comics,
-		$selectedSeries,
-		$selectedCreators,
-		$selectedEvents,
+		selectedSeries,
+		selectedCreators,
+		selectedEvents,
 		monthIndex
 	);
 
@@ -59,18 +70,22 @@
 
 	function filterComics(
 		comics: Comic[],
-		selectedSeries: Set<string>,
-		selectedCreators: Set<string>,
-		selectedEvents: Set<string>,
+		selectedSeries: Set<number>,
+		selectedCreators: Set<number>,
+		selectedEvents: Set<number>,
 		monthIndex: number
 	) {
-		let noCreatorsSelected = selectedCreators.size === $creators.size;
-		let noEventsSelected = selectedEvents.size === $events.size;
-		let noSeriesSelected = selectedSeries.size === $series.size;
+		// TODO: DRY up
+		let noCreatorsSelected =
+			selectedCreators.size === Object.keys(creatorsMap).length || selectedCreators.size === 0;
+		let noEventsSelected =
+			selectedEvents.size === Object.keys(eventsMap).length || selectedEvents.size === 0;
+		let noSeriesSelected =
+			selectedSeries.size === Object.keys(seriesMap).length || selectedSeries.size === 0;
 		return comics.filter(
 			(c) =>
 				(monthIndex < 0 || getOnSaleDate(c).month() == monthIndex) &&
-				(noSeriesSelected || selectedSeries.has(c.series.name)) &&
+				(noSeriesSelected || selectedSeries.has(c.series.id)) &&
 				(noCreatorsSelected || isCreatorSelected(c, selectedCreators)) &&
 				(noEventsSelected || isEventSelected(c, selectedEvents))
 		);
@@ -106,9 +121,6 @@
 	}
 
 	function resetFilters() {
-		$selectedCreators = new Set($creators);
-		$selectedSeries = new Set($series);
-		$selectedEvents = new Set($events);
 		goto($page.url.pathname, { replaceState: true, keepFocus: true, noScroll: true });
 	}
 
@@ -140,50 +152,52 @@
 </p>
 
 <form
-	class="search"
+	class="spaced"
 	bind:this={form}
 	on:submit={submitReplaceState}
 	on:input={debouncedSubmit}
 	on:change={requestSubmit}
 >
-	<div>
-		<label
-			>Search <input
-				type="text"
-				autocomplete="off"
-				autocorrect="off"
-				autocapitalize="off"
-				spellcheck="false"
-				value={data.search}
-				name="search"
-			/></label
-		>
+	<div class="search">
+		<div>
+			<label
+				>Search <input
+					type="text"
+					autocomplete="off"
+					autocorrect="off"
+					autocapitalize="off"
+					spellcheck="false"
+					value={data.search}
+					name="search"
+				/></label
+			>
+		</div>
+		<div>
+			<Select
+				options={sortOptionText}
+				values={sortingOptions}
+				id="sorting"
+				name="sortBy"
+				value={data.sortBy}>Sort by</Select
+			>
+		</div>
+		<div>
+			<Select options={months} id="month" value={data.month} name="month">Release Month</Select>
+		</div>
+		<div>
+			<label><input type="checkbox" name="ascending" />Ascending</label>
+		</div>
 	</div>
-	<div>
-		<Select
-			options={sortOptionText}
-			values={sortingOptions}
-			id="sorting"
-			name="sortBy"
-			value={data.sortBy}>Sort by</Select
-		>
-	</div>
-	<div>
-		<Select options={months} id="month" value={data.month} name="month">Release Month</Select>
-	</div>
-	<div>
-		<label><input type="checkbox" name="ascending" />Ascending</label>
-	</div>
-</form>
 
-<details>
-	<summary>Filter</summary>
-	<div class="filters">
-		<Filter items={$series} legend="Series" included={selectedSeries} />
-		<Filter items={$creators} legend="Creators" included={selectedCreators} />
-		<Filter items={$events} legend="Events" included={selectedEvents} />
-	</div>
-</details>
+	<details>
+		<summary>Filter</summary>
+		<div class="filters">
+			<Filter items={seriesMap} legend="Series" included={selectedSeries} />
+			<Filter items={creatorsMap} legend="Creators" included={selectedCreators} />
+			<Filter items={eventsMap} legend="Events" included={selectedEvents} />
+		</div>
+	</details>
+</form>
 
 <ComicGrid oneColOnMobile={true}>
 	{#each orderedComics as comic, idx (comic.id)}

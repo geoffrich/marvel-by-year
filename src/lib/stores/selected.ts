@@ -7,6 +7,7 @@ interface ComicStore<T> extends Writable<T> {
 	applyNewComics: (comics: Comic[]) => void;
 }
 
+// TODO: remove?
 export function createSelectedStores(
 	mapping: (c: Comic) => string | string[]
 ): [ComicStore<Set<string>>, Writable<Set<string>>] {

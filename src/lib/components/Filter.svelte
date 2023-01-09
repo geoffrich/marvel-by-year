@@ -1,44 +1,37 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
 	import { Plus, Minus } from '$lib/icons';
 	import IconButton from './IconButton.svelte';
 
-	export let items: Set<string>;
+	/** Mapping of IDs (included in the set) with text values */
+	export let items: Record<number, string>;
 	export let legend: string;
 
-	export let included: Writable<Set<string>>;
+	export let included: Set<number>;
 
 	let showItems = true;
 
-	$: sortedItems = [...items].sort();
+	$: sortedItems = Object.entries(items).sort((a, b) => (a[1] > b[1] ? 1 : -1));
 
 	function uncheckAll() {
-		$included.clear();
-		$included = $included;
+		included.clear();
+		included = included;
 	}
 
 	function checkAll() {
-		$included = new Set(items);
+		included = new Set(Object.keys(items).map((x) => Number(x)));
 	}
 
 	function updateShowItems() {
 		showItems = !showItems;
 	}
 
-	function handleChange({ target }) {
-		if (target.checked) {
-			$included.add(target.value);
-		} else {
-			$included.delete(target.value);
-		}
-
-		$included = $included;
-	}
+	// TODO: confusing that `included` may have items not in this set after a page navigation. remove entirely?
+	// also confusing since 0 === everything
 </script>
 
-{#if items.size > 1}
+{#if sortedItems.length > 1}
 	<fieldset>
-		<legend>{legend} {$included.size} / {items.size}</legend>
+		<legend>{legend} {included.size} / {sortedItems.length}</legend>
 		<div class="buttons">
 			<button on:click={checkAll}>Check all</button>
 			<button on:click={uncheckAll}>Uncheck all</button>
@@ -51,10 +44,15 @@
 			</IconButton>
 		</div>
 		{#if showItems}
-			{#each sortedItems as i (i)}
+			{#each sortedItems as [k, v] (k)}
 				<label
-					><input on:change={handleChange} type="checkbox" checked={$included.has(i)} value={i} />
-					{i}</label
+					><input
+						type="checkbox"
+						checked={included.has(Number(k))}
+						value={k}
+						name={legend.toLowerCase()}
+					/>
+					{v}</label
 				>
 			{/each}
 		{/if}

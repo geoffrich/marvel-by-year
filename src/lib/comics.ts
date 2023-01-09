@@ -4,23 +4,23 @@ import dayjs from './dayjs';
 const NO_EVENT = '(no event)';
 const NO_CREATOR = '(unknown)';
 
-export function getSeries(c: Comic): string {
-	return c.series.name;
+export function getSeries(c: Comic) {
+	return c.series;
 }
 
-export function getCreators({ creators }: Comic): string[] {
+export function getCreators({ creators }: Comic) {
 	if (creators.length > 0) {
-		return creators.map((cr) => cr.name);
+		return creators;
 	} else {
-		return [NO_CREATOR];
+		return [{ id: -1, name: NO_CREATOR }];
 	}
 }
 
-export function getEvents({ events }: Comic): string[] {
+export function getEvents({ events }: Comic) {
 	if (events.length > 0) {
-		return events.map((e) => e.name);
+		return events;
 	} else {
-		return [NO_EVENT];
+		return [{ id: -1, name: NO_EVENT }];
 	}
 }
 
@@ -38,18 +38,18 @@ export function compareTitles({ title: titleA }: Comic, { title: titleB }: Comic
 	return titleA.localeCompare(titleB, undefined, { numeric: true, sensitivity: 'base' });
 }
 
-export function isEventSelected({ events }: Comic, selectedEvents: Set<string>) {
+export function isEventSelected({ events }: Comic, selectedEvents: Set<number>) {
 	return (
-		events.find((e) => selectedEvents.has(e.name)) !== undefined ||
-		(selectedEvents.has(NO_EVENT) && events.length === 0)
+		events.find((e) => selectedEvents.has(e.id)) !== undefined ||
+		(selectedEvents.has(-1) && events.length === 0)
 	);
 }
 
 // TODO: make more efficient
-export function isCreatorSelected({ creators }: Comic, selectedCreators: Set<string>) {
+export function isCreatorSelected({ creators }: Comic, selectedCreators: Set<number>) {
 	return (
-		creators.find((e) => selectedCreators.has(e.name)) !== undefined ||
-		(selectedCreators.has(NO_CREATOR) && creators.length === 0)
+		creators.find((e) => selectedCreators.has(e.id)) !== undefined ||
+		(selectedCreators.has(-1) && creators.length === 0)
 	);
 }
 

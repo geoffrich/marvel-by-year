@@ -4,7 +4,6 @@ import { filterSchema } from './util';
 
 export const load: PageLoad = function ({ data: props, url }) {
 	const filter = filterSchema.parse(url.searchParams);
-
 	return {
 		...props,
 		...filter,
