@@ -66,13 +66,9 @@
 		selectedEvents: Set<number>,
 		monthIndex: number
 	) {
-		// TODO: DRY up
-		let noCreatorsSelected =
-			selectedCreators.size === Object.keys(creatorsMap).length || selectedCreators.size === 0;
-		let noEventsSelected =
-			selectedEvents.size === Object.keys(eventsMap).length || selectedEvents.size === 0;
-		let noSeriesSelected =
-			selectedSeries.size === Object.keys(seriesMap).length || selectedSeries.size === 0;
+		let noCreatorsSelected = selectedCreators.size === 0;
+		let noEventsSelected = selectedEvents.size === 0;
+		let noSeriesSelected = selectedSeries.size === 0;
 		return comics.filter(
 			(c) =>
 				(monthIndex < 0 || getOnSaleDate(c).month() == monthIndex) &&
@@ -200,7 +196,7 @@
 			/>
 		</li>
 	{:else}
-		<li>Nothing to show! Try clearing the filters?</li>
+		<li class="not-found">Nothing to show! Try clearing the filters?</li>
 	{/each}
 </ComicGrid>
 <PageLinks year={data.year} />
@@ -243,5 +239,9 @@
 
 	.reset {
 		margin-left: var(--size-2);
+	}
+
+	.not-found {
+		grid-column: 1 / -1;
 	}
 </style>

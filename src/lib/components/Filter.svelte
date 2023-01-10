@@ -10,6 +10,7 @@
 
 	let showItems = true;
 
+	$: isFiltered = included.size > 0;
 	$: sortedItems = Object.entries(items).sort((a, b) => (a[1] > b[1] ? 1 : -1));
 
 	function uncheckAll() {
@@ -24,9 +25,12 @@
 
 {#if sortedItems.length > 1}
 	<fieldset>
-		<legend>{legend}</legend>
+		<legend
+			>{legend}
+			{#if isFiltered}({included.size} selected){/if}</legend
+		>
 		<div class="buttons">
-			<button on:click={uncheckAll}>Show all</button>
+			<button on:click={uncheckAll} class:hidden={!isFiltered}>Show all</button>
 			<IconButton size="1.5rem" altText={showItems ? 'Hide' : 'Show'} on:click={updateShowItems}>
 				{#if showItems}
 					<Minus />
@@ -81,5 +85,9 @@
 
 	button {
 		padding-inline: var(--size-2);
+	}
+
+	button.hidden {
+		opacity: 0.5;
 	}
 </style>

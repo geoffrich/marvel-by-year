@@ -67,7 +67,6 @@ async function getComics({ params, setHeaders, url }: RequestEvent) {
 	if (badStatus === undefined) {
 		const response = adaptResponses(results);
 
-		// TODO: not currently working due to https://github.com/sveltejs/kit/issues/6477
 		setHeaders({
 			'cache-control': 'public, max-age=86400'
 		});
