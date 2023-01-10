@@ -3,7 +3,10 @@ import fs from 'fs';
 
 /** @type {import('vite').UserConfig} */
 const config = {
-	plugins: [sveltekit(), rawFonts(['.ttf'])]
+	plugins: [sveltekit(), rawFonts(['.ttf'])],
+	ssr: {
+		noExternal: ['zod-form-data']
+	}
 };
 
 function rawFonts(ext) {
