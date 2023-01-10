@@ -39,10 +39,5 @@
 		"dayjs": "^1.10.6",
 		"ioredis": "^5.2.1",
 		"match-sorter": "^6.3.1"
-	},
-	"pnpm": {
-		"patchedDependencies": {
-			"zod-form-data@1.2.4": "patches/zod-form-data@1.2.4.patch"
-		}
 	}
 }

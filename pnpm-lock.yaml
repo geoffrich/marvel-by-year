@@ -1,10 +1,5 @@
 lockfileVersion: 5.4
 
-patchedDependencies:
-  zod-form-data@1.2.4:
-    hash: qlmywjtvjj3dwc5v6nfwfccvfm
-    path: patches/zod-form-data@1.2.4.patch
-
 specifiers:
   '@resvg/resvg-js': ^2.1.0
   '@sveltejs/adapter-netlify': ^1.0.0
@@ -57,7 +52,7 @@ devDependencies:
   typescript: 4.9.4
   vite: 4.0.4
   zod: 3.20.2
-  zod-form-data: 1.2.4_qlmywjtvjj3dwc5v6nfwfccvfm_zod@3.20.2
+  zod-form-data: 1.2.4_zod@3.20.2
 
 packages:
 
@@ -1327,14 +1322,13 @@ packages:
       '@types/yoga-layout': 1.9.2
     dev: true
 
-  /zod-form-data/1.2.4_qlmywjtvjj3dwc5v6nfwfccvfm_zod@3.20.2:
+  /zod-form-data/1.2.4_zod@3.20.2:
     resolution: {integrity: sha512-mI/rgItfvYQpvzEqGuBda/nuTHrMNoFZJ5cpiGLC5O3ZaVwI0XVo3/yTY2RreVMu57wGcDrfQcTRe5aMq2ijYA==}
     peerDependencies:
       zod: ^3.11.x
     dependencies:
       zod: 3.20.2
     dev: true
-    patched: true
 
   /zod/3.20.2:
     resolution: {integrity: sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==}
