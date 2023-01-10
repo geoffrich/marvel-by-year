@@ -1,13 +1,5 @@
-diff --git a/node_modules/zod-form-data/dist/zod-form-data.es.js b/node_modules/zod-form-data/dist/zod-form-data.es.mjs
-similarity index 100%
-rename from node_modules/zod-form-data/dist/zod-form-data.es.js
-rename to node_modules/zod-form-data/dist/zod-form-data.es.mjs
-diff --git a/node_modules/zod-form-data/dist/zod-form-data.es.js.map b/node_modules/zod-form-data/dist/zod-form-data.es.mjs.map
-similarity index 100%
-rename from node_modules/zod-form-data/dist/zod-form-data.es.js.map
-rename to node_modules/zod-form-data/dist/zod-form-data.es.mjs.map
 diff --git a/node_modules/zod-form-data/package.json b/node_modules/zod-form-data/package.json
-index a39aaea..367560d 100644
+index a39aaea..e6ec956 100644
 --- a/node_modules/zod-form-data/package.json
 +++ b/node_modules/zod-form-data/package.json
 @@ -3,7 +3,9 @@
@@ -16,7 +8,7 @@ index a39aaea..367560d 100644
    "main": "./dist/zod-form-data.umd.js",
 -  "module": "./dist/zod-form-data.es.js",
 +  "exports": {
-+    ".": "./dist/zod-form-data.es.mjs"
++    ".": "./dist/zod-form-data.es.js"
 +  },
    "types": "./dist/types/index.d.ts",
    "license": "MIT",
