@@ -2,6 +2,7 @@
 	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import { navigating, page } from '$app/stores';
 	import 'focus-visible'; // polyfill :focus-visible for Safari
+	import 'form-request-submit-polyfill'; // polyfill .requestSubmit for Safari < 16
 	import '../global.css';
 
 	$: title = $page.data.title;

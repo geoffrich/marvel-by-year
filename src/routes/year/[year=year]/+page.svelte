@@ -114,7 +114,6 @@
 	}
 
 	let form: HTMLFormElement;
-	// todo: handle lack of support
 	const requestSubmit = () => form.requestSubmit();
 	const debouncedSubmit = debounce(requestSubmit, 250);
 
