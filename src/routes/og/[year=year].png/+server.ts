@@ -8,12 +8,17 @@ import Image from '../Image.svelte';
 
 export const prerender = 'auto';
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url, setHeaders }) => {
 	const year = parseInt(params.year);
 	console.log('Generating social image for ', year);
 	const redis = new Redis();
 	const api = new Api(redis, url.origin);
 	const comics = await api.getRandomComics(year, year + 1, 5);
 	const images = comics.map((c) => getImage(c.image, ImageSize.XXLarge, c.ext));
+
+	setHeaders({
+		'cache-control': 'public, max-age=86400'
+	});
+
 	return componentToPng(Image, { text: `Marvel Comics from ${year}`, images }, 630, 1200);
 };
