@@ -39,11 +39,13 @@
 	$: selectedSeries = new Set(filter.series);
 	$: seriesMap = toMapping(comics, getSeries);
 
-	$: selectedCreators = new Set(filter.creators);
+	$: selectedCreators = new Set(filter.creator);
 	$: creatorsMap = toMapping(comics, getCreators);
 
-	$: selectedEvents = new Set(filter.events);
+	$: selectedEvents = new Set(filter.event);
 	$: eventsMap = toMapping(comics, getEvents);
+
+	$: filterSelectSize = selectedSeries.size + selectedCreators.size + selectedEvents.size;
 
 	// TODO: can this be more efficient?
 	// with simulated CPU slowdown, there's lag when clearing the text field
@@ -177,13 +179,16 @@
 	</div>
 
 	<details>
-		<summary>Filter</summary>
+		<summary
+			>Filter {#if filterSelectSize > 0}({filterSelectSize} selected){/if}</summary
+		>
 		<div class="filters">
-			<Filter items={seriesMap} legend="Series" included={selectedSeries} />
-			<Filter items={creatorsMap} legend="Creators" included={selectedCreators} />
-			<Filter items={eventsMap} legend="Events" included={selectedEvents} />
+			<Filter items={seriesMap} name="series" legend="Series" included={selectedSeries} />
+			<Filter items={creatorsMap} name="creator" legend="Creators" included={selectedCreators} />
+			<Filter items={eventsMap} name="event" legend="Events" included={selectedEvents} />
 		</div>
 	</details>
+	<button type="submit" class="no-js-only">Submit</button>
 </form>
 
 <ComicGrid oneColOnMobile={true}>

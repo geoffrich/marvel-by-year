@@ -5,6 +5,7 @@ import fs from 'fs';
 const config = {
 	plugins: [sveltekit(), rawFonts(['.ttf'])],
 	ssr: {
+		// due to https://github.com/airjp73/remix-validated-form/issues/230
 		noExternal: ['zod-form-data']
 	}
 };

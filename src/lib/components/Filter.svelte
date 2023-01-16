@@ -5,6 +5,7 @@
 	/** Mapping of IDs (included in the set) with text values */
 	export let items: Record<number, string>;
 	export let legend: string;
+	export let name: string;
 
 	export let included: Set<number>;
 
@@ -40,15 +41,10 @@
 			</IconButton>
 		</div>
 		{#if showItems}
-			{#each sortedItems as [k, v] (k)}
+			{#each sortedItems as [id, title] (id)}
 				<label
-					><input
-						type="checkbox"
-						checked={included.has(Number(k))}
-						value={k}
-						name={legend.toLowerCase()}
-					/>
-					{v}</label
+					><input type="checkbox" checked={included.has(Number(id))} value={id} {name} />
+					{title}</label
 				>
 			{/each}
 		{/if}

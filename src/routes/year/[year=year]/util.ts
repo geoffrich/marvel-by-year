@@ -23,15 +23,18 @@ export const SortOption = SortOptionEnum.enum;
 export const Month = MonthEnum.enum;
 
 export const sortOptionText = SortOptionEnum.options.map(splitPascalCase);
+
+const multiCheckbox = zfd.repeatable(z.array(zfd.numeric())).catch([]);
+
 export const filterSchema = zfd.formData({
 	search: zfd.text(z.string().default('')),
 	ascending: zfd.checkbox(),
 	// use catch in case no value or bad value passed
 	sortBy: zfd.text(SortOptionEnum.catch('BestMatch')),
 	month: zfd.text(MonthEnum.catch('all')),
-	series: zfd.repeatable(z.array(zfd.numeric())).catch([]),
-	creators: zfd.repeatable(z.array(zfd.numeric())).catch([]),
-	events: zfd.repeatable(z.array(zfd.numeric())).catch([])
+	series: multiCheckbox,
+	creator: multiCheckbox,
+	event: multiCheckbox
 });
 
 function splitPascalCase(s: string) {
