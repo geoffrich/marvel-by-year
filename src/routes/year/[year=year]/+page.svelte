@@ -6,7 +6,6 @@
 	import PageLinks from '$lib/components/PageLinks.svelte';
 	import ComicGrid from '$lib/components/ComicGrid.svelte';
 	import Select from '$lib/components/form/Select.svelte';
-	import { createSelectedStores } from '$lib/stores/selected';
 	import {
 		getSeries,
 		getCreators,
@@ -21,99 +20,68 @@
 	import { matchSorter } from 'match-sorter';
 	import type { MatchSorterOptions } from 'match-sorter';
 	import { page } from '$app/stores';
+	import debounce from 'just-debounce-it';
+	import { goto } from '$app/navigation';
+	import { SortOption, Month, sortOptionText, filterSchema } from './util';
+	import { toMapping } from '$lib/util';
 
 	export let data: PageData;
 
-	let search = $page.url.searchParams.get('search') || '';
-
-	enum SortOption {
-		BestMatch = 'best match',
-		Title = 'title',
-		PublishDate = 'publish date',
-		UnlimitedDate = 'unlimited date'
-	}
-
 	const sortingOptions = Object.values(SortOption);
+	const months = Object.values(Month);
 
-	const months = [
-		'all',
-		'Jan',
-		'Feb',
-		'Mar',
-		'Apr',
-		'May',
-		'Jun',
-		'Jul',
-		'Aug',
-		'Sep',
-		'Oct',
-		'Nov',
-		'Dec'
-	];
+	$: filter = filterSchema.parse($page.url.searchParams);
 
-	let startMonth = $page.url.searchParams.get('month');
-	let month = months[startMonth ? startMonth : 0];
-	$: monthIndex = months.indexOf(month) - 1;
-
-	let sortBy = SortOption.BestMatch;
-	let searchText = search;
-	let timer: ReturnType<typeof setTimeout>;
-	let sortDescending = true;
-
-	function updateSearchText(e: Event) {
-		clearTimeout(timer);
-		timer = setTimeout(() => {
-			searchText = (e.target as HTMLInputElement).value;
-		}, 250);
-	}
+	$: monthIndex = months.indexOf(filter.month) - 1;
 
 	$: comics = data.response.comics;
 
-	let [series, selectedSeries] = createSelectedStores(getSeries);
-	$: series.applyNewComics(comics);
+	$: selectedSeries = new Set(filter.series);
+	$: seriesMap = toMapping(comics, getSeries);
 
-	let [creators, selectedCreators] = createSelectedStores(getCreators);
-	$: creators.applyNewComics(comics);
+	$: selectedCreators = new Set(filter.creator);
+	$: creatorsMap = toMapping(comics, getCreators);
 
-	let [events, selectedEvents] = createSelectedStores(getEvents);
-	$: events.applyNewComics(comics);
+	$: selectedEvents = new Set(filter.event);
+	$: eventsMap = toMapping(comics, getEvents);
+
+	$: filterSelectSize = selectedSeries.size + selectedCreators.size + selectedEvents.size;
 
 	// TODO: can this be more efficient?
 	// with simulated CPU slowdown, there's lag when clearing the text field
 	$: filteredComics = filterComics(
 		comics,
-		$selectedSeries,
-		$selectedCreators,
-		$selectedEvents,
+		selectedSeries,
+		selectedCreators,
+		selectedEvents,
 		monthIndex
 	);
 
-	$: sortedComics = sortComics(filteredComics, sortBy, searchText);
+	$: sortedComics = sortComics(filteredComics, filter.sortBy, filter.search);
 
-	$: orderedComics = sortDescending ? sortedComics : [...sortedComics].reverse();
+	$: orderedComics = filter.ascending ? [...sortedComics].reverse() : sortedComics;
 
 	function filterComics(
 		comics: Comic[],
-		selectedSeries: Set<string>,
-		selectedCreators: Set<string>,
-		selectedEvents: Set<string>,
+		selectedSeries: Set<number>,
+		selectedCreators: Set<number>,
+		selectedEvents: Set<number>,
 		monthIndex: number
 	) {
-		let noCreatorsSelected = selectedCreators.size === $creators.size;
-		let noEventsSelected = selectedEvents.size === $events.size;
-		let noSeriesSelected = selectedSeries.size === $series.size;
+		let noCreatorsSelected = selectedCreators.size === 0;
+		let noEventsSelected = selectedEvents.size === 0;
+		let noSeriesSelected = selectedSeries.size === 0;
 		return comics.filter(
 			(c) =>
 				(monthIndex < 0 || getOnSaleDate(c).month() == monthIndex) &&
-				(noSeriesSelected || selectedSeries.has(c.series.name)) &&
+				(noSeriesSelected || selectedSeries.has(c.series.id)) &&
 				(noCreatorsSelected || isCreatorSelected(c, selectedCreators)) &&
 				(noEventsSelected || isEventSelected(c, selectedEvents))
 		);
 	}
 
-	function sortComics(comics: Comic[], sortBy: string, searchText: string) {
+	function sortComics(comics: Comic[], sortBy: keyof typeof SortOption, searchText: string) {
 		let sortFunction: MatchSorterOptions<Comic>['sorter'];
-
 		switch (sortBy) {
 			case SortOption.PublishDate:
 				sortFunction = (matchItems) => matchItems.sort((a, b) => compareDates(a.item, b.item));
@@ -142,15 +110,24 @@
 	}
 
 	function resetFilters() {
-		$selectedCreators = new Set($creators);
-		$selectedSeries = new Set($series);
-		$selectedEvents = new Set($events);
-		searchText = '';
-		month = months[0];
+		goto($page.url.pathname, { replaceState: true, keepFocus: true, noScroll: true });
+	}
+
+	let form: HTMLFormElement;
+	const requestSubmit = () => form.requestSubmit();
+	const debouncedSubmit = debounce(requestSubmit, 250);
+
+	export function submitReplaceState(e: SubmitEvent) {
+		e.preventDefault();
+		const form = e.target as HTMLFormElement;
+		const url = new URL(form.action);
+		// @ts-expect-error
+		const params = new URLSearchParams(new FormData(form));
+		url.search = params.toString();
+		goto(url, { replaceState: true, keepFocus: true, noScroll: true });
 	}
 </script>
 
-<!-- TODO: this is possibly a bug with SvelteKit. When a request times out and we show an error page, hitting reload does not populate stuff -->
 <h1>{$page.data.title || `Comics for ${data.year}`}</h1>
 <PageLinks year={data.year} />
 
@@ -162,39 +139,56 @@
 	<button class="reset" on:click={resetFilters}>Reset filters</button>
 </p>
 
-<div class="search">
-	<div>
-		<label
-			>Search <input
-				type="text"
-				autocomplete="off"
-				autocorrect="off"
-				autocapitalize="off"
-				spellcheck="false"
-				value={searchText}
-				on:input={updateSearchText}
-			/></label
-		>
+<form
+	class="spaced"
+	bind:this={form}
+	on:submit={submitReplaceState}
+	on:input={debouncedSubmit}
+	on:change={requestSubmit}
+>
+	<div class="search">
+		<div>
+			<label
+				>Search <input
+					type="text"
+					autocomplete="off"
+					autocorrect="off"
+					autocapitalize="off"
+					spellcheck="false"
+					value={filter.search}
+					name="search"
+				/></label
+			>
+		</div>
+		<div>
+			<Select
+				options={sortOptionText}
+				values={sortingOptions}
+				id="sorting"
+				name="sortBy"
+				value={filter.sortBy}>Sort by</Select
+			>
+		</div>
+		<div>
+			<Select options={months} id="month" value={filter.month} name="month">Release Month</Select>
+		</div>
+		<div>
+			<label><input type="checkbox" name="ascending" />Ascending</label>
+		</div>
 	</div>
-	<div>
-		<Select options={sortingOptions} id="sorting" bind:value={sortBy}>Sort by</Select>
-	</div>
-	<div>
-		<Select options={months} id="month" bind:value={month}>Release Month</Select>
-	</div>
-	<div>
-		<label><input type="checkbox" bind:checked={sortDescending} />Descending</label>
-	</div>
-</div>
 
-<details>
-	<summary>Filter</summary>
-	<div class="filters">
-		<Filter items={$series} legend="Series" included={selectedSeries} />
-		<Filter items={$creators} legend="Creators" included={selectedCreators} />
-		<Filter items={$events} legend="Events" included={selectedEvents} />
-	</div>
-</details>
+	<details>
+		<summary
+			>Filter {#if filterSelectSize > 0}({filterSelectSize} selected){/if}</summary
+		>
+		<div class="filters">
+			<Filter items={seriesMap} name="series" legend="Series" included={selectedSeries} />
+			<Filter items={creatorsMap} name="creator" legend="Creators" included={selectedCreators} />
+			<Filter items={eventsMap} name="event" legend="Events" included={selectedEvents} />
+		</div>
+	</details>
+	<button type="submit" class="no-js-only">Submit</button>
+</form>
 
 <ComicGrid oneColOnMobile={true}>
 	{#each orderedComics as comic, idx (comic.id)}
@@ -202,11 +196,11 @@
 			<ComicSummary
 				{comic}
 				lazyLoad={idx > 10}
-				showUnlimitedDate={sortBy === SortOption.UnlimitedDate}
+				showUnlimitedDate={filter.sortBy === SortOption.UnlimitedDate}
 			/>
 		</li>
 	{:else}
-		<li>Nothing to show!</li>
+		<li class="not-found">Nothing to show! Try clearing the filters?</li>
 	{/each}
 </ComicGrid>
 <PageLinks year={data.year} />
@@ -249,5 +243,9 @@
 
 	.reset {
 		margin-left: var(--size-2);
+	}
+
+	.not-found {
+		grid-column: 1 / -1;
 	}
 </style>

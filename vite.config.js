@@ -3,7 +3,11 @@ import fs from 'fs';
 
 /** @type {import('vite').UserConfig} */
 const config = {
-	plugins: [sveltekit(), rawFonts(['.ttf'])]
+	plugins: [sveltekit(), rawFonts(['.ttf'])],
+	ssr: {
+		// due to https://github.com/airjp73/remix-validated-form/issues/230
+		noExternal: ['zod-form-data']
+	}
 };
 
 function rawFonts(ext) {

@@ -1,47 +1,37 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
 	import { Plus, Minus } from '$lib/icons';
 	import IconButton from './IconButton.svelte';
 
-	export let items: Set<string>;
+	/** Mapping of IDs (included in the set) with text values */
+	export let items: Record<number, string>;
 	export let legend: string;
+	export let name: string;
 
-	export let included: Writable<Set<string>>;
+	export let included: Set<number>;
 
 	let showItems = true;
 
-	$: sortedItems = [...items].sort();
+	$: isFiltered = included.size > 0;
+	$: sortedItems = Object.entries(items).sort((a, b) => (a[1] > b[1] ? 1 : -1));
 
 	function uncheckAll() {
-		$included.clear();
-		$included = $included;
-	}
-
-	function checkAll() {
-		$included = new Set(items);
+		included.clear();
+		included = included;
 	}
 
 	function updateShowItems() {
 		showItems = !showItems;
 	}
-
-	function handleChange({ target }) {
-		if (target.checked) {
-			$included.add(target.value);
-		} else {
-			$included.delete(target.value);
-		}
-
-		$included = $included;
-	}
 </script>
 
-{#if items.size > 1}
+{#if sortedItems.length > 1}
 	<fieldset>
-		<legend>{legend} {$included.size} / {items.size}</legend>
+		<legend
+			>{legend}
+			{#if isFiltered}({included.size} selected){/if}</legend
+		>
 		<div class="buttons">
-			<button on:click={checkAll}>Check all</button>
-			<button on:click={uncheckAll}>Uncheck all</button>
+			<button on:click={uncheckAll} class:hidden={!isFiltered}>Show all</button>
 			<IconButton size="1.5rem" altText={showItems ? 'Hide' : 'Show'} on:click={updateShowItems}>
 				{#if showItems}
 					<Minus />
@@ -51,10 +41,10 @@
 			</IconButton>
 		</div>
 		{#if showItems}
-			{#each sortedItems as i (i)}
+			{#each sortedItems as [id, title] (id)}
 				<label
-					><input on:change={handleChange} type="checkbox" checked={$included.has(i)} value={i} />
-					{i}</label
+					><input type="checkbox" checked={included.has(Number(id))} value={id} {name} />
+					{title}</label
 				>
 			{/each}
 		{/if}
@@ -91,5 +81,9 @@
 
 	button {
 		padding-inline: var(--size-2);
+	}
+
+	button.hidden {
+		opacity: 0.5;
 	}
 </style>

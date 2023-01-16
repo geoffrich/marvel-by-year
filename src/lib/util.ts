@@ -1,3 +1,5 @@
+import type { Comic } from './types';
+
 export function dedupe<Item>(arr: Item[], getId: (arg: Item) => any): Item[] {
 	const deduped = arr.filter((c, idx) => {
 		const matchingIdIndex = arr.findIndex((c2) => getId(c) === getId(c2));
@@ -27,4 +29,14 @@ export function promiseTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
 
 	// Returns a race between our timeout and the passed in promise
 	return Promise.race([promise, timeout]);
+}
+
+export function toMapping(
+	comics: Comic[],
+	mapping: (c: Comic) => { id: number; name: string } | { id: number; name: string }[]
+): Record<number, string> {
+	return comics.flatMap(mapping).reduce<Record<number, string>>((acc, cur) => {
+		acc[cur.id] = cur.name;
+		return acc;
+	}, {});
 }

@@ -3,6 +3,13 @@
 	import { navigating, page } from '$app/stores';
 	import 'focus-visible'; // polyfill :focus-visible for Safari
 	import '../global.css';
+	import { browser } from '$app/environment';
+
+	if (browser) {
+		// polyfill .requestSubmit for Safari < 16
+		// accesses HTMLFormElement so needs to be only run in browser
+		import('form-request-submit-polyfill');
+	}
 
 	$: title = $page.data.title;
 </script>

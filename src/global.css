@@ -110,3 +110,11 @@ select {
 	display: grid;
 	gap: var(--size-4);
 }
+
+body.has-js .no-js-only {
+	display: none;
+}
+
+body.no-js .js-only {
+	display: none;
+}
