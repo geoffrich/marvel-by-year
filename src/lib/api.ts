@@ -128,6 +128,7 @@ export default class MarvelApi {
 
 function getComicsSearchParams(year: number, offset: number, limit: number) {
 	return {
+		format: 'comic',
 		formatType: 'comic',
 		noVariants: 'true',
 		dateRange: `${year}-01-01,${year}-12-31`,
