@@ -38,7 +38,7 @@ async function getComics({ params, setHeaders, url }: RequestEvent) {
 	const api = new MarvelApi(redis, url.origin, ignoreCache);
 
 	console.log(`Getting comics for ${year}`);
-	let totalComics = await api.getTotalComics(year);
+	let { total: totalComics, fallbackUsed } = await api.getTotalComics(year);
 	console.log(`Total comics: ${totalComics}`);
 	if (totalComics === -1) {
 		console.log(`unable to fetch total comics for ${year}`);
@@ -73,7 +73,8 @@ async function getComics({ params, setHeaders, url }: RequestEvent) {
 
 		return {
 			response,
-			year
+			year,
+			fallbackUsed
 		};
 	}
 
