@@ -129,6 +129,11 @@
 </script>
 
 <h1>{$page.data.title || `Comics for ${data.year}`}</h1>
+{#if data.fallbackUsed}
+	<div class="fallback-banner">
+		The Marvel API is down, so this page is using cached data. The data may be outdated.
+	</div>
+{/if}
 <PageLinks year={data.year} />
 
 <p>
@@ -210,6 +215,13 @@
 {/if}
 
 <style>
+	.fallback-banner {
+		background-color: var(--red-3);
+		padding: var(--size-2);
+		width: 100%;
+		border-radius: var(--radius-2);
+		font-size: var(--font-size-1);
+	}
 	.filters {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(15.625rem, 1fr));

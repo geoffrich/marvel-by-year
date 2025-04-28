@@ -79,11 +79,11 @@ export default class MarvelApi {
 		return parsedResult;
 	}
 
-	async getTotalComics(year: number): Promise<number> {
+	async getTotalComics(year: number): Promise<{ total: number; fallbackUsed?: boolean }> {
 		const key = `year:${year}:total`;
 		const val = await this.redis.get<number>(key, parseInt);
 		if (val && !this.ignoreCache) {
-			return val;
+			return { total: val };
 		}
 
 		const result = await this.callMarvelApi(COMICS_ENDPOINT, getComicsSearchParams(year, 0, 1));
@@ -92,19 +92,19 @@ export default class MarvelApi {
 		if (parsedResult.code === 200) {
 			const { total } = parsedResult.data;
 			await this.redis.set(key, total);
-			return total;
+			return { total };
 		}
 
 		try {
 			console.log(`Marvel API failed with ${parsedResult.code}, falling back to cached data`);
 			// the total comics count expires, so this is a workaround by counting how many pages of cached data we have for that year
 			const numPages = await this.redis.getCountOfKeysForYear(year);
-			return numPages * 100;
+			return { total: numPages * 100, fallbackUsed: true };
 		} catch (e) {
 			console.log('unable to fallback to redis keys', e);
 		}
 
-		return -1;
+		return { total: -1 };
 	}
 
 	async getRandomComics(
