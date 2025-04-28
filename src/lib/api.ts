@@ -88,7 +88,6 @@ export default class MarvelApi {
 
 		const result = await this.callMarvelApi(COMICS_ENDPOINT, getComicsSearchParams(year, 0, 1));
 		const parsedResult: ComicDataWrapper = await result.json();
-		console.log({ parsedResult });
 
 		if (parsedResult.code === 200) {
 			const { total } = parsedResult.data;
@@ -97,7 +96,7 @@ export default class MarvelApi {
 		}
 
 		try {
-			console.log('Marvel API failed, falling back to cached data');
+			console.log(`Marvel API failed with ${parsedResult.code}, falling back to cached data`);
 			// the total comics count expires, so this is a workaround by counting how many pages of cached data we have for that year
 			const numPages = await this.redis.getCountOfKeysForYear(year);
 			return numPages * 100;
