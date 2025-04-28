@@ -237,6 +237,20 @@ export default class RedisClient {
 		return await this.getRandomComicsFromIds(ids);
 	}
 
+	async getCountOfKeysForYear(year: number) {
+		const pattern = `year:${year}:*:c`;
+		let cursor = '0';
+		let count = 0;
+
+		do {
+			const [newCursor, keys] = await this.redis.scan(cursor, 'MATCH', pattern);
+			cursor = newCursor;
+			count += keys.length;
+		} while (cursor !== '0');
+
+		return count;
+	}
+
 	async quit() {
 		if (this.closed) return;
 		await this.redis.quit();
